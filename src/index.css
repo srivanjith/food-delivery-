@@ -1,0 +1,67 @@
+@import "tailwindcss";
+
+@layer base {
+  body {
+    @apply bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100 transition-colors duration-300;
+  }
+}
+
+/* Glassmorphism helpers */
+.glass-effect {
+  @apply backdrop-blur-md bg-white/75 dark:bg-slate-900/75 border border-white/20 dark:border-slate-800/50 shadow-lg;
+}
+
+.glass-card {
+  @apply backdrop-blur-sm bg-white/40 dark:bg-slate-900/40 border border-white/10 dark:border-slate-800/30 rounded-2xl shadow-md transition-all duration-300;
+}
+
+.glass-card-hover {
+  @apply hover:bg-white/60 dark:hover:bg-slate-900/60 hover:border-white/20 dark:hover:border-slate-800/50 hover:shadow-xl hover:-translate-y-1;
+}
+
+/* Premium gradient backgrounds */
+.hero-gradient {
+  background: radial-gradient(circle at 10% 20%, rgba(16, 185, 129, 0.08) 0%, rgba(52, 211, 153, 0.03) 90%);
+}
+
+.dark .hero-gradient {
+  background: radial-gradient(circle at 10% 20%, rgba(2, 44, 34, 0.4) 0%, rgba(15, 23, 42, 0.1) 90%);
+}
+
+.green-gradient-text {
+  @apply bg-gradient-to-r from-emerald-600 to-teal-500 bg-clip-text text-transparent dark:from-emerald-400 dark:to-teal-300;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-slate-100 dark:bg-slate-900 rounded-full;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-slate-300 dark:bg-slate-700 hover:bg-emerald-500 dark:hover:bg-emerald-400 rounded-full transition-colors duration-200;
+}
+
+/* Leaf Animation for Growing Tree in dashboard */
+@keyframes sway {
+  0%, 100% { transform: rotate(0deg); }
+  50% { transform: rotate(5deg); }
+}
+
+.animate-sway {
+  animation: sway 4s ease-in-out infinite;
+}
+
+/* Clean Custom Form Inputs */
+.form-input {
+  @apply w-full px-4 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:focus:ring-emerald-400 focus:border-transparent transition-all duration-200;
+}
+
+/* Skeleton Loading Animation */
+.skeleton {
+  @apply animate-pulse bg-slate-200 dark:bg-slate-800 rounded-xl;
+}
