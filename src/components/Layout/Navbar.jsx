@@ -22,10 +22,6 @@ export default function Navbar() {
 
   const isActive = (path) => location.pathname === path;
 
-  const navLinks = [
-    { name: 'Home', path: '/' },
-    { name: 'Restaurants', path: '/' } // Home contains the filterable restaurants
-  ];
 
   return (
     <nav className="sticky top-0 z-40 w-full glass-effect transition-all duration-300">
@@ -97,14 +93,6 @@ export default function Navbar() {
             {/* Auth Buttons */}
             {user ? (
               <div className="flex items-center space-x-3">
-                {user.role === 'customer' && (
-                  <div className="flex flex-col items-end text-xs">
-                    <span className="font-semibold text-slate-800 dark:text-slate-200">{user.name.split(' ')[0]}</span>
-                    <span className="text-emerald-600 dark:text-emerald-400 font-bold font-sans">
-                      🌱 {user.ecoPoints} pts
-                    </span>
-                  </div>
-                )}
                 <Link to={user.role === 'admin' ? '/admin' : '/dashboard'}>
                   <img
                     src={user.avatar || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80'}

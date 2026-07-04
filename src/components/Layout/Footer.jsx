@@ -1,20 +1,9 @@
 import React from 'react';
-import { useApp } from '../../context/AppContext';
 import { Leaf, Heart, Globe, Footprints } from 'lucide-react';
 
 export default function Footer() {
-  const { platformCarbonSaved, platformTreesPlanted } = useApp();
-
-  // Format carbon metrics
-  const formatCarbon = (g) => {
-    if (g >= 1000000) {
-      return `${(g / 1000000).toFixed(2)} metric tons`;
-    }
-    return `${(g / 1000).toLocaleString()} kg`;
-  };
-
   return (
-    <footer className="bg-slate-900 text-slate-400 dark:bg-slate-950 border-t border-slate-800 font-sans">
+    <footer className="bg-slate-900 text-slate-400 dark:bg-slate-955 border-t border-slate-800 font-sans">
       {/* Community Impact Banner */}
       <div className="bg-gradient-to-r from-emerald-900 to-teal-900 text-white py-6 px-4">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between text-center md:text-left gap-4">
@@ -24,22 +13,22 @@ export default function Footer() {
             </div>
             <div>
               <h4 className="font-bold text-base md:text-lg">Our Community's Green Footprint</h4>
-              <p className="text-emerald-200 text-xs md:text-sm">Every meal ordered helps heal the planet.</p>
+              <p className="text-emerald-205 text-xs md:text-sm">Every meal ordered helps heal the planet.</p>
             </div>
           </div>
           <div className="flex flex-wrap justify-center gap-6 md:gap-10">
             <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl px-4 py-2 text-center min-w-[120px]">
               <div className="text-emerald-400 font-extrabold text-lg md:text-xl flex items-center justify-center">
                 <Footprints className="w-4.5 h-4.5 mr-1" />
-                {formatCarbon(platformCarbonSaved)}
+                42,822
               </div>
-              <div className="text-[10px] uppercase font-bold tracking-wider text-emerald-200">CO₂ Saved</div>
+              <div className="text-[10px] uppercase font-bold tracking-wider text-emerald-200">Green Deliveries</div>
             </div>
             <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl px-4 py-2 text-center min-w-[120px]">
               <div className="text-teal-400 font-extrabold text-lg md:text-xl flex items-center justify-center">
-                🌱 {platformTreesPlanted.toLocaleString()}
+                🌱 1,284,530
               </div>
-              <div className="text-[10px] uppercase font-bold tracking-wider text-teal-200">Trees Planted</div>
+              <div className="text-[10px] uppercase font-bold tracking-wider text-teal-200">Points Rewarded</div>
             </div>
           </div>
         </div>
@@ -56,7 +45,7 @@ export default function Footer() {
               <span className="text-lg font-bold text-white tracking-tight">EcoEats</span>
             </div>
             <p className="text-sm text-slate-400 leading-relaxed">
-              Pioneering sustainable, zero-waste food delivery. Partnering exclusively with local eco-certified kitchens and organic growers.
+              Pioneering sustainable, low-emission food delivery. Partnering exclusively with local eco-certified kitchens and organic growers.
             </p>
           </div>
 
@@ -66,7 +55,7 @@ export default function Footer() {
             <ul className="space-y-2 text-sm">
               <li><a href="#/" className="hover:text-emerald-400 transition-colors">100% Organic Farms</a></li>
               <li><a href="#/" className="hover:text-emerald-400 transition-colors">Zero-Waste Kitchen Standards</a></li>
-              <li><a href="#/" className="hover:text-emerald-400 transition-colors">Surplus Food Rescue Program</a></li>
+              <li><a href="#/" className="hover:text-emerald-400 transition-colors">Self-Pickup Rewards</a></li>
               <li><a href="#/" className="hover:text-emerald-400 transition-colors">Eco-Packaging Materials</a></li>
             </ul>
           </div>
@@ -78,7 +67,7 @@ export default function Footer() {
               <li><a href="#/" className="hover:text-emerald-400 transition-colors">Bicycle Couriers</a></li>
               <li><a href="#/" className="hover:text-emerald-400 transition-colors">Electric Vehicles</a></li>
               <li><a href="#/" className="hover:text-emerald-400 transition-colors">Solar Drone Delivery</a></li>
-              <li><a href="#/" className="hover:text-emerald-400 transition-colors">Carbon Offset Operations</a></li>
+              <li><a href="#/" className="hover:text-emerald-400 transition-colors">Low Emission Routing</a></li>
             </ul>
           </div>
 

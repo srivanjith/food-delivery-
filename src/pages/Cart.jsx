@@ -24,9 +24,9 @@ export default function Cart() {
     return (
       <div className="min-h-[75vh] flex flex-col items-center justify-center font-sans text-center px-4">
         <span className="text-6xl animate-bounce-slow">🍃</span>
-        <h2 className="text-2xl font-black text-slate-800 dark:text-white mt-4">Your Sustainable Cart is Empty</h2>
+        <h2 className="text-2xl font-black text-slate-800 dark:text-white mt-4">Your Shopping Cart is Empty</h2>
         <p className="text-sm text-slate-500 mt-2 max-w-sm">
-          Browse our organic and zero-waste menus to order meals with tracked carbon footprint statistics.
+          Browse our organic and local menus to order delicious meals and earn eco points!
         </p>
         <Link
           to="/"
@@ -174,7 +174,7 @@ export default function Cart() {
               {/* Trust Callout */}
               <div className="mt-4 flex items-center justify-center text-[10px] font-bold text-slate-400 dark:text-slate-500">
                 <ShieldCheck className="w-3.5 h-3.5 mr-1 text-emerald-500" />
-                Carbon-Neutral Checkout Guarantee
+                Eco-Friendly Checkout Guarantee
               </div>
             </div>
           </div>

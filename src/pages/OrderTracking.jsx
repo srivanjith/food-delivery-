@@ -1,9 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
-import ProgressBar from '../components/Common/ProgressBar';
-import EcoBadge from '../components/Common/EcoBadge';
-import { CheckCircle2, Navigation, Clock, ShieldAlert, Sparkles, Map, RefreshCw } from 'lucide-react';
+import { CheckCircle2, Navigation, Clock, Sparkles, Map, RefreshCw } from 'lucide-react';
 
 export default function OrderTracking() {
   const { id } = useParams();
@@ -14,18 +12,51 @@ export default function OrderTracking() {
   // Simulation steps
   const statusSteps = ['Order Received', 'Preparing', 'Out for Delivery', 'Delivered'];
   
-  // Custom mock map animation state (progress along delivery route: 0 to 100)
-  const [mapProgress, setMapProgress] = useState(15);
-  
+  // Custom mock map animation states
+  const [liveProgress, setLiveProgress] = useState(10);
+  const [coords, setCoords] = useState({ x: 120, y: 80 });
+
   useEffect(() => {
     if (!order) return;
 
-    // Set initial map progress based on order status
-    if (order.status === 'Order Received') setMapProgress(10);
-    else if (order.status === 'Preparing') setMapProgress(35);
-    else if (order.status === 'Out for Delivery') setMapProgress(70);
-    else if (order.status === 'Delivered') setMapProgress(100);
-  }, [order]);
+    let startVal = 10;
+    let endVal = 10;
+    if (order.status === 'Order Received') { startVal = 8; endVal = 15; }
+    else if (order.status === 'Preparing') { startVal = 20; endVal = 45; }
+    else if (order.status === 'Out for Delivery') { startVal = 50; endVal = 95; }
+    else if (order.status === 'Delivered') { startVal = 100; endVal = 100; }
+
+    setLiveProgress(startVal);
+
+    if (order.status === 'Delivered') return;
+
+    const interval = setInterval(() => {
+      setLiveProgress(prev => {
+        const step = 0.5;
+        const next = prev + step;
+        return next > endVal ? startVal : next;
+      });
+    }, 50);
+
+    return () => clearInterval(interval);
+  }, [order?.status, order]);
+
+  useEffect(() => {
+    const t = liveProgress / 100;
+    if (t <= 0.5) {
+      const lt = t * 2;
+      const mt = 1 - lt;
+      const x = mt * mt * 120 + 2 * mt * lt * 250 + lt * lt * 380;
+      const y = mt * mt * 80 + 2 * mt * lt * 160 + lt * lt * 70;
+      setCoords({ x, y });
+    } else {
+      const lt = (t - 0.5) * 2;
+      const mt = 1 - lt;
+      const x = mt * mt * 380 + 2 * mt * lt * 510 + lt * lt * 640;
+      const y = mt * mt * 70 + 2 * mt * lt * (-20) + lt * lt * 180;
+      setCoords({ x, y });
+    }
+  }, [liveProgress]);
 
   // Simulate progress manually or via timer
   const handleSimulateStep = () => {
@@ -35,18 +66,12 @@ export default function OrderTracking() {
     if (currentIndex < statusSteps.length - 1) {
       const nextStatus = statusSteps[currentIndex + 1];
       updateOrderStatus(order.id, nextStatus);
-      
-      // Update map tracking progress
-      if (nextStatus === 'Preparing') setMapProgress(35);
-      if (nextStatus === 'Out for Delivery') setMapProgress(70);
-      if (nextStatus === 'Delivered') setMapProgress(100);
     }
   };
 
   const resetSimulation = () => {
     if (!order) return;
     updateOrderStatus(order.id, 'Order Received');
-    setMapProgress(10);
   };
 
   if (!order) {
@@ -128,11 +153,18 @@ export default function OrderTracking() {
               {/* Graphical timeline */}
               <div className="grid grid-cols-4 gap-2 relative mb-8">
                 {/* Horizontal progress bar */}
-                <div className="absolute top-4 left-[12%] right-[12%] h-1 bg-slate-100 dark:bg-slate-800 rounded z-0">
+                <div className="absolute top-4 left-[12%] right-[12%] h-1 bg-slate-100 dark:bg-slate-800 rounded z-0 flex items-center">
                   <div
-                    className="h-full bg-emerald-500 rounded transition-all duration-1000 ease-out"
+                    className="h-full bg-emerald-500 rounded transition-all duration-1000 ease-out relative"
                     style={{ width: `${(currentStepIndex / 3) * 100}%` }}
-                  />
+                  >
+                    {/* Tiny moving vehicle on upper line */}
+                    <div 
+                      className="absolute -right-3.5 -top-3 bg-emerald-600 dark:bg-emerald-500 text-white rounded-full p-1 shadow-md border border-white dark:border-slate-800 text-[10px] transition-all duration-500 animate-pulse"
+                    >
+                      {deliveryIcon}
+                    </div>
+                  </div>
                 </div>
 
                 {statusSteps.map((step, index) => {
@@ -233,11 +265,10 @@ export default function OrderTracking() {
 
                 {/* Animated Courier Courier Moving marker */}
                 <div
-                  className="absolute z-20 -translate-x-1/2 -translate-y-1/2 transition-all duration-700 ease-out"
+                  className="absolute z-20 -translate-x-1/2 -translate-y-1/2 transition-all duration-300 ease-out"
                   style={{
-                    // Approximate path positioning using linear interpolation
-                    left: `${120 + (640 - 120) * (mapProgress / 100)}px`,
-                    top: `${80 + (180 - 80) * (mapProgress / 100) + Math.sin((mapProgress / 100) * Math.PI) * 40}px`
+                    left: `${coords.x}px`,
+                    top: `${coords.y}px`
                   }}
                 >
                   <div className="h-10 w-10 bg-slate-900 dark:bg-slate-800 text-xl border-2 border-emerald-400 rounded-full flex items-center justify-center shadow-2xl animate-bounce-slow">
@@ -246,7 +277,7 @@ export default function OrderTracking() {
                 </div>
 
                 <div className="absolute bottom-3 left-4 text-[10px] text-slate-400 dark:text-slate-500 font-bold bg-white/80 dark:bg-slate-900/80 px-2 py-0.5 rounded">
-                  EV Fleet Carbon Factor: 20g/km
+                  Eco-Friendly Logistics Route
                 </div>
               </div>
             </div>
@@ -285,19 +316,16 @@ export default function OrderTracking() {
                 </div>
               </div>
 
-              {/* Reforestation summary badge */}
+              {/* Green Logistics Status */}
               <div className="border border-dashed border-slate-205 dark:border-slate-800 rounded-2xl p-4 space-y-2">
-                <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Environmental Impact</h4>
-                <div className="flex flex-wrap gap-1.5">
-                  <EcoBadge type="carbon" value={order.carbonFootprint} />
-                  <EcoBadge type="saving" value={order.carbonSaved} />
+                <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Green Logistics Status</h4>
+                <div className="flex items-center text-[10px] font-extrabold text-emerald-605 dark:text-emerald-400">
+                  <Sparkles className="w-3.5 h-3.5 mr-1" />
+                  Eco Logistics Active
                 </div>
-                {order.treesPlanted > 0 && (
-                  <div className="flex items-center text-[10px] font-extrabold text-emerald-600 dark:text-emerald-400 pt-1">
-                    <Sparkles className="w-3.5 h-3.5 mr-1" />
-                    Planted {order.treesPlanted} real sapling!
-                  </div>
-                )}
+                <p className="text-[10px] text-slate-500 dark:text-slate-400 leading-normal">
+                  This order uses sustainable packaging and low-emission courier logistics to ensure a minimal footprint.
+                </p>
               </div>
 
               <Link

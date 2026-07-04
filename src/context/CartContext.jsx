@@ -85,66 +85,33 @@ export const CartProvider = ({ children }) => {
   const deliveryCharges = {
     bicycle: 20, // Cheap and eco-friendly
     ev: 35,
-    drone: 60 // Premium tech delivery
+    drone: 60, // Premium tech delivery
+    pickup: 0 // Self-pickup is free
   };
-  const deliveryCharge = cartItems.length > 0 ? deliveryCharges[deliveryMethod] : 0;
+  const deliveryCharge = cartItems.length > 0 ? (deliveryCharges[deliveryMethod] ?? 0) : 0;
 
   const gst = Math.round((subtotal + packagingCharge) * 0.05); // 5% GST
   const offsetFee = offsetCarbon && cartItems.length > 0 ? 10 : 0; // ₹10 carbon offset donation
   const grandTotal = subtotal + packagingCharge + deliveryCharge + gst + offsetFee;
 
-  // Carbon Impact Calculations
-  const foodCarbonFootprint = cartItems.reduce(
-    (acc, item) => acc + (item.carbonFootprint || 150) * item.quantity,
-    0
-  );
-
-  // Carbon offsets based on packaging and delivery methods
-  // Standard packaging (plastic/styrofoam) is estimated to emit 80g per meal. Compostable is 20g, seaweed 5g, reusable is 0g (after first use)
-  const standardPackagingEmissions = cartItems.reduce((acc, item) => acc + 80 * item.quantity, 0);
-  const selectedPackagingEmissions = {
-    compostable: cartItems.reduce((acc, item) => acc + 20 * item.quantity, 0),
-    seaweed: cartItems.reduce((acc, item) => acc + 5 * item.quantity, 0),
-    reusable: 0
-  }[packagingChoice];
-
-  // Standard delivery (petrol bike) emits around 150g CO2 per km.
-  // Delivery distance average: 2.5km (375g CO2)
   const averageDistance = cartItems.length > 0 ? cartItems[0].distance || 2.5 : 0;
-  const standardDeliveryEmissions = Math.round(averageDistance * 150);
-  
-  const selectedDeliveryEmissions = {
-    bicycle: 0,
-    ev: Math.round(averageDistance * 20), // EV grid electricity emissions
-    drone: Math.round(averageDistance * 10) // Drone electrical efficiency
-  }[deliveryMethod];
-
-  const totalCarbonFootprint = foodCarbonFootprint + selectedPackagingEmissions + selectedDeliveryEmissions;
-
-  // Let's calculate the savings!
-  // Baseline: Standard restaurant meal (meat heavy, ~400g CO2 average per dish) + plastic packing (80g) + petrol delivery (150g/km)
-  const baselineFoodEmissions = cartItems.reduce((acc, item) => {
-    // If it's steak it has high baseline, but standard meals average 450g. We save by choosing vegetarian/vegan or sustainable alternatives.
-    const baseline = item.name.toLowerCase().includes('steak') ? 1200 : 450;
-    return acc + baseline * item.quantity;
-  }, 0);
-  
-  const baselineTotal = baselineFoodEmissions + standardPackagingEmissions + standardDeliveryEmissions;
-  const carbonSaved = cartItems.length > 0 ? Math.max(0, baselineTotal - totalCarbonFootprint) : 0;
 
   // Points earned for this order
-  // 1 point per ₹10 spent + 20 points for Bicycle, 10 for EV, 30 for seaweed, 50 for reusable, 15 for surplus items
+  // 1 point per ₹10 spent + 20 points for Bicycle, 10 for EV, 40 for self-pickup, 30 for seaweed, 50 for reusable
+  // Additional points:
+  // - Distance points: Closer is higher points, farther is lower points (Max of 5, or round(50 - distance * 10))
   const calculateEcoPointsEarned = () => {
     if (cartItems.length === 0) return 0;
     let points = Math.floor(subtotal / 10);
     if (deliveryMethod === 'bicycle') points += 20;
     if (deliveryMethod === 'ev') points += 10;
+    if (deliveryMethod === 'pickup') points += 40; // Self-pickup bonus
     if (packagingChoice === 'seaweed') points += 30;
     if (packagingChoice === 'reusable') points += 50;
     
-    // Check if contains surplus
-    const hasSurplus = cartItems.some(item => item.id.startsWith('deal-'));
-    if (hasSurplus) points += 25;
+    // Check distance-based eco points
+    const distancePoints = Math.max(5, Math.round(50 - (averageDistance * 10)));
+    points += distancePoints;
 
     return points;
   };
@@ -171,8 +138,6 @@ export const CartProvider = ({ children }) => {
         gst,
         offsetFee,
         grandTotal,
-        totalCarbonFootprint,
-        carbonSaved,
         ecoPointsEarned
       }}
     >

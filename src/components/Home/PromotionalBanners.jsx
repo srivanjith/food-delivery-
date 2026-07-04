@@ -1,17 +1,17 @@
 import React from 'react';
-import { Flame, Trees, RefreshCw, ChevronRight } from 'lucide-react';
+import { MapPin, Award, RefreshCw, ChevronRight } from 'lucide-react';
 
 export default function PromotionalBanners({ onSelectCategory }) {
   const promotions = [
     {
       id: 'promo-1',
-      title: 'Surplus Food Rescue',
-      description: 'Local bakeries and cafes sell delicious, unsold fresh food at 60% off daily. Prevent commercial food waste!',
-      buttonText: 'Rescue Food',
-      icon: <Flame className="w-6 h-6 text-amber-500" />,
+      title: 'Self-Pickup Bonus',
+      description: 'Opt to collect your order yourself and enjoy ₹0 delivery fees plus +40 bonus Eco Points immediately!',
+      buttonText: 'Explore Kitchens',
+      icon: <MapPin className="w-6 h-6 text-amber-500" />,
       color: 'from-amber-500/10 to-amber-600/5 border-amber-500/20 dark:border-amber-900/30 text-amber-900 dark:text-amber-300',
       btnColor: 'bg-amber-500 hover:bg-amber-600 shadow-amber-500/10',
-      category: 'Surplus Rescue'
+      category: 'All'
     },
     {
       id: 'promo-2',
@@ -25,18 +25,18 @@ export default function PromotionalBanners({ onSelectCategory }) {
     },
     {
       id: 'promo-3',
-      title: 'Plant a Real Tree',
-      description: 'Round up your order total at checkout to donate. Watch your tree grow in your private dashboard forest.',
-      buttonText: 'Grow Forest',
-      icon: <Trees className="w-6 h-6 text-emerald-500 animate-sway" />,
+      title: 'Points to Discounts',
+      description: 'Accumulate points with every sustainable meal. Deduct points at checkout for direct discounts (10 pts = ₹1 discount).',
+      buttonText: 'Check Tiers',
+      icon: <Award className="w-6 h-6 text-emerald-500" />,
       color: 'from-emerald-500/10 to-emerald-600/5 border-emerald-500/20 dark:border-emerald-900/30 text-emerald-900 dark:text-emerald-300',
       btnColor: 'bg-emerald-500 hover:bg-emerald-600 shadow-emerald-500/10',
-      category: 'Organic'
+      category: 'All'
     }
   ];
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 font-sans">
+    <div className="max-w-7xl mx-auto px-4 py-4 font-sans">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {promotions.map((promo) => (
           <div
@@ -50,7 +50,7 @@ export default function PromotionalBanners({ onSelectCategory }) {
               <h4 className="text-lg font-bold text-slate-800 dark:text-white mt-2">
                 {promo.title}
               </h4>
-              <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+              <p className="text-xs text-slate-505 dark:text-slate-400 leading-relaxed">
                 {promo.description}
               </p>
             </div>

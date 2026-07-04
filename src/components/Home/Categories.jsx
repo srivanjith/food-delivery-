@@ -1,5 +1,5 @@
 import React from 'react';
-import { Compass, Leaf, Sparkles, Trash2, Flame, MapPin } from 'lucide-react';
+import { Compass, Leaf, Sparkles, Trash2, MapPin } from 'lucide-react';
 
 export default function Categories({ selectedCategory, onSelectCategory }) {
   const categoriesList = [
@@ -7,7 +7,6 @@ export default function Categories({ selectedCategory, onSelectCategory }) {
     { name: 'Vegan', icon: <Leaf className="w-4 h-4" /> },
     { name: 'Organic', icon: <Sparkles className="w-4 h-4" /> },
     { name: 'Zero Waste', icon: <Trash2 className="w-4 h-4" /> },
-    { name: 'Surplus Rescue', icon: <Flame className="w-4 h-4" /> },
     { name: 'Locally Sourced', icon: <MapPin className="w-4 h-4" /> }
   ];
 

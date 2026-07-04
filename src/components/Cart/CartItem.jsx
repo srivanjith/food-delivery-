@@ -19,9 +19,6 @@ export default function CartItem({ item }) {
           <h4 className="text-sm font-bold text-slate-800 dark:text-slate-100 truncate">
             {item.name}
           </h4>
-          <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold block mt-0.5">
-            🌱 {item.carbonFootprint}g CO₂e
-          </span>
           <span className="text-xs text-slate-500 font-bold block mt-0.5 md:hidden">
             ₹{item.price}
           </span>

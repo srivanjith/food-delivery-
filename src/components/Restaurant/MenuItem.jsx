@@ -1,6 +1,5 @@
 import React from 'react';
 import { useCart } from '../../context/CartContext';
-import EcoBadge from '../Common/EcoBadge';
 import { ShoppingCart, Leaf, Star, Sparkles, Plus, Minus } from 'lucide-react';
 
 export default function MenuItem({ item }) {
@@ -54,11 +53,6 @@ export default function MenuItem({ item }) {
                 )}
               </h4>
               <div className="flex flex-wrap gap-1.5 mt-2">
-                {/* Eco Score badge */}
-                <EcoBadge type="score" value={item.ecoScore} />
-                {/* Carbon footprint */}
-                <EcoBadge type="carbon" value={item.carbonFootprint} />
-                
                 {/* Organic / Local tags */}
                 {item.organic && <span className="text-[9px] font-bold bg-amber-50 text-amber-800 dark:bg-amber-950 dark:text-amber-300 px-2 py-0.5 rounded">Organic</span>}
                 {item.localSourced && <span className="text-[9px] font-bold bg-blue-50 text-blue-800 dark:bg-blue-950 dark:text-blue-300 px-2 py-0.5 rounded">Local</span>}

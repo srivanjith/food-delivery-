@@ -3,12 +3,11 @@ import { useApp } from '../context/AppContext';
 import Hero from '../components/Home/Hero';
 import Categories from '../components/Home/Categories';
 import PromotionalBanners from '../components/Home/PromotionalBanners';
-import SurplusRescue from '../components/Home/SurplusRescue';
 import RestaurantCard from '../components/Restaurant/RestaurantCard';
 import { Sparkles, HelpCircle } from 'lucide-react';
 
 export default function Home() {
-  const { restaurants, surplusDeals } = useApp();
+  const { restaurants } = useApp();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
 
@@ -39,15 +38,10 @@ export default function Home() {
       {/* Sustainable Categories Filter */}
       <Categories selectedCategory={selectedCategory} onSelectCategory={setSelectedCategory} />
 
-      {/* Surplus Food Rescue Section (Only render if selected category is 'All' or 'Surplus Rescue') */}
-      {(selectedCategory === 'All' || selectedCategory === 'Surplus Rescue') && (
-        <SurplusRescue deals={surplusDeals} />
-      )}
-
       {/* Restaurant Listings Section */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <div className="flex items-center space-x-2 mb-6">
-          <span className="p-2 bg-emerald-100 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-455 rounded-xl">
+          <span className="p-2 bg-emerald-105 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-455 rounded-xl">
             <Sparkles className="w-5 h-5" />
           </span>
           <div>
@@ -55,7 +49,7 @@ export default function Home() {
               {selectedCategory === 'All' ? 'Eco-Certified Restaurants' : `${selectedCategory} Kitchens`}
             </h2>
             <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-              Eco-Score A to E. Verified carbon offsets and plastic-free logistics.
+              Earn loyalty eco points on every order. Save on future purchases with our points system!
             </p>
           </div>
         </div>

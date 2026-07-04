@@ -1,6 +1,5 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import EcoBadge from '../Common/EcoBadge';
 import { Star, Clock, MapPin, Award } from 'lucide-react';
 
 export default function RestaurantCard({ restaurant }) {
@@ -16,16 +15,6 @@ export default function RestaurantCard({ restaurant }) {
           alt={restaurant.name}
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-505"
         />
-        
-        {/* Eco Score absolute positioning */}
-        <div className="absolute top-4 left-4">
-          <EcoBadge type="score" value={restaurant.ecoScore} />
-        </div>
-
-        {/* Avg footprint absolute positioning */}
-        <div className="absolute bottom-4 right-4 bg-slate-900/70 backdrop-blur-sm text-white text-[10px] font-bold px-2.5 py-1 rounded-lg">
-          🌱 Avg {restaurant.carbonFootprintAvg}g CO₂e
-        </div>
       </div>
 
       {/* Restaurant Info */}

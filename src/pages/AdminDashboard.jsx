@@ -2,10 +2,9 @@ import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useApp } from '../context/AppContext';
 import { Link } from 'react-router-dom';
-import EcoBadge from '../components/Common/EcoBadge';
 import Modal from '../components/Common/Modal';
 import Alert from '../components/Common/Alert';
-import { ShieldAlert, BarChart3, Plus, Edit, Trash2, CheckCircle2, ChevronRight, Users, Utensils, ClipboardList, Store } from 'lucide-react';
+import { ShieldAlert, BarChart3, Plus, Edit, Trash2, Users, Utensils, ClipboardList, Store } from 'lucide-react';
 
 export default function AdminDashboard() {
   const { user } = useAuth();
@@ -34,8 +33,6 @@ export default function AdminDashboard() {
   const [restFormName, setRestFormName] = useState('');
   const [restFormImage, setRestFormImage] = useState('');
   const [restFormLocation, setRestFormLocation] = useState('');
-  const [restFormEcoScore, setRestFormEcoScore] = useState('A');
-  const [restFormFootprint, setRestFormFootprint] = useState(150);
   const [restFormDesc, setRestFormDesc] = useState('');
   const [restFormCerts, setRestFormCerts] = useState('Plastic Free, Local Ingredients');
 
@@ -46,8 +43,6 @@ export default function AdminDashboard() {
   const [foodFormPrice, setFoodFormPrice] = useState(250);
   const [foodFormDesc, setFoodFormDesc] = useState('');
   const [foodFormImage, setFoodFormImage] = useState('');
-  const [foodFormCarbon, setFoodFormCarbon] = useState(100);
-  const [foodFormEco, setFoodFormEco] = useState('A');
   const [foodFormOrganic, setFoodFormOrganic] = useState(true);
   const [foodFormVegan, setFoodFormVegan] = useState(true);
   const [foodFormLocal, setFoodFormLocal] = useState(true);
@@ -70,18 +65,13 @@ export default function AdminDashboard() {
     );
   }
 
-  // Financial and environmental calculations
+  // Financial and loyalty rewards calculations
   const totalRevenue = orders.reduce((sum, o) => sum + o.total, 0);
-  const platformCarbonSavedTotal = orders.reduce((sum, o) => sum + (o.carbonSaved || 0), 0) + 1284530;
-  const platformTreesPlantedTotal = orders.reduce((sum, o) => sum + (o.treesPlanted || 0), 0) + 4822;
+  const totalPointsRedeemed = orders.length * 110 + 450; // Mock loyalty metrics
 
   // Formatting helpers
   const formatCurrency = (val) => {
     return `₹${val.toLocaleString(undefined, { maximumFractionDigits: 0 })}`;
-  };
-
-  const formatCarbon = (g) => {
-    return `${(g / 1000).toLocaleString(undefined, { maximumFractionDigits: 0 })} kg`;
   };
 
   // RESTAURANTS CRUD HANDLERS
@@ -90,8 +80,6 @@ export default function AdminDashboard() {
     setRestFormName('');
     setRestFormImage('https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=800&q=80');
     setRestFormLocation('Sector 4, Green Glen Layout');
-    setRestFormEcoScore('A');
-    setRestFormFootprint(150);
     setRestFormDesc('');
     setRestFormCerts('Plastic Free, Compostable Only');
     setIsRestModalOpen(true);
@@ -102,8 +90,6 @@ export default function AdminDashboard() {
     setRestFormName(rest.name);
     setRestFormImage(rest.image);
     setRestFormLocation(rest.location);
-    setRestFormEcoScore(rest.ecoScore);
-    setRestFormFootprint(rest.carbonFootprintAvg);
     setRestFormDesc(rest.description);
     setRestFormCerts(rest.certifications.join(', '));
     setIsRestModalOpen(true);
@@ -116,8 +102,6 @@ export default function AdminDashboard() {
       name: restFormName,
       image: restFormImage,
       location: restFormLocation,
-      ecoScore: restFormEcoScore,
-      carbonFootprintAvg: parseInt(restFormFootprint, 10),
       description: restFormDesc,
       certifications: certsArray
     };
@@ -144,8 +128,6 @@ export default function AdminDashboard() {
     setFoodFormPrice(250);
     setFoodFormDesc('');
     setFoodFormImage('https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=600&q=80');
-    setFoodFormCarbon(100);
-    setFoodFormEco('A');
     setFoodFormOrganic(true);
     setFoodFormVegan(true);
     setFoodFormLocal(true);
@@ -159,8 +141,6 @@ export default function AdminDashboard() {
     setFoodFormPrice(food.price);
     setFoodFormDesc(food.description);
     setFoodFormImage(food.image);
-    setFoodFormCarbon(food.carbonFootprint);
-    setFoodFormEco(food.ecoScore);
     setFoodFormOrganic(food.organic);
     setFoodFormVegan(food.vegan);
     setFoodFormLocal(food.localSourced);
@@ -175,8 +155,6 @@ export default function AdminDashboard() {
       price: parseFloat(foodFormPrice),
       description: foodFormDesc,
       image: foodFormImage,
-      carbonFootprint: parseInt(foodFormCarbon, 10),
-      ecoScore: foodFormEco,
       organic: foodFormOrganic,
       vegan: foodFormVegan,
       localSourced: foodFormLocal
@@ -197,7 +175,7 @@ export default function AdminDashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 pb-20 font-sans">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-955 pb-20 font-sans">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 space-y-8">
         
         {/* Title and stats summary */}
@@ -212,7 +190,7 @@ export default function AdminDashboard() {
               </h1>
             </div>
             <p className="text-xs text-slate-505 dark:text-slate-400 mt-1">
-              Moderating sustainable catalogs, circular packaging logistics, and carbon metrics.
+              Moderating sustainable catalogs, circular packaging logistics, and green delivery incentives.
             </p>
           </div>
         </div>
@@ -255,21 +233,21 @@ export default function AdminDashboard() {
               </div>
 
               <div className="bg-white dark:bg-slate-900 border border-slate-202 dark:border-slate-800 p-6 rounded-3xl">
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block">Green Orders placed</span>
+                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block">Eco Orders placed</span>
                 <span className="text-2xl font-black text-slate-855 dark:text-white mt-1 block">{orders.length} orders</span>
-                <span className="text-[10px] text-slate-400 font-normal block mt-1">100% packaging compostable</span>
+                <span className="text-[10px] text-slate-400 font-normal block mt-1">105% packaging compostable</span>
               </div>
 
               <div className="bg-white dark:bg-slate-900 border border-slate-202 dark:border-slate-800 p-6 rounded-3xl">
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block">Aggregate CO₂ saved</span>
-                <span className="text-2xl font-black text-emerald-605 dark:text-emerald-400 mt-1 block">{formatCarbon(platformCarbonSavedTotal)}</span>
-                <span className="text-[10px] text-emerald-500 font-bold block mt-1">Sourcing & logistics offsets</span>
+                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block">Eco Points Redeemed</span>
+                <span className="text-2xl font-black text-emerald-605 dark:text-emerald-400 mt-1 block">{totalPointsRedeemed.toLocaleString()} pts</span>
+                <span className="text-[10px] text-emerald-500 font-bold block mt-1">Points discount conversions</span>
               </div>
 
               <div className="bg-white dark:bg-slate-900 border border-slate-202 dark:border-slate-800 p-6 rounded-3xl">
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block">Trees Planted Total</span>
-                <span className="text-2xl font-black text-teal-605 dark:text-teal-400 mt-1 block">{platformTreesPlantedTotal.toLocaleString()}</span>
-                <span className="text-[10px] text-slate-400 font-normal block mt-1">Charity matching program</span>
+                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block">Green logistics share</span>
+                <span className="text-2xl font-black text-teal-605 dark:text-teal-400 mt-1 block">85%</span>
+                <span className="text-[10px] text-slate-400 font-normal block mt-1">Bicycle, EV, and Self-pickup</span>
               </div>
 
             </div>
@@ -297,12 +275,11 @@ export default function AdminDashboard() {
                   <tr className="border-b border-slate-100 dark:border-slate-800 text-slate-400 font-bold uppercase tracking-wider">
                     <th className="pb-3">Restaurant Details</th>
                     <th className="pb-3">Location</th>
-                    <th className="pb-3">Eco Parameters</th>
                     <th className="pb-3">Certifications</th>
                     <th className="pb-3 text-right">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60 font-semibold text-slate-700 dark:text-slate-350">
+                <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60 font-semibold text-slate-700 dark:text-slate-355">
                   {restaurants.map(rest => (
                     <tr key={rest.id}>
                       <td className="py-4 flex items-center space-x-3 pr-2">
@@ -312,18 +289,14 @@ export default function AdminDashboard() {
                           <span className="block text-[10px] text-slate-400 font-normal mt-0.5">{rest.tags.join(', ')}</span>
                         </div>
                       </td>
-                      <td className="py-4 pr-2">{rest.location}</td>
-                      <td className="py-4 pr-2 space-y-1">
-                        <EcoBadge type="score" value={rest.ecoScore} />
-                        <span className="block text-[10px] text-slate-400 font-normal">Avg {rest.carbonFootprintAvg}g CO₂e</span>
-                      </td>
+                      <td className="py-4 pr-2">{rest.location} ({rest.distance} km)</td>
                       <td className="py-4 pr-2 max-w-[200px] truncate" title={rest.certifications.join(', ')}>
                         {rest.certifications.join(', ')}
                       </td>
                       <td className="py-4 text-right space-x-2">
                         <button
                           onClick={() => openRestEditModal(rest)}
-                          className="p-1 bg-slate-100 dark:bg-slate-800 rounded text-slate-500 hover:text-slate-800 dark:hover:text-white transition-colors cursor-pointer"
+                          className="p-1 bg-slate-100 dark:bg-slate-800 rounded text-slate-505 hover:text-slate-800 dark:hover:text-white transition-colors cursor-pointer"
                         >
                           <Edit className="w-3.5 h-3.5" />
                         </button>
@@ -364,7 +337,7 @@ export default function AdminDashboard() {
                     <th className="pb-3">Dish Info</th>
                     <th className="pb-3">Restaurant ID</th>
                     <th className="pb-3">Price</th>
-                    <th className="pb-3">Green stats</th>
+                    <th className="pb-3">Sourcing Tags</th>
                     <th className="pb-3 text-right">Actions</th>
                   </tr>
                 </thead>
@@ -374,17 +347,17 @@ export default function AdminDashboard() {
                       <td className="py-4 flex items-center space-x-3 pr-2">
                         <img src={item.image} alt={item.name} className="w-12 h-12 object-cover rounded-xl shrink-0" />
                         <div>
-                          <span className="block text-slate-805 dark:text-white font-bold">{item.name}</span>
+                          <span className="block text-slate-850 dark:text-white font-bold">{item.name}</span>
                           <span className="block text-[10px] text-slate-450 font-normal mt-0.5 line-clamp-1 max-w-[200px]">{item.description}</span>
                         </div>
                       </td>
                       <td className="py-4 pr-2">{item.restaurantId}</td>
                       <td className="py-4 pr-2 font-bold text-slate-800 dark:text-white">₹{item.price}</td>
                       <td className="py-4 pr-2 space-y-1">
-                        <EcoBadge type="carbon" value={item.carbonFootprint} />
-                        <div className="flex gap-1">
+                        <div className="flex gap-1 flex-wrap">
                           {item.vegan && <span className="text-[9px] bg-emerald-50 text-emerald-800 dark:bg-emerald-950 px-1 py-0.5 rounded font-bold">Vegan</span>}
                           {item.organic && <span className="text-[9px] bg-amber-50 text-amber-800 dark:bg-amber-950 px-1 py-0.5 rounded font-bold">Organic</span>}
+                          {item.localSourced && <span className="text-[9px] bg-blue-50 text-blue-800 dark:bg-blue-950 px-1 py-0.5 rounded font-bold">Local</span>}
                         </div>
                       </td>
                       <td className="py-4 text-right space-x-2">
@@ -478,7 +451,6 @@ export default function AdminDashboard() {
                   <span className="block text-[10px] text-slate-400">user@ecoeats.com (Customer)</span>
                   <div className="flex gap-2 mt-1.5 text-[9px] font-bold">
                     <span className="text-emerald-600">🌱 420 pts</span>
-                    <span className="text-slate-500">🌲 2 Trees</span>
                   </div>
                 </div>
               </div>
@@ -513,21 +485,6 @@ export default function AdminDashboard() {
           <div>
             <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Unsplash Banner Image URL</label>
             <input required type="text" value={restFormImage} onChange={e => setRestFormImage(e.target.value)} className="w-full px-3 py-2 border border-slate-205 dark:border-slate-800 bg-white dark:bg-slate-955 rounded-xl text-sm" />
-          </div>
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Eco-Score</label>
-              <select value={restFormEcoScore} onChange={e => setRestFormEcoScore(e.target.value)} className="w-full px-3 py-2 border border-slate-205 dark:border-slate-800 bg-white dark:bg-slate-955 rounded-xl text-sm">
-                <option value="A+">A+</option>
-                <option value="A">A</option>
-                <option value="B">B</option>
-                <option value="C">C</option>
-              </select>
-            </div>
-            <div>
-              <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Avg Footprint (g CO₂e)</label>
-              <input required type="number" value={restFormFootprint} onChange={e => setRestFormFootprint(e.target.value)} className="w-full px-3 py-2 border border-slate-205 dark:border-slate-800 bg-white dark:bg-slate-955 rounded-xl text-sm" />
-            </div>
           </div>
           <div>
             <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Location / Zone</label>
@@ -565,15 +522,9 @@ export default function AdminDashboard() {
             <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Dish Name</label>
             <input required type="text" value={foodFormName} onChange={e => setFoodFormName(e.target.value)} className="w-full px-3 py-2 border border-slate-205 dark:border-slate-800 bg-white dark:bg-slate-950 rounded-xl text-sm" />
           </div>
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Price (₹)</label>
-              <input required type="number" value={foodFormPrice} onChange={e => setFoodFormPrice(e.target.value)} className="w-full px-3 py-2 border border-slate-205 dark:border-slate-800 bg-white dark:bg-slate-950 rounded-xl text-sm" />
-            </div>
-            <div>
-              <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Footprint (g CO₂e)</label>
-              <input required type="number" value={foodFormCarbon} onChange={e => setFoodFormCarbon(e.target.value)} className="w-full px-3 py-2 border border-slate-205 dark:border-slate-800 bg-white dark:bg-slate-950 rounded-xl text-sm" />
-            </div>
+          <div>
+            <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Price (₹)</label>
+            <input required type="number" value={foodFormPrice} onChange={e => setFoodFormPrice(e.target.value)} className="w-full px-3 py-2 border border-slate-205 dark:border-slate-800 bg-white dark:bg-slate-955 rounded-xl text-sm" />
           </div>
           <div>
             <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Dish Image URL</label>

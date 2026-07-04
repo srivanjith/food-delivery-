@@ -1,15 +1,7 @@
 import React from 'react';
-import { useApp } from '../../context/AppContext';
-import { Search, Compass, ShieldCheck, Heart } from 'lucide-react';
+import { Search, Compass, ShieldCheck } from 'lucide-react';
 
 export default function Hero({ searchQuery, setSearchQuery }) {
-  const { platformCarbonSaved, platformTreesPlanted } = useApp();
-
-  // Format carbon metrics
-  const formatCarbonKg = (g) => {
-    return (g / 1000).toLocaleString(undefined, { maximumFractionDigits: 0 });
-  };
-
   return (
     <div className="relative overflow-hidden hero-gradient py-12 md:py-20 px-4 sm:px-6 lg:px-8 border-b border-slate-100 dark:border-slate-800/50 font-sans">
       <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
@@ -17,16 +9,16 @@ export default function Hero({ searchQuery, setSearchQuery }) {
         {/* Left Side: Copywriting & Search */}
         <div className="lg:col-span-7 space-y-6 text-center lg:text-left">
           <div className="inline-flex items-center space-x-1.5 px-3 py-1 bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-250 dark:border-emerald-900 rounded-full text-xs font-bold text-emerald-600 dark:text-emerald-400">
-            <span>✨ Zero-Waste & Carbon-Neutral Dining</span>
+            <span>✨ Zero-Waste & Eco-Friendly Dining</span>
           </div>
 
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-slate-800 dark:text-slate-105 leading-[1.1] font-sans">
+          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-slate-800 dark:text-slate-100 leading-[1.1] font-sans">
             Feast Locally. <br />
-            <span className="green-gradient-text">Breathe Globally.</span>
+            <span className="green-gradient-text">Earn Rewards.</span>
           </h1>
 
           <p className="text-base sm:text-lg text-slate-600 dark:text-slate-350 max-w-xl mx-auto lg:mx-0 leading-relaxed">
-            Order from local eco-certified kitchens. Track the carbon footprint of your meal, rescue surplus foods, and plant real trees with every delivery.
+            Order from local organic and eco-certified kitchens. Select green packaging, use low-emission logistics, and earn Eco Points to claim discounts on every order.
           </p>
 
           {/* Search Bar */}
@@ -40,7 +32,7 @@ export default function Hero({ searchQuery, setSearchQuery }) {
               onChange={(e) => setSearchQuery(e.target.value)}
               id="restaurant-search-input"
               placeholder="Search organic kitchens, healthy bowls, or sourdough bakery..."
-              className="block w-full pl-11 pr-4 py-4 bg-white dark:bg-slate-900 border border-slate-205 dark:border-slate-800 rounded-2xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-slate-700 dark:text-slate-205 placeholder-slate-400 font-sans"
+              className="block w-full pl-11 pr-4 py-4 bg-white dark:bg-slate-900 border border-slate-205 dark:border-slate-800 rounded-2xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-slate-700 dark:text-slate-105 placeholder-slate-400 font-sans"
             />
           </div>
 
@@ -71,19 +63,19 @@ export default function Hero({ searchQuery, setSearchQuery }) {
               </div>
               
               <span className="text-[10px] uppercase font-bold tracking-widest text-emerald-600 dark:text-emerald-400">
-                Live Eco Impact
+                Live Rewards Issued
               </span>
               
               <h3 className="text-3xl sm:text-4xl font-black text-slate-800 dark:text-white mt-1 mb-2 font-sans tracking-tight">
-                {formatCarbonKg(platformCarbonSaved)} kg
+                1,284,530
               </h3>
               
-              <p className="text-xs text-slate-500 dark:text-slate-405 leading-relaxed">
-                Total CO₂ emissions offset and saved by the EcoEats community.
+              <p className="text-xs text-slate-505 dark:text-slate-400 leading-relaxed">
+                Total Eco Points rewarded to the EcoEats community for sustainable choices.
               </p>
 
               <div className="w-full border-t border-slate-100 dark:border-slate-800 mt-4 pt-3 flex items-center justify-center text-xs font-bold text-slate-700 dark:text-slate-300 gap-1.5">
-                <span>🌲 {platformTreesPlanted.toLocaleString()} Trees Planted</span>
+                <span>🌱 42,822 Green Deliveries Completed</span>
               </div>
             </div>
           </div>

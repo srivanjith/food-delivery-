@@ -2,28 +2,6 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 
 const AuthContext = createContext();
 
-const MOCK_USER = {
-  id: 'user-888',
-  name: 'Jane Eco-Citizen',
-  email: 'user@ecoeats.com',
-  role: 'customer',
-  avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=150&q=80',
-  savedAddresses: [
-    { id: 'addr-1', label: 'Home 🏡', address: 'Apartment 4B, Emerald Heights, Sector 4, Green Glen Layout, Bengaluru' },
-    { id: 'addr-2', label: 'Office 💼', address: 'Eco-Solutions Hub, 5th Floor, Block C, Koramangala, Bengaluru' }
-  ],
-  ecoPoints: 420,
-  treesPlantedCount: 2
-};
-
-const MOCK_ADMIN = {
-  id: 'admin-999',
-  name: 'Admin Moderator',
-  email: 'admin@ecoeats.com',
-  role: 'admin',
-  avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=150&q=80'
-};
-
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -42,19 +20,19 @@ export const AuthProvider = ({ children }) => {
     setLoading(true);
     setError(null);
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 800));
-
-      if (email === 'user@ecoeats.com' && password === 'password') {
-        setUser(MOCK_USER);
-        localStorage.setItem('ecoeats_user', JSON.stringify(MOCK_USER));
-        return MOCK_USER;
-      } else if (email === 'admin@ecoeats.com' && password === 'admin123') {
-        setUser(MOCK_ADMIN);
-        localStorage.setItem('ecoeats_user', JSON.stringify(MOCK_ADMIN));
-        return MOCK_ADMIN;
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      });
+      const data = await response.json();
+      
+      if (response.ok && data.success) {
+        setUser(data.user);
+        localStorage.setItem('ecoeats_user', JSON.stringify(data.user));
+        return data.user;
       } else {
-        throw new Error('Invalid email or password. Use user@ecoeats.com / password or admin@ecoeats.com / admin123');
+        throw new Error(data.message || 'Invalid email or password');
       }
     } catch (err) {
       setError(err.message);
@@ -68,22 +46,20 @@ export const AuthProvider = ({ children }) => {
     setLoading(true);
     setError(null);
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      const response = await fetch('/api/auth/signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, password })
+      });
+      const data = await response.json();
       
-      const newUser = {
-        id: `user-${Math.floor(Math.random() * 1000)}`,
-        name,
-        email,
-        role: 'customer',
-        avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80',
-        savedAddresses: [],
-        ecoPoints: 50, // Welcome points
-        treesPlantedCount: 0
-      };
-
-      setUser(newUser);
-      localStorage.setItem('ecoeats_user', JSON.stringify(newUser));
-      return newUser;
+      if (response.ok && data.success) {
+        setUser(data.user);
+        localStorage.setItem('ecoeats_user', JSON.stringify(data.user));
+        return data.user;
+      } else {
+        throw new Error(data.message || 'Signup failed');
+      }
     } catch (err) {
       setError(err.message);
       throw err;
@@ -97,47 +73,57 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem('ecoeats_user');
   };
 
-  const updateProfile = (updatedData) => {
+  const updateProfile = async (updatedData) => {
     if (!user) return;
-    const updatedUser = { ...user, ...updatedData };
-    setUser(updatedUser);
-    localStorage.setItem('ecoeats_user', JSON.stringify(updatedUser));
+    try {
+      const response = await fetch('/api/auth/profile', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: user.id, ...updatedData })
+      });
+      const data = await response.json();
+      if (response.ok && data.success) {
+        setUser(data.user);
+        localStorage.setItem('ecoeats_user', JSON.stringify(data.user));
+      } else {
+        throw new Error(data.message || 'Profile update failed');
+      }
+    } catch (err) {
+      console.error('Update profile error:', err);
+    }
   };
 
-  const addAddress = (label, address) => {
+  const addAddress = async (label, address) => {
     if (!user) return;
     const newAddress = {
-      id: `addr-${Math.floor(Math.random() * 1000)}`,
+      id: `addr-${Date.now()}`,
       label,
       address
     };
     const updatedAddresses = [...(user.savedAddresses || []), newAddress];
-    updateProfile({ savedAddresses: updatedAddresses });
+    await updateProfile({ savedAddresses: updatedAddresses });
   };
 
-  const removeAddress = (addressId) => {
+  const removeAddress = async (addressId) => {
     if (!user) return;
     const updatedAddresses = user.savedAddresses.filter(addr => addr.id !== addressId);
-    updateProfile({ savedAddresses: updatedAddresses });
+    await updateProfile({ savedAddresses: updatedAddresses });
   };
 
-  const addEcoPoints = (points) => {
+  const addEcoPoints = async (points) => {
     if (!user) return;
     const newPoints = (user.ecoPoints || 0) + points;
-    
-    // Check if user has earned a new tree (each 200 points = 1 tree)
-    const oldTrees = Math.floor((user.ecoPoints || 0) / 200);
-    const newTrees = Math.floor(newPoints / 200);
-    const treesEarned = newTrees - oldTrees;
-    
-    updateProfile({ 
-      ecoPoints: newPoints,
-      treesPlantedCount: (user.treesPlantedCount || 0) + (treesEarned > 0 ? treesEarned : 0)
-    });
+    await updateProfile({ ecoPoints: newPoints });
+  };
+
+  const deductEcoPoints = async (points) => {
+    if (!user) return;
+    const newPoints = Math.max(0, (user.ecoPoints || 0) - points);
+    await updateProfile({ ecoPoints: newPoints });
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, error, login, signup, logout, updateProfile, addAddress, removeAddress, addEcoPoints }}>
+    <AuthContext.Provider value={{ user, loading, error, login, signup, logout, updateProfile, addAddress, removeAddress, addEcoPoints, deductEcoPoints }}>
       {children}
     </AuthContext.Provider>
   );

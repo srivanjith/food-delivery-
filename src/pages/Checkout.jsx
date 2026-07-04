@@ -3,13 +3,12 @@ import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { useApp } from '../context/AppContext';
 import { useNavigate, Link } from 'react-router-dom';
-import Alert from '../components/Common/Alert';
 import Modal from '../components/Common/Modal';
 import { MapPin, CreditCard, ShieldCheck, ArrowLeft, Plus, Check } from 'lucide-react';
 
 export default function Checkout() {
-  const { user, addAddress, addEcoPoints } = useAuth();
-  const { cartItems, grandTotal, carbonSaved, clearCart, ecoPointsEarned, packagingChoice, deliveryMethod, subtotal, packagingCharge, deliveryCharge, gst, offsetFee, offsetCarbon } = useCart();
+  const { user, addAddress, addEcoPoints, deductEcoPoints } = useAuth();
+  const { cartItems, grandTotal, clearCart, ecoPointsEarned, packagingChoice, deliveryMethod, subtotal, packagingCharge, deliveryCharge, gst, offsetFee, offsetCarbon } = useCart();
   const { addOrder } = useApp();
   const navigate = useNavigate();
 
@@ -18,6 +17,9 @@ export default function Checkout() {
   const [isAddingAddress, setIsAddingAddress] = useState(false);
   const [newAddressLabel, setNewAddressLabel] = useState('');
   const [newAddressValue, setNewAddressValue] = useState('');
+
+  // Points state
+  const [usePointsDiscount, setUsePointsDiscount] = useState(false);
 
   // Payment states
   const [paymentMethod, setPaymentMethod] = useState('card'); // 'card' | 'cod' | 'points'
@@ -30,6 +32,11 @@ export default function Checkout() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [gatewayMessage, setGatewayMessage] = useState('');
   const [isGatewayOpen, setIsGatewayOpen] = useState(false);
+
+  // Calculations for points discount
+  const pointsDiscountAmount = usePointsDiscount ? Math.min(Math.floor((user?.ecoPoints || 0) / 10), grandTotal) : 0;
+  const pointsToRedeem = pointsDiscountAmount * 10;
+  const finalPaidTotal = grandTotal - pointsDiscountAmount;
 
   if (cartItems.length === 0) {
     return (
@@ -78,11 +85,18 @@ export default function Checkout() {
   };
 
   const handlePlaceOrder = () => {
-    // Validate address selection
-    const addressObj = user.savedAddresses.find(addr => addr.id === selectedAddressId);
-    if (!addressObj) {
-      alert('Please select or add a delivery address!');
-      return;
+    let addressText = '';
+    
+    // Address validation (skip if self-pickup)
+    if (deliveryMethod !== 'pickup') {
+      const addressObj = user.savedAddresses.find(addr => addr.id === selectedAddressId);
+      if (!addressObj) {
+        alert('Please select or add a delivery address!');
+        return;
+      }
+      addressText = addressObj.address;
+    } else {
+      addressText = 'Self-Pickup at Restaurant';
     }
 
     // Trigger Razorpay Simulated Gateway
@@ -118,21 +132,23 @@ export default function Checkout() {
         packagingCharge,
         deliveryCharge,
         gst,
-        total: grandTotal,
-        carbonFootprint: cartItems.reduce((sum, item) => sum + (item.carbonFootprint || 120) * item.quantity, 0),
-        carbonSaved,
+        total: finalPaidTotal,
         packagingChoice: packagingChoice === 'reusable' ? 'Reusable Bento Box' : (packagingChoice === 'seaweed' ? 'Seaweed biodegradable' : 'Compostable Paper'),
-        deliveryMethod: deliveryMethod === 'bicycle' ? 'Bicycle' : (deliveryMethod === 'ev' ? 'Electric Vehicle' : 'Solar Drone'),
+        deliveryMethod: deliveryMethod === 'bicycle' ? 'Bicycle' : (deliveryMethod === 'ev' ? 'Electric Vehicle' : (deliveryMethod === 'pickup' ? 'Self-Pickup' : 'Solar Drone')),
         status: 'Order Received',
-        treesPlanted: (offsetCarbon ? 1 : 0) + (packagingChoice === 'reusable' ? 1 : 0),
-        address: addressObj.address
+        address: addressText
       };
 
       // Add to Global Context
       addOrder(newOrder);
       
-      // Update User Eco-Points
+      // Update User Eco-Points (Add earned points)
       addEcoPoints(ecoPointsEarned);
+      
+      // Deduct redeemed points
+      if (pointsToRedeem > 0) {
+        deductEcoPoints(pointsToRedeem);
+      }
       
       // Clear Cart
       clearCart();
@@ -165,7 +181,7 @@ export default function Checkout() {
             
             {/* 1. Address Section */}
             <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6">
-              <div className="flex justify-between items-center mb-4">
+              <div className="flex justify-between items-center mb-1">
                 <h3 className="text-base font-bold text-slate-805 dark:text-white flex items-center">
                   <MapPin className="w-4 h-4 mr-1.5 text-emerald-500" />
                   1. Delivery Address
@@ -179,6 +195,15 @@ export default function Checkout() {
                     <Plus className="w-3.5 h-3.5 mr-0.5" />
                     Add Address
                   </button>
+                )}
+              </div>
+
+              {/* Registered Addresses Count Label */}
+              <div className="mb-4 text-xs font-medium text-slate-500 dark:text-slate-400">
+                {user.savedAddresses && user.savedAddresses.length === 1 ? (
+                  <span>Registered Address in App: <span className="font-bold text-slate-800 dark:text-white">1 Address Saved</span></span>
+                ) : (
+                  <span>Registered Addresses in App: <span className="font-bold text-slate-800 dark:text-white">{user.savedAddresses ? user.savedAddresses.length : 0} Addresses Saved</span></span>
                 )}
               </div>
 
@@ -369,6 +394,45 @@ export default function Checkout() {
               )}
             </div>
 
+            {/* 3. Eco-Points Redemption Block */}
+            {user.ecoPoints > 0 && (
+              <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 mt-6">
+                <h3 className="text-base font-bold text-slate-805 dark:text-white flex items-center mb-4">
+                  <span className="mr-1.5 text-emerald-500">🌱</span>
+                  3. Redeem Eco-Points for Discount
+                </h3>
+                <div className="p-4 bg-emerald-500/5 border border-emerald-500/20 text-emerald-800 dark:text-emerald-350 rounded-2xl text-xs space-y-3 leading-relaxed">
+                  <div className="flex justify-between items-center">
+                    <span>Your Current Balance: <strong>{user.ecoPoints} points</strong></span>
+                    <span className="text-[10px] font-bold bg-emerald-500 text-white px-2 py-0.5 rounded">10 pts = ₹1</span>
+                  </div>
+                  
+                  <label className="flex items-start cursor-pointer select-none">
+                    <input
+                      type="checkbox"
+                      checked={usePointsDiscount}
+                      onChange={(e) => setUsePointsDiscount(e.target.checked)}
+                      className="mt-0.5 h-4 w-4 rounded border-slate-300 text-emerald-500 focus:ring-emerald-500 cursor-pointer"
+                    />
+                    <div className="ml-3">
+                      <span className="block font-bold text-slate-850 dark:text-slate-100">
+                        Redeem points to reduce order total (-₹{Math.min(Math.floor(user.ecoPoints / 10), grandTotal)})
+                      </span>
+                      <span className="block text-[10px] text-slate-400 mt-0.5">
+                        Uses up to {Math.min(user.ecoPoints, grandTotal * 10)} points.
+                      </span>
+                    </div>
+                  </label>
+                  
+                  {usePointsDiscount && (
+                    <div className="text-[10px] font-bold text-emerald-600 dark:text-emerald-450 uppercase tracking-wide">
+                      Redeeming {pointsToRedeem} points for ₹{pointsDiscountAmount} off!
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
           </div>
 
           {/* Right Column: Checkout Review panel */}
@@ -390,13 +454,49 @@ export default function Checkout() {
                 ))}
               </div>
 
-              {/* Carbon saved summary */}
+              {/* Detailed Invoice Breakdown */}
+              <div className="space-y-2 border-t border-slate-100 dark:border-slate-800 pt-4 mb-6 text-xs text-slate-655 dark:text-slate-400">
+                <div className="flex justify-between">
+                  <span>Subtotal</span>
+                  <span className="font-semibold text-slate-850 dark:text-slate-200">₹{subtotal}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Packaging ({packagingChoice})</span>
+                  <span className="font-semibold text-slate-850 dark:text-slate-200">₹{packagingCharge}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Delivery Mode ({deliveryMethod === 'pickup' ? 'Self-Pickup' : deliveryMethod})</span>
+                  <span className="font-semibold text-slate-850 dark:text-slate-200">₹{deliveryCharge}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>GST (5%)</span>
+                  <span className="font-semibold text-slate-850 dark:text-slate-200">₹{gst}</span>
+                </div>
+                {offsetCarbon && (
+                  <div className="flex justify-between">
+                    <span>Reforestation Donation</span>
+                    <span className="font-semibold text-slate-850 dark:text-slate-200">₹{offsetFee}</span>
+                  </div>
+                )}
+                {usePointsDiscount && (
+                  <div className="flex justify-between text-emerald-600 dark:text-emerald-450 font-extrabold">
+                    <span>Eco-Points Discount</span>
+                    <span>-₹{pointsDiscountAmount}</span>
+                  </div>
+                )}
+                <div className="flex justify-between border-t border-slate-100 dark:border-slate-800 pt-2 font-extrabold text-sm text-slate-850 dark:text-white">
+                  <span>Grand Total</span>
+                  <span>₹{finalPaidTotal}</span>
+                </div>
+              </div>
+
+              {/* Eco Points summary */}
               <div className="bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-100 dark:border-emerald-900/50 p-4 rounded-2xl mb-6 text-xs text-emerald-800 dark:text-emerald-300 leading-normal flex items-start">
-                <span className="text-base mr-2">🌲</span>
+                <span className="text-base mr-2">🌱</span>
                 <div>
-                  <strong>Order Offset: Saving {carbonSaved}g CO₂e!</strong>
+                  <strong>Rewards Earned: +{ecoPointsEarned} Eco Points!</strong>
                   <p className="text-[10px] text-emerald-600 dark:text-emerald-400 mt-0.5 leading-snug">
-                    By sourcing organically and organizing EV/Bike logistics, you prevent carbon emission damages.
+                    These points will be added to your profile immediately after order completion.
                   </p>
                 </div>
               </div>
@@ -406,7 +506,7 @@ export default function Checkout() {
                 id="place-order-submit-btn"
                 className="w-full py-4 bg-emerald-500 hover:bg-emerald-600 text-white font-extrabold text-sm rounded-2xl shadow-lg transition-all cursor-pointer"
               >
-                Place Order (₹{grandTotal})
+                Place Order (₹{finalPaidTotal})
               </button>
             </div>
           </div>

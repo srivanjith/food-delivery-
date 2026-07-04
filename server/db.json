@@ -1,0 +1,312 @@
+{
+  "users": [
+    {
+      "id": "user-888",
+      "name": "Jane Eco-Citizen",
+      "email": "user@ecoeats.com",
+      "password": "password",
+      "role": "customer",
+      "avatar": "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=150&q=80",
+      "savedAddresses": [
+        { "id": "addr-1", "label": "Home 🏡", "address": "Apartment 4B, Emerald Heights, Sector 4, Green Glen Layout, Bengaluru" },
+        { "id": "addr-2", "label": "Office 💼", "address": "Eco-Solutions Hub, 5th Floor, Block C, Koramangala, Bengaluru" }
+      ],
+      "ecoPoints": 420
+    },
+    {
+      "id": "admin-999",
+      "name": "Admin Moderator",
+      "email": "admin@ecoeats.com",
+      "password": "password",
+      "role": "admin",
+      "avatar": "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=150&q=80",
+      "savedAddresses": [],
+      "ecoPoints": 0
+    }
+  ],
+  "restaurants": [
+    {
+      "id": "rest-1",
+      "name": "The Green Beanery",
+      "image": "https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?auto=format&fit=crop&w=800&q=80",
+      "rating": 4.8,
+      "deliveryTime": "15-25",
+      "distance": 1.2,
+      "location": "Green Glen Layout",
+      "categories": ["Vegan", "Organic", "Locally Sourced"],
+      "description": "100% plant-based food crafted from locally grown organic vegetables. We practice complete compostable packaging and zero waste kitchen policies.",
+      "address": "102, Emerald Plaza, Sector 4, Green Glen Layout, Bengaluru",
+      "lat": 12.9279,
+      "lng": 77.6826,
+      "tags": ["Salads", "Bowls", "Smoothies", "Healthy"],
+      "certifications": ["Plastic Free", "Organic Certified"]
+    },
+    {
+      "id": "rest-2",
+      "name": "Roots & Shoots Cafe",
+      "image": "https://images.unsplash.com/photo-1466978913421-dad2ebd01d17?auto=format&fit=crop&w=800&q=80",
+      "rating": 4.5,
+      "deliveryTime": "20-30",
+      "distance": 2.5,
+      "location": "HSR Layout",
+      "categories": ["Organic", "Locally Sourced", "Vegetarian"],
+      "description": "A charming farm-to-table bistro sourcing 90% of our ingredients within a 50km radius. Serving delicious wholesome vegetarian plates.",
+      "address": "45, 17th Cross, Sector 3, HSR Layout, Bengaluru",
+      "lat": 12.9105,
+      "lng": 77.6450,
+      "tags": ["Burgers", "Pasta", "Coffee", "Desserts"],
+      "certifications": ["90% Local Ingredients", "Compostable Only"]
+    },
+    {
+      "id": "rest-3",
+      "name": "Zero Waste Bistro",
+      "image": "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=800&q=80",
+      "rating": 4.7,
+      "deliveryTime": "25-35",
+      "distance": 3.1,
+      "location": "Koramangala",
+      "categories": ["Zero Waste", "Vegan", "Locally Sourced"],
+      "description": "Pioneers of circular dining. Every single ingredient is used entirely, leftovers are composted in-house, and delivery is packed in returnable stainless steel tiffins.",
+      "address": "562, 80 Feet Road, 4th Block, Koramangala, Bengaluru",
+      "lat": 12.9343,
+      "lng": 77.6148,
+      "tags": ["Bowls", "Soups", "Wraps", "Cold-Pressed Juices"],
+      "certifications": ["Zero Waste Certified", "100% Biodegradable", "B-Corp"]
+    },
+    {
+      "id": "rest-4",
+      "name": "Re-Bake Artisan Bakery",
+      "image": "https://images.unsplash.com/photo-1555507036-ab1f4038808a?auto=format&fit=crop&w=800&q=80",
+      "rating": 4.6,
+      "deliveryTime": "10-20",
+      "distance": 0.8,
+      "location": "Green Glen Layout",
+      "categories": ["Organic"],
+      "description": "Premium organic sourdough and French pastries baked fresh daily.",
+      "address": "Shop 4, Willow Heights, Green Glen Layout, Bengaluru",
+      "lat": 12.925,
+      "lng": 77.685,
+      "tags": ["Sourdough", "Pastries", "Cakes", "Breakfast"],
+      "certifications": ["Organic Flour Certified"]
+    },
+    {
+      "id": "rest-5",
+      "name": "The Conscious Carnivore",
+      "image": "https://images.unsplash.com/photo-1543007630-9710e4a00a20?auto=format&fit=crop&w=800&q=85",
+      "rating": 4.3,
+      "deliveryTime": "30-40",
+      "distance": 4.2,
+      "location": "Indiranagar",
+      "categories": ["Locally Sourced"],
+      "description": "We serve organic, free-range, grass-fed meats sourced from local sustainable farms.",
+      "address": "782, 100 Feet Road, Indiranagar, Bengaluru",
+      "lat": 12.9719,
+      "lng": 77.6412,
+      "tags": ["Steaks", "Grills", "Burgers", "Salads"],
+      "certifications": ["Grass-Fed Certified", "100% Free-Range"]
+    },
+    {
+      "id": "rest-6",
+      "name": "Nectar Juices & Bowls",
+      "image": "https://images.unsplash.com/photo-1553530666-ba11a7da3888?auto=format&fit=crop&w=800&q=80",
+      "rating": 4.4,
+      "deliveryTime": "15-25",
+      "distance": 1.8,
+      "location": "HSR Layout",
+      "categories": ["Vegan", "Organic"],
+      "description": "Cold-pressed juices and vibrant acai bowls using organic local fruits.",
+      "address": "22, 24th Main Road, Sector 2, HSR Layout, Bengaluru",
+      "lat": 12.911,
+      "lng": 77.652,
+      "tags": ["Juices", "Acai Bowls", "Salads", "Vegan Desserts"],
+      "certifications": ["Water-Conserving Prep"]
+    }
+  ],
+  "foodItems": [
+    {
+      "id": "food-101",
+      "restaurantId": "rest-1",
+      "name": "Organic Avocabo Green Salad",
+      "price": 320,
+      "description": "Fresh organic Haas avocado, baby spinach, cucumbers, heirloom cherry tomatoes, pumpkin seeds, tossed in a house-made lemon-herb vinaigrette.",
+      "image": "https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=600&q=80",
+      "rating": 4.9,
+      "organic": true,
+      "vegan": true,
+      "localSourced": true,
+      "popular": true
+    },
+    {
+      "id": "food-102",
+      "restaurantId": "rest-1",
+      "name": "Quinoa Eco-Buddha Bowl",
+      "price": 360,
+      "description": "Roasted sweet potato, tri-color organic quinoa, steamed edamame, organic beet hummus, broccoli florets, and a creamy tahini drizzle.",
+      "image": "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=600&q=80",
+      "rating": 4.8,
+      "organic": true,
+      "vegan": true,
+      "localSourced": true,
+      "popular": true
+    },
+    {
+      "id": "food-103",
+      "restaurantId": "rest-1",
+      "name": "Detoxifying Green Smoothie",
+      "price": 190,
+      "description": "Cold-blended organic kale, Granny Smith apples, ginger, mint leaves, chia seeds, and raw local honey.",
+      "image": "https://images.unsplash.com/photo-1553530666-ba11a7da3888?auto=format&fit=crop&w=600&q=80",
+      "rating": 4.6,
+      "organic": true,
+      "vegan": false,
+      "localSourced": true,
+      "popular": false
+    },
+    {
+      "id": "food-201",
+      "restaurantId": "rest-2",
+      "name": "Lentil & Walnut Veggie Burger",
+      "price": 280,
+      "description": "House-made brown lentil & walnut patty, organic cheddar cheese, caramelized onions, local butterhead lettuce, served on a whole-wheat bun.",
+      "image": "https://images.unsplash.com/photo-1585238342024-78d387f4a707?auto=format&fit=crop&w=600&q=80",
+      "rating": 4.7,
+      "organic": true,
+      "vegan": false,
+      "localSourced": true,
+      "popular": true
+    },
+    {
+      "id": "food-202",
+      "restaurantId": "rest-2",
+      "name": "Wild Mushroom Truffle Pasta",
+      "price": 420,
+      "description": "Sautéed local oyster and shiitake mushrooms, hand-rolled fettuccine, white truffle oil, and shaved vegan parmesan.",
+      "image": "https://images.unsplash.com/photo-1473093295043-cdd812d0e601?auto=format&fit=crop&w=600&q=80",
+      "rating": 4.5,
+      "organic": false,
+      "vegan": true,
+      "localSourced": true,
+      "popular": true
+    },
+    {
+      "id": "food-301",
+      "restaurantId": "rest-3",
+      "name": "Upcycled Cauliflower Rice Bowl",
+      "price": 290,
+      "description": "Rice made from grated surplus cauliflower stems, grilled organic tofu, spiced chickpeas, pickled red onions, and herb chimichurri.",
+      "image": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=600&q=80",
+      "rating": 4.8,
+      "organic": true,
+      "vegan": true,
+      "localSourced": true,
+      "popular": true
+    },
+    {
+      "id": "food-302",
+      "restaurantId": "rest-3",
+      "name": "Immunity Ginger Soup",
+      "price": 180,
+      "description": "Warm, slow-simmered vegetable broth made from organic veggie trims, infused with high-grade ginger, turmeric, and lemongrass.",
+      "image": "https://images.unsplash.com/photo-1547592165-e1d17fed6005?auto=format&fit=crop&w=600&q=80",
+      "rating": 4.4,
+      "organic": true,
+      "vegan": true,
+      "localSourced": true,
+      "popular": false
+    },
+    {
+      "id": "food-401",
+      "restaurantId": "rest-4",
+      "name": "Country Sourdough Loaf (Fresh)",
+      "price": 180,
+      "description": "Artisanal 36-hour slow fermented country sourdough bread, made with 100% organic locally milled wheat.",
+      "image": "https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=600&q=80",
+      "rating": 4.8,
+      "organic": true,
+      "vegan": true,
+      "localSourced": true,
+      "popular": true
+    },
+    {
+      "id": "food-501",
+      "restaurantId": "rest-5",
+      "name": "Local Free-Range Grass-Fed Steak",
+      "price": 790,
+      "description": "250g sirloin steak sourced from grass-fed local pastured cattle, grilled with organic garlic butter and fresh rosemary.",
+      "image": "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=600&q=80",
+      "rating": 4.6,
+      "organic": true,
+      "vegan": false,
+      "localSourced": true,
+      "popular": true
+    },
+    {
+      "id": "food-502",
+      "restaurantId": "rest-5",
+      "name": "Organic Pastured Chicken Burger",
+      "price": 450,
+      "description": "Juicy organic grilled chicken breast, wild organic arugula, local tomatoes, avocado spread, on a brioche bun.",
+      "image": "https://images.unsplash.com/photo-1525059696034-4967a8e1dca2?auto=format&fit=crop&w=600&q=80",
+      "rating": 4.4,
+      "organic": true,
+      "vegan": false,
+      "localSourced": true,
+      "popular": false
+    },
+    {
+      "id": "food-601",
+      "restaurantId": "rest-6",
+      "name": "Imperfect Acai Energy Bowl",
+      "price": 340,
+      "description": "Pure organic acai topped with sliced bananas and strawberries, plus organic house granola.",
+      "image": "https://images.unsplash.com/photo-1590301157890-4810ed352733?auto=format&fit=crop&w=600&q=80",
+      "rating": 4.7,
+      "organic": true,
+      "vegan": true,
+      "localSourced": false,
+      "popular": true
+    }
+  ],
+  "orders": [
+    {
+      "id": "order-9001",
+      "date": "2026-06-25T13:45:00Z",
+      "restaurantName": "The Green Beanery",
+      "restaurantId": "rest-1",
+      "items": [
+        { "id": "food-101", "name": "Organic Avocabo Green Salad", "price": 320, "quantity": 1 },
+        { "id": "food-103", "name": "Detoxifying Green Smoothie", "price": 190, "quantity": 2 }
+      ],
+      "subtotal": 700,
+      "packagingCharge": 38,
+      "deliveryCharge": 40,
+      "gst": 35,
+      "total": 813,
+      "packagingChoice": "Compostable Paper",
+      "deliveryMethod": "Bicycle",
+      "status": "Delivered"
+    },
+    {
+      "id": "order-9002",
+      "date": "2026-06-28T20:10:00Z",
+      "restaurantName": "Re-Bake Artisan Bakery",
+      "restaurantId": "rest-4",
+      "items": [
+        { "id": "food-401", "name": "Country Sourdough Loaf (Fresh)", "price": 180, "quantity": 2 }
+      ],
+      "subtotal": 360,
+      "packagingCharge": 0,
+      "deliveryCharge": 30,
+      "gst": 18,
+      "total": 408,
+      "packagingChoice": "Compostable Paper",
+      "deliveryMethod": "Electric Vehicle",
+      "status": "Delivered"
+    }
+  ],
+  "reviews": [
+    { "id": "rev-1", "restaurantId": "rest-1", "user": "Mark S.", "rating": 5, "comment": "Hands down the best salad in the city! Love that it comes in compostable packaging.", "date": "2026-06-30" },
+    { "id": "rev-2", "restaurantId": "rest-1", "user": "Emma K.", "rating": 4, "comment": "Great portions, and the rewards tracking really opened my eyes. Highly recommend.", "date": "2026-07-01" },
+    { "id": "rev-3", "restaurantId": "rest-2", "user": "David P.", "rating": 5, "comment": "Delicious vegetarian options, local ingredients taste so fresh!", "date": "2026-06-28" }
+  ]
+}

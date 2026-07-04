@@ -4,10 +4,9 @@ import { useApp } from '../context/AppContext';
 import { useAuth } from '../context/AuthContext';
 import MenuItem from '../components/Restaurant/MenuItem';
 import MenuFilter from '../components/Restaurant/MenuFilter';
-import EcoBadge from '../components/Common/EcoBadge';
 import Modal from '../components/Common/Modal';
 import Alert from '../components/Common/Alert';
-import { Star, Clock, MapPin, Award, ArrowLeft, MessageSquare, Plus, PenTool } from 'lucide-react';
+import { Star, Clock, MapPin, Award, ArrowLeft, MessageSquare, PenTool } from 'lucide-react';
 
 export default function RestaurantMenu() {
   const { id } = useParams();
@@ -15,10 +14,8 @@ export default function RestaurantMenu() {
   const {
     restaurants,
     foodItems,
-    surplusDeals,
     reviews,
-    addReview,
-    addItem
+    addReview
   } = useApp();
 
   const [searchQuery, setSearchQuery] = useState('');
@@ -58,9 +55,6 @@ export default function RestaurantMenu() {
 
     return matchesSearch;
   });
-
-  // Get surplus deals for this specific restaurant
-  const restaurantDeals = surplusDeals.filter(deal => deal.restaurantId === restaurant.id);
 
   // Get reviews for this specific restaurant
   const restaurantReviews = reviews.filter(rev => rev.restaurantId === restaurant.id);
@@ -108,10 +102,6 @@ export default function RestaurantMenu() {
         <div className="absolute bottom-6 left-0 right-0">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-white space-y-3">
             <div className="flex flex-wrap gap-2">
-              <EcoBadge type="score" value={restaurant.ecoScore} />
-              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-500/20 backdrop-blur-sm border border-emerald-500/30 text-emerald-300">
-                🌱 Avg {restaurant.carbonFootprintAvg}g CO₂e
-              </span>
             </div>
             
             <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight font-sans">
@@ -162,40 +152,7 @@ export default function RestaurantMenu() {
             </div>
           </div>
 
-          {/* Restaurant Specific Surplus Deals */}
-          {restaurantDeals.length > 0 && (
-            <div className="bg-amber-500/5 dark:bg-amber-950/10 border border-amber-500/20 rounded-3xl p-6">
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center space-x-2">
-                  <span className="text-xl">🔥</span>
-                  <h3 className="text-base font-extrabold text-slate-850 dark:text-white">Active Surplus Rescue Deals</h3>
-                </div>
-                <span className="text-[10px] font-bold text-amber-705 dark:text-amber-400 uppercase tracking-wider">High waste prevention impact</span>
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {restaurantDeals.map(deal => (
-                  <div key={deal.id} className="bg-white dark:bg-slate-900 border border-slate-205 dark:border-slate-800 rounded-2xl p-4 flex gap-3 shadow-sm hover:shadow-md transition-shadow">
-                    <img src={deal.image} alt={deal.name} className="w-16 h-16 rounded-xl object-cover" />
-                    <div className="flex-1 min-w-0 flex flex-col justify-between">
-                      <div>
-                        <h4 className="text-xs font-bold text-slate-800 dark:text-white truncate">{deal.name}</h4>
-                        <span className="text-[9px] font-bold text-red-500 block mt-0.5">Only {deal.quantityLeft} left</span>
-                      </div>
-                      <div className="flex items-center justify-between mt-2 pt-2 border-t border-slate-100 dark:border-slate-800">
-                        <span className="text-sm font-black text-slate-800 dark:text-white">₹{deal.price}</span>
-                        <button
-                          onClick={() => addItem({ id: deal.id, restaurantId: deal.restaurantId, name: deal.name, price: deal.price, image: deal.image, carbonFootprint: deal.carbonFootprint, ecoScore: deal.ecoScore })}
-                          className="px-2.5 py-1 bg-amber-550 text-white font-bold text-[10px] rounded-lg hover:bg-amber-600 cursor-pointer"
-                        >
-                          Rescue
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
+
 
           {/* Dishes menu filter */}
           <div>
