@@ -1,78 +1,80 @@
 @import "tailwindcss";
 
 @theme {
-  /* Leafy Green / Lime Green (#8BC34A) as primary */
-  --color-emerald-50: #FFFDF5;
-  --color-emerald-100: #FFF3D6;
-  --color-emerald-200: #FFEEC4;
-  --color-emerald-300: #C5E1A5;
-  --color-emerald-400: #9CCC65;
-  --color-emerald-500: #8BC34A;
-  --color-emerald-600: #7CB342;
-  --color-emerald-700: #689F38;
-  --color-emerald-800: #558B2F;
-  --color-emerald-900: #33691E;
+  /* Forest Mint & Emerald Green (#10B981) as primary */
+  --color-emerald-50: #F0FDF4;
+  --color-emerald-100: #DCFCE7;
+  --color-emerald-200: #BBF7D0;
+  --color-emerald-300: #86EFAC;
+  --color-emerald-400: #4ADE80;
+  --color-emerald-500: #10B981;
+  --color-emerald-600: #059669;
+  --color-emerald-700: #047857;
+  --color-emerald-800: #065F46;
+  --color-emerald-900: #064E3B;
 
   /* Teal overrides (blend into Leafy Green) */
-  --color-teal-50: #FFFDF5;
-  --color-teal-100: #FFF3D6;
-  --color-teal-200: #FFEEC4;
-  --color-teal-300: #C5E1A5;
-  --color-teal-400: #9CCC65;
-  --color-teal-500: #8BC34A;
-  --color-teal-600: #7CB342;
-  --color-teal-700: #689F38;
-  --color-teal-800: #558B2F;
-  --color-teal-900: #33691E;
+  --color-teal-50: #F0FDF4;
+  --color-teal-100: #DCFCE7;
+  --color-teal-200: #BBF7D0;
+  --color-teal-300: #86EFAC;
+  --color-teal-400: #4ADE80;
+  --color-teal-500: #10B981;
+  --color-teal-600: #059669;
+  --color-teal-700: #047857;
+  --color-teal-800: #065F46;
+  --color-teal-900: #064E3B;
 
   /* Green overrides (blend into Leafy Green) */
-  --color-green-50: #FFFDF5;
-  --color-green-100: #FFF3D6;
-  --color-green-200: #FFEEC4;
-  --color-green-300: #C5E1A5;
-  --color-green-400: #9CCC65;
-  --color-green-500: #8BC34A;
-  --color-green-600: #7CB342;
-  --color-green-700: #689F38;
-  --color-green-800: #558B2F;
-  --color-green-900: #33691E;
+  --color-green-50: #F0FDF4;
+  --color-green-100: #DCFCE7;
+  --color-green-200: #BBF7D0;
+  --color-green-300: #86EFAC;
+  --color-green-400: #4ADE80;
+  --color-green-500: #10B981;
+  --color-green-600: #059669;
+  --color-green-700: #047857;
+  --color-green-800: #065F46;
+  --color-green-900: #064E3B;
 
-  /* Warm Orange / Coral (#F05A28) as secondary */
-  --color-orange-50: #FFFBEB;
-  --color-orange-100: #FFECE6;
-  --color-orange-200: #FFD4C4;
-  --color-orange-300: #FFA88A;
-  --color-orange-400: #FF7B52;
-  --color-orange-500: #F05A28;
-  --color-orange-600: #D84315;
-  --color-orange-700: #BF360C;
+  /* Coral Salmon (#FF6B4A) as secondary */
+  --color-orange-50: #FFF5F2;
+  --color-orange-100: #FFE4DE;
+  --color-orange-200: #FFC9BE;
+  --color-orange-300: #FFA291;
+  --color-orange-400: #FF7E66;
+  --color-orange-500: #FF6B4A;
+  --color-orange-600: #E05232;
+  --color-orange-700: #B83E21;
 
-  /* Gold / Yellow (#F6C445) as accent */
-  --color-amber-50: #FFFDF5;
-  --color-amber-100: #FFF3D6;
-  --color-amber-200: #FFE6A3;
-  --color-amber-300: #FAD36E;
-  --color-amber-400: #F6C445;
-  --color-amber-500: #E0B036;
-  --color-amber-600: #C79B2A;
-  --color-amber-700: #A8811E;
+  /* Honey Gold (#F59E0B) as accent */
+  --color-amber-50: #FEFDF0;
+  --color-amber-100: #FEF9C3;
+  --color-amber-200: #FEF08A;
+  --color-amber-300: #FDE047;
+  --color-amber-400: #FACC15;
+  --color-amber-500: #F59E0B;
+  --color-amber-600: #D97706;
+  --color-amber-700: #B45309;
 
-  /* Cream (#FFF3D6) as background bases */
-  --color-cream: #FFF3D6;
+  /* Clean background bases */
+  --color-cream: #F9FAFB;
   
-  /* Slate overrides using Dark Brown / Charcoal (#3B2F2F) and Cream (#FFF3D6) */
-  --color-slate-50: #FFF3D6; /* Base cream bg for light mode */
-  --color-slate-100: #FFEEC4;
-  --color-slate-200: #F2DFB8;
-  --color-slate-300: #C7B59F;
-  --color-slate-400: #7A6956;
-  --color-slate-500: #665543;
-  --color-slate-650: #544434;
-  --color-slate-600: #544434;
-  --color-slate-700: #423427;
-  --color-slate-800: #33271D;
-  --color-slate-900: #241B14; /* Primary dark brown text */
-  --color-slate-950: #1A120C; /* Dark mode deep chocolate brown background */
+  /* Slate overrides using premium Charcoal grays and Clean off-whites */
+  --color-slate-50: #F9FAFB; /* Base off-white bg for light mode */
+  --color-slate-100: #F3F4F6;
+  --color-slate-200: #E5E7EB;
+  --color-slate-300: #D1D5DB;
+  --color-slate-400: #9CA3AF;
+  --color-slate-500: #6B7280;
+  --color-slate-650: #374151;
+  --color-slate-600: #4B5563;
+  --color-slate-700: #374151;
+  --color-slate-800: #1F2937;
+  --color-slate-850: #182030;
+  --color-slate-855: #121824;
+  --color-slate-900: #111827; /* Primary crisp dark text */
+  --color-slate-950: #0B0F19; /* Obsidian black dark mode background */
 }
 
 @layer base {
@@ -96,11 +98,11 @@
 
 /* Premium gradient backgrounds */
 .hero-gradient {
-  background: radial-gradient(circle at 10% 20%, rgba(139, 195, 74, 0.1) 0%, rgba(240, 90, 40, 0.04) 90%);
+  background: radial-gradient(circle at 10% 20%, rgba(16, 185, 129, 0.1) 0%, rgba(255, 107, 74, 0.04) 90%);
 }
 
 .dark .hero-gradient {
-  background: radial-gradient(circle at 10% 20%, rgba(59, 47, 47, 0.4) 0%, rgba(41, 32, 32, 0.15) 90%);
+  background: radial-gradient(circle at 10% 20%, rgba(16, 185, 129, 0.08) 0%, rgba(255, 107, 74, 0.02) 90%);
 }
 
 .green-gradient-text {
@@ -141,7 +143,166 @@
   @apply animate-pulse bg-slate-200 dark:bg-slate-800 rounded-xl;
 }
 
-/* Global premium background color override */
-body, html, #root, .min-h-screen, .bg-slate-50 {
-  background-color: #FFF3D6 !important;
+/* Premium Skeuomorphism Utilities */
+.skeuo-card {
+  box-shadow: 
+    0 4px 6px -1px rgba(0, 0, 0, 0.05), 
+    0 2px 4px -1px rgba(0, 0, 0, 0.03), 
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.5);
+  @apply border border-slate-200 dark:border-slate-800 bg-gradient-to-b from-white to-slate-50 dark:from-slate-900 dark:to-slate-950/80;
+}
+
+.dark .skeuo-card {
+  box-shadow: 
+    0 4px 6px -1px rgba(0, 0, 0, 0.3), 
+    0 2px 4px -1px rgba(0, 0, 0, 0.2), 
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.08);
+}
+
+.skeuo-input {
+  box-shadow: 
+    inset 0 2px 4px 0 rgba(0, 0, 0, 0.06), 
+    0 1px 0 0 rgba(255, 255, 255, 0.8);
+  @apply bg-slate-50 dark:bg-slate-950/50 border border-slate-200 dark:border-slate-800;
+}
+
+.dark .skeuo-input {
+  box-shadow: 
+    inset 0 2px 4px 0 rgba(0, 0, 0, 0.35), 
+    0 1px 0 0 rgba(255, 255, 255, 0.03);
+}
+
+.skeuo-button-primary {
+  @apply bg-gradient-to-b from-emerald-400 to-emerald-500 hover:from-emerald-500 hover:to-emerald-600 
+         border border-emerald-600/30 border-t-white/35 text-white shadow-md shadow-emerald-500/25 
+         transition-all active:translate-y-[1px] active:shadow-[inset_0_2px_4px_rgba(0,0,0,0.2)] 
+         duration-150 cursor-pointer;
+}
+
+.skeuo-button-secondary {
+  @apply bg-gradient-to-b from-slate-50 to-slate-100 hover:from-slate-100 hover:to-slate-200 
+         border border-slate-300 border-t-white/80 text-slate-800 shadow-sm 
+         transition-all active:translate-y-[1px] active:shadow-[inset_0_2px_3px_rgba(0,0,0,0.1)] 
+         duration-150 cursor-pointer 
+         dark:from-slate-800 dark:to-slate-900 dark:hover:from-slate-900 dark:hover:to-slate-950
+         dark:border-slate-700 dark:border-t-white/10 dark:text-slate-100;
+}
+
+.skeuo-badge {
+  box-shadow: 
+    0 1px 2px 0 rgba(0, 0, 0, 0.05), 
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.4);
+  @apply border border-emerald-200 bg-gradient-to-b from-emerald-50 to-emerald-100/50 dark:from-emerald-950/30 dark:to-emerald-950/60 dark:border-emerald-900/40;
+}
+
+/* Aurora UI Animations & Frosted Skeuo-Glass Card */
+@keyframes aurora-float {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+  }
+  33% {
+    transform: translate(30px, -50px) scale(1.15);
+  }
+  66% {
+    transform: translate(-30px, 20px) scale(0.92);
+  }
+}
+
+.animate-aurora-1 {
+  animation: aurora-float 22s ease-in-out infinite;
+}
+
+.animate-aurora-2 {
+  animation: aurora-float 28s ease-in-out infinite reverse;
+}
+
+.animate-aurora-3 {
+  animation: aurora-float 34s ease-in-out infinite 4s;
+}
+
+.skeuo-glass-card {
+  box-shadow: 
+    0 8px 32px 0 rgba(0, 0, 0, 0.04), 
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.45);
+  @apply border border-white/20 dark:border-slate-800/45 backdrop-blur-lg bg-white/70 dark:bg-slate-900/65;
+}
+
+.dark .skeuo-glass-card {
+  box-shadow: 
+    0 8px 32px 0 rgba(0, 0, 0, 0.2), 
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.06);
+}
+
+/* Neumorphic soft-extrusion elements */
+.neumo-card {
+  @apply bg-slate-50 dark:bg-slate-950 border-0 transition-all duration-300;
+  box-shadow: 4px 4px 8px rgba(163, 177, 198, 0.3), -4px -4px 8px rgba(255, 255, 255, 0.85);
+}
+
+.neumo-card-pressed {
+  @apply bg-slate-50 dark:bg-slate-950 border-0 transition-all duration-300;
+  box-shadow: inset 3px 3px 6px rgba(163, 177, 198, 0.4), inset -3px -3px 6px rgba(255, 255, 255, 0.9);
+}
+
+.neumo-input {
+  @apply w-full px-4 py-3 bg-slate-50 dark:bg-slate-950 border-0 text-slate-800 dark:text-white rounded-xl focus:outline-none transition-all duration-300;
+  box-shadow: inset 3px 3px 6px rgba(163, 177, 198, 0.3), inset -3px -3px 6px rgba(255, 255, 255, 0.85);
+}
+
+.neumo-button {
+  @apply flex items-center space-x-1.5 px-4 py-2.5 bg-slate-50 dark:bg-slate-950 border-0 text-xs font-bold text-slate-700 dark:text-slate-300 rounded-xl transition-all duration-200 cursor-pointer;
+  box-shadow: 3px 3px 6px rgba(163, 177, 198, 0.3), -3px -3px 6px rgba(255, 255, 255, 0.85);
+}
+.neumo-button:hover {
+  @apply text-emerald-600 dark:text-emerald-400;
+}
+.neumo-button:active {
+  @apply text-emerald-600 dark:text-emerald-400;
+  box-shadow: inset 3px 3px 6px rgba(163, 177, 198, 0.45), inset -3px -3px 6px rgba(255, 255, 255, 0.9);
+}
+
+.neumo-button-active {
+  @apply flex items-center space-x-1.5 px-4 py-2.5 bg-slate-50 dark:bg-slate-950 border-0 text-xs font-bold text-emerald-600 dark:text-emerald-400 rounded-xl transition-all duration-200 cursor-pointer;
+  box-shadow: inset 3px 3px 6px rgba(163, 177, 198, 0.45), inset -3px -3px 6px rgba(255, 255, 255, 0.9);
+}
+
+/* Dark Mode Overrides for Neumorphic Elements */
+@media (prefers-color-scheme: dark) {
+  .neumo-card {
+    box-shadow: 4px 4px 8px rgba(4, 5, 8, 0.75), -4px -4px 8px rgba(24, 34, 52, 0.15);
+  }
+  .neumo-card-pressed {
+    box-shadow: inset 3px 3px 6px rgba(4, 5, 8, 0.75), inset -3px -3px 6px rgba(24, 34, 52, 0.2);
+  }
+  .neumo-input {
+    box-shadow: inset 3px 3px 6px rgba(4, 5, 8, 0.75), inset -3px -3px 6px rgba(24, 34, 52, 0.15);
+  }
+  .neumo-button {
+    box-shadow: 3px 3px 6px rgba(4, 5, 8, 0.75), -3px -3px 6px rgba(24, 34, 52, 0.15);
+  }
+  .neumo-button:active {
+    box-shadow: inset 3px 3px 6px rgba(4, 5, 8, 0.75), inset -3px -3px 6px rgba(24, 34, 52, 0.2);
+  }
+  .neumo-button-active {
+    box-shadow: inset 3px 3px 6px rgba(4, 5, 8, 0.75), inset -3px -3px 6px rgba(24, 34, 52, 0.2);
+  }
+}
+
+.dark .neumo-card {
+  box-shadow: 4px 4px 8px rgba(4, 5, 8, 0.75), -4px -4px 8px rgba(24, 34, 52, 0.15);
+}
+.dark .neumo-card-pressed {
+  box-shadow: inset 3px 3px 6px rgba(4, 5, 8, 0.75), inset -3px -3px 6px rgba(24, 34, 52, 0.2);
+}
+.dark .neumo-input {
+  box-shadow: inset 3px 3px 6px rgba(4, 5, 8, 0.75), inset -3px -3px 6px rgba(24, 34, 52, 0.15);
+}
+.dark .neumo-button {
+  box-shadow: 3px 3px 6px rgba(4, 5, 8, 0.75), -3px -3px 6px rgba(24, 34, 52, 0.15);
+}
+.dark .neumo-button:active {
+  box-shadow: inset 3px 3px 6px rgba(4, 5, 8, 0.75), inset -3px -3px 6px rgba(24, 34, 52, 0.2);
+}
+.dark .neumo-button-active {
+  box-shadow: inset 3px 3px 6px rgba(4, 5, 8, 0.75), inset -3px -3px 6px rgba(24, 34, 52, 0.2);
 }

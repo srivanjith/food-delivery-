@@ -69,16 +69,6 @@ export default function Auth() {
     }, 1000);
   };
 
-  const fillCredentials = (type) => {
-    if (type === 'customer') {
-      setEmail('user@ecoeats.com');
-      setPassword('password');
-    } else {
-      setEmail('admin@ecoeats.com');
-      setPassword('admin123');
-    }
-  };
-
   return (
     <div className="min-h-[85vh] bg-slate-50 dark:bg-slate-950 flex flex-col justify-center py-12 sm:px-6 lg:px-8 font-sans">
       <div className="sm:mx-auto sm:w-full sm:max-w-md text-center px-4">
@@ -160,27 +150,6 @@ export default function Auth() {
                 {loading ? 'Signing In...' : 'Sign In'}
               </button>
 
-              <div className="pt-2 border-t border-slate-100 dark:border-slate-850 space-y-3">
-                <span className="block text-center text-xs font-bold text-slate-400 uppercase tracking-wider">
-                  Quick Testing Accounts
-                </span>
-                <div className="grid grid-cols-2 gap-2">
-                  <button
-                    type="button"
-                    onClick={() => fillCredentials('customer')}
-                    className="py-2 px-3 border border-slate-202 dark:border-slate-800 text-xs font-semibold text-slate-655 dark:text-slate-350 hover:bg-slate-50 dark:hover:bg-slate-850 rounded-xl cursor-pointer"
-                  >
-                    👤 Customer
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => fillCredentials('admin')}
-                    className="py-2 px-3 border border-slate-202 dark:border-slate-800 text-xs font-semibold text-slate-655 dark:text-slate-350 hover:bg-slate-50 dark:hover:bg-slate-850 rounded-xl cursor-pointer"
-                  >
-                    🛠️ Admin
-                  </button>
-                </div>
-              </div>
 
               <p className="text-center text-xs text-slate-500 mt-4">
                 Don't have an account?{' '}
@@ -252,7 +221,7 @@ export default function Auth() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     id="signup-password-input"
-                    className="block w-full pl-10 pr-3 py-3 border border-slate-205 dark:border-slate-855 bg-white dark:bg-slate-955 text-slate-700 dark:text-slate-200 rounded-xl focus:ring-1.5 focus:ring-emerald-500 focus:outline-none"
+                    className="block w-full pl-10 pr-3 py-3 border border-slate-205 dark:border-slate-855 bg-white dark:bg-slate-950 text-slate-700 dark:text-slate-200 rounded-xl focus:ring-1.5 focus:ring-emerald-500 focus:outline-none"
                     placeholder="Min 6 characters"
                   />
                 </div>
@@ -272,7 +241,7 @@ export default function Auth() {
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     id="signup-confirm-password-input"
-                    className="block w-full pl-10 pr-3 py-3 border border-slate-205 dark:border-slate-855 bg-white dark:bg-slate-955 text-slate-700 dark:text-slate-200 rounded-xl focus:ring-1.5 focus:ring-emerald-500 focus:outline-none"
+                    className="block w-full pl-10 pr-3 py-3 border border-slate-205 dark:border-slate-855 bg-white dark:bg-slate-950 text-slate-700 dark:text-slate-200 rounded-xl focus:ring-1.5 focus:ring-emerald-500 focus:outline-none"
                     placeholder="Re-enter password"
                   />
                 </div>

@@ -1,8 +1,8 @@
 import React from 'react';
 import { useCart } from '../../context/CartContext';
-import { ShoppingCart, Leaf, Star, Sparkles, Plus, Minus } from 'lucide-react';
+import { ShoppingCart, Leaf, Star, Sparkles, Plus, Minus, Edit, Trash2 } from 'lucide-react';
 
-export default function MenuItem({ item }) {
+export default function MenuItem({ item, isAdmin = false, onEdit = null, onDelete = null }) {
   const { cartItems, addItem, updateQuantity } = useCart();
 
   const cartItem = cartItems.find((i) => i.id === item.id);
@@ -21,7 +21,7 @@ export default function MenuItem({ item }) {
   };
 
   return (
-    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 flex flex-col md:flex-row gap-5 hover:shadow-md transition-all duration-300 font-sans">
+    <div className="neumo-card rounded-3xl p-5 flex flex-col md:flex-row gap-5 hover:scale-[1.005] hover:shadow-md transition-all duration-300 font-sans">
       
       {/* Left/Top: Image & Indicators */}
       <div className="relative w-full md:w-40 h-40 md:h-auto rounded-2xl overflow-hidden bg-slate-105 shrink-0">
@@ -44,7 +44,7 @@ export default function MenuItem({ item }) {
           {/* Header row */}
           <div className="flex justify-between items-start">
             <div>
-              <h4 className="text-base font-bold text-slate-850 dark:text-white flex items-center">
+              <h4 className="text-base font-bold text-slate-855 dark:text-white flex items-center">
                 {item.name}
                 {item.vegan && (
                   <span className="p-0.5 bg-emerald-50 dark:bg-emerald-950 text-emerald-650 dark:text-emerald-400 rounded-md ml-1.5" title="Vegan">
@@ -79,33 +79,54 @@ export default function MenuItem({ item }) {
             ₹{item.price}
           </span>
 
-          {quantity > 0 ? (
-            <div className="flex items-center space-x-3 bg-emerald-500 text-white rounded-xl px-2 py-1 shadow-md shadow-emerald-500/10">
+          <div className="flex items-center space-x-2">
+            {isAdmin && (
+              <div className="flex items-center space-x-1.5 mr-2">
+                <button
+                  onClick={() => onEdit(item)}
+                  className="p-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white rounded-xl transition-all cursor-pointer"
+                  title="Edit Dish"
+                >
+                  <Edit className="w-3.5 h-3.5" />
+                </button>
+                <button
+                  onClick={() => { if (confirm('Delete this dish?')) onDelete(item.id); }}
+                  className="p-2 bg-red-55/10 hover:bg-red-50 dark:bg-red-950/20 dark:hover:bg-red-950/40 text-red-500 hover:text-red-700 rounded-xl transition-all cursor-pointer"
+                  title="Delete Dish"
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            )}
+
+            {quantity > 0 ? (
+              <div className="flex items-center space-x-3 bg-emerald-500 text-white rounded-xl px-2 py-1 shadow-md shadow-emerald-500/10">
+                <button
+                  onClick={handleDecrement}
+                  className="p-1 hover:bg-emerald-600 rounded-lg transition-colors cursor-pointer"
+                  aria-label="Decrease quantity"
+                >
+                  <Minus className="w-3.5 h-3.5" />
+                </button>
+                <span className="text-sm font-extrabold w-4 text-center">{quantity}</span>
+                <button
+                  onClick={handleIncrement}
+                  className="p-1 hover:bg-emerald-600 rounded-lg transition-colors cursor-pointer"
+                  aria-label="Increase quantity"
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            ) : (
               <button
-                onClick={handleDecrement}
-                className="p-1 hover:bg-emerald-600 rounded-lg transition-colors cursor-pointer"
-                aria-label="Decrease quantity"
+                onClick={handleAdd}
+                className="flex items-center space-x-1.5 px-4.5 py-2 bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold rounded-xl shadow-md shadow-emerald-500/10 hover:shadow-emerald-500/20 transition-all cursor-pointer"
               >
-                <Minus className="w-3.5 h-3.5" />
+                <ShoppingCart className="w-3.5 h-3.5" />
+                <span>Add to Cart</span>
               </button>
-              <span className="text-sm font-extrabold w-4 text-center">{quantity}</span>
-              <button
-                onClick={handleIncrement}
-                className="p-1 hover:bg-emerald-600 rounded-lg transition-colors cursor-pointer"
-                aria-label="Increase quantity"
-              >
-                <Plus className="w-3.5 h-3.5" />
-              </button>
-            </div>
-          ) : (
-            <button
-              onClick={handleAdd}
-              className="flex items-center space-x-1.5 px-4.5 py-2 bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold rounded-xl shadow-md shadow-emerald-500/10 hover:shadow-emerald-500/20 transition-all cursor-pointer"
-            >
-              <ShoppingCart className="w-3.5 h-3.5" />
-              <span>Add to Cart</span>
-            </button>
-          )}
+            )}
+          </div>
         </div>
       </div>
     </div>

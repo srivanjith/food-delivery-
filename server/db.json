@@ -389,6 +389,8 @@
       "date": "2026-06-25T13:45:00Z",
       "restaurantName": "The Green Beanery",
       "restaurantId": "rest-1",
+      "customerName": "Jane Eco-Citizen",
+      "customerEmail": "user@ecoeats.com",
       "items": [
         { "id": "food-101", "name": "Organic Avocabo Green Salad", "price": 320, "quantity": 1 },
         { "id": "food-103", "name": "Detoxifying Green Smoothie", "price": 190, "quantity": 2 }
@@ -407,6 +409,8 @@
       "date": "2026-06-28T20:10:00Z",
       "restaurantName": "Re-Bake Artisan Bakery",
       "restaurantId": "rest-4",
+      "customerName": "Jane Eco-Citizen",
+      "customerEmail": "user@ecoeats.com",
       "items": [
         { "id": "food-401", "name": "Country Sourdough Loaf (Fresh)", "price": 180, "quantity": 2 }
       ],

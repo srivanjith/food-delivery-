@@ -6,14 +6,14 @@ export default function RestaurantCard({ restaurant }) {
   return (
     <Link
       to={`/restaurant/${restaurant.id}`}
-      className="bg-white dark:bg-slate-900 border border-slate-205 dark:border-slate-800 rounded-3xl overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col group font-sans"
+      className="skeuo-glass-card rounded-3xl overflow-hidden hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 flex flex-col group font-sans"
     >
       {/* Restaurant Image & Badges */}
       <div className="relative h-48 overflow-hidden bg-slate-100">
         <img
           src={restaurant.image}
           alt={restaurant.name}
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-505"
+          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
         />
       </div>
 
@@ -22,13 +22,13 @@ export default function RestaurantCard({ restaurant }) {
         <div>
           {/* Header row */}
           <div className="flex justify-between items-start">
-            <h3 className="text-lg font-bold text-slate-850 dark:text-white line-clamp-1 group-hover:text-emerald-500 dark:group-hover:text-emerald-400 transition-colors">
+            <h3 className="text-lg font-bold text-slate-800 dark:text-white line-clamp-1 group-hover:text-emerald-500 dark:group-hover:text-emerald-400 transition-colors">
               {restaurant.name}
             </h3>
             
             {/* Rating */}
-            <div className="flex items-center text-xs font-bold text-slate-800 dark:text-slate-200 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-lg shrink-0 ml-2">
-              <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500 mr-1" />
+            <div className="flex items-center text-xs font-bold text-slate-800 dark:text-slate-200 bg-slate-100 dark:bg-slate-800 border border-slate-200/50 dark:border-slate-700/50 shadow-[inset_0_1px_rgba(255,255,255,0.8),0_1px_2px_rgba(0,0,0,0.05)] dark:shadow-[inset_0_1px_rgba(255,255,255,0.05)] px-2 py-0.5 rounded-lg shrink-0 ml-2">
+              <Star className="w-3.5 h-3.5 text-amber-550 fill-amber-500 mr-1" />
               {restaurant.rating}
             </div>
           </div>
@@ -46,9 +46,9 @@ export default function RestaurantCard({ restaurant }) {
             {restaurant.certifications && restaurant.certifications.slice(0, 2).map((cert, index) => (
               <span
                 key={index}
-                className="inline-flex items-center text-[9px] font-extrabold text-emerald-700 bg-emerald-50 dark:bg-emerald-950/40 dark:text-emerald-305 px-2 py-0.5 rounded uppercase tracking-wider"
+                className="inline-flex items-center text-[9px] font-extrabold text-emerald-805 dark:text-emerald-300 px-2 py-0.5 rounded-lg uppercase tracking-wider skeuo-badge"
               >
-                <Award className="w-2.5 h-2.5 mr-0.5" />
+                <Award className="w-2.5 h-2.5 mr-0.5 text-emerald-600 dark:text-emerald-400" />
                 {cert}
               </span>
             ))}

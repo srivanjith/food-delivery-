@@ -127,6 +127,8 @@ export default function Checkout() {
         date: new Date().toISOString(),
         restaurantName: cartItems[0].restaurantId === 'rest-4' ? 'Re-Bake Artisan Bakery' : (cartItems[0].restaurantId === 'rest-1' ? 'The Green Beanery' : 'Sustainable Bistro'),
         restaurantId: cartItems[0].restaurantId,
+        customerName: user.name,
+        customerEmail: user.email,
         items: cartItems.map(item => ({ id: item.id, name: item.name, price: item.price, quantity: item.quantity })),
         subtotal,
         packagingCharge,

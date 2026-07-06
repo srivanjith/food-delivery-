@@ -6,7 +6,7 @@ import MenuItem from '../components/Restaurant/MenuItem';
 import MenuFilter from '../components/Restaurant/MenuFilter';
 import Modal from '../components/Common/Modal';
 import Alert from '../components/Common/Alert';
-import { Star, Clock, MapPin, Award, ArrowLeft, MessageSquare, PenTool } from 'lucide-react';
+import { Star, Clock, MapPin, Award, ArrowLeft, MessageSquare, PenTool, Plus } from 'lucide-react';
 
 export default function RestaurantMenu() {
   const { id } = useParams();
@@ -15,7 +15,11 @@ export default function RestaurantMenu() {
     restaurants,
     foodItems,
     reviews,
-    addReview
+    addReview,
+    addFoodItem,
+    updateFoodItem,
+    deleteFoodItem,
+    updateRestaurant
   } = useApp();
 
   const [searchQuery, setSearchQuery] = useState('');
@@ -26,6 +30,23 @@ export default function RestaurantMenu() {
   const [reviewRating, setReviewRating] = useState(5);
   const [reviewComment, setReviewComment] = useState('');
   const [reviewSuccess, setReviewSuccess] = useState('');
+
+  // Food Item modal states
+  const [isFoodModalOpen, setIsFoodModalOpen] = useState(false);
+  const [foodFormId, setFoodFormId] = useState(null);
+  const [foodFormName, setFoodFormName] = useState('');
+  const [foodFormPrice, setFoodFormPrice] = useState(250);
+  const [foodFormDesc, setFoodFormDesc] = useState('');
+  const [foodFormImage, setFoodFormImage] = useState('');
+  const [foodFormOrganic, setFoodFormOrganic] = useState(true);
+  const [foodFormVegan, setFoodFormVegan] = useState(true);
+  const [foodFormLocal, setFoodFormLocal] = useState(true);
+  const [successMsg, setSuccessMsg] = useState('');
+
+  // Certifications modal states
+  const [isCertModalOpen, setIsCertModalOpen] = useState(false);
+  const [certInput, setCertInput] = useState('');
+  const [certSuccessMsg, setCertSuccessMsg] = useState('');
 
   // Find the current restaurant
   const restaurant = restaurants.find((r) => r.id === id);
@@ -73,6 +94,80 @@ export default function RestaurantMenu() {
       setReviewSuccess('');
       setIsReviewModalOpen(false);
     }, 2000);
+  };
+
+  // Admin menu management handlers
+  const openFoodAddModal = () => {
+    setFoodFormId(null);
+    setFoodFormName('');
+    setFoodFormPrice(250);
+    setFoodFormDesc('');
+    setFoodFormImage('https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=600&q=80');
+    setFoodFormOrganic(true);
+    setFoodFormVegan(true);
+    setFoodFormLocal(true);
+    setIsFoodModalOpen(true);
+  };
+
+  const openFoodEditModal = (food) => {
+    setFoodFormId(food.id);
+    setFoodFormName(food.name);
+    setFoodFormPrice(food.price);
+    setFoodFormDesc(food.description);
+    setFoodFormImage(food.image);
+    setFoodFormOrganic(food.organic);
+    setFoodFormVegan(food.vegan);
+    setFoodFormLocal(food.localSourced);
+    setIsFoodModalOpen(true);
+  };
+
+  const handleFoodSubmit = (e) => {
+    e.preventDefault();
+    const payload = {
+      restaurantId: restaurant.id,
+      name: foodFormName,
+      price: parseFloat(foodFormPrice),
+      description: foodFormDesc,
+      image: foodFormImage,
+      organic: foodFormOrganic,
+      vegan: foodFormVegan,
+      localSourced: foodFormLocal
+    };
+
+    if (foodFormId) {
+      updateFoodItem({ ...payload, id: foodFormId });
+      setSuccessMsg('Dish details updated successfully!');
+    } else {
+      addFoodItem(payload);
+      setSuccessMsg('New dish registered in kitchen inventory!');
+    }
+
+    setTimeout(() => {
+      setSuccessMsg('');
+      setIsFoodModalOpen(false);
+    }, 1500);
+  };
+
+  // Admin certifications management handlers
+  const openCertModal = () => {
+    setCertInput(restaurant.certifications.join(', '));
+    setIsCertModalOpen(true);
+  };
+
+  const handleCertSubmit = (e) => {
+    e.preventDefault();
+    const certsArray = certInput.split(',').map(c => c.trim()).filter(Boolean);
+    
+    updateRestaurant({
+      ...restaurant,
+      certifications: certsArray
+    });
+
+    setCertSuccessMsg('Green certifications updated successfully!');
+    setTimeout(() => {
+      setCertSuccessMsg('');
+      setIsCertModalOpen(false);
+    }, 1500);
   };
 
   return (
@@ -137,8 +232,19 @@ export default function RestaurantMenu() {
         <div className="lg:col-span-8 space-y-8">
           
           {/* Restaurant certifications section */}
-          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6">
-            <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest mb-3">Verified Green Certifications</h3>
+          <div className="neumo-card rounded-3xl p-6">
+            <div className="flex justify-between items-center mb-3">
+              <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest">Verified Green Certifications</h3>
+              {user?.role === 'admin' && (
+                <button
+                  onClick={openCertModal}
+                  className="p-1 text-slate-450 hover:text-emerald-500 dark:hover:text-emerald-400 transition-colors cursor-pointer"
+                  title="Edit Certifications"
+                >
+                  <PenTool className="w-3.5 h-3.5" />
+                </button>
+              )}
+            </div>
             <div className="flex flex-wrap gap-2.5">
               {restaurant.certifications && restaurant.certifications.map((cert, index) => (
                 <span
@@ -152,10 +258,21 @@ export default function RestaurantMenu() {
             </div>
           </div>
 
-
-
           {/* Dishes menu filter */}
           <div>
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="text-lg font-bold text-slate-800 dark:text-white">Restaurant Menu</h3>
+              {user?.role === 'admin' && (
+                <button
+                  onClick={openFoodAddModal}
+                  className="inline-flex items-center space-x-1.5 px-3.5 py-2 skeuo-button-primary text-xs font-bold rounded-xl"
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                  <span>Add Dish to Menu</span>
+                </button>
+              )}
+            </div>
+
             <MenuFilter
               searchQuery={searchQuery}
               setSearchQuery={setSearchQuery}
@@ -173,7 +290,13 @@ export default function RestaurantMenu() {
                 </div>
               ) : (
                 filteredMenuItems.map((item) => (
-                  <MenuItem key={item.id} item={item} />
+                  <MenuItem
+                    key={item.id}
+                    item={item}
+                    isAdmin={user?.role === 'admin'}
+                    onEdit={openFoodEditModal}
+                    onDelete={deleteFoodItem}
+                  />
                 ))
               )}
             </div>
@@ -182,7 +305,7 @@ export default function RestaurantMenu() {
 
         {/* Right Column: Reviews */}
         <div className="lg:col-span-4 space-y-6">
-          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 flex flex-col">
+          <div className="neumo-card rounded-3xl p-6 flex flex-col">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-sm font-black text-slate-805 dark:text-white uppercase tracking-wider flex items-center">
                 <MessageSquare className="w-4 h-4 mr-1.5 text-emerald-500" />
@@ -211,7 +334,7 @@ export default function RestaurantMenu() {
                     <div className="flex justify-between items-center text-xs font-semibold text-slate-600 dark:text-slate-400">
                       <span>{rev.user}</span>
                       <span className="flex items-center text-amber-500 font-bold">
-                        <Star className="w-3 h-3 fill-amber-500 text-amber-500 mr-0.5" />
+                        <Star className="w-3.5 h-3.5 fill-amber-500 text-amber-500 mr-0.5" />
                         {rev.rating}/5
                       </span>
                     </div>
@@ -250,7 +373,7 @@ export default function RestaurantMenu() {
                 >
                   <Star className={`w-8 h-8 ${
                     star <= reviewRating 
-                      ? 'text-amber-550 fill-amber-500' 
+                      ? 'text-amber-550 fill-amber-550' 
                       : 'text-slate-300 dark:text-slate-700'
                   }`} />
                 </button>
@@ -268,7 +391,7 @@ export default function RestaurantMenu() {
               value={reviewComment}
               onChange={(e) => setReviewComment(e.target.value)}
               placeholder="How was the food packaging? Did they fulfill zero waste delivery? Comment on food sourcing!"
-              className="w-full p-3 bg-white dark:bg-slate-950 border border-slate-205 dark:border-slate-800 rounded-xl focus:ring-1.5 focus:ring-emerald-500 focus:outline-none text-sm text-slate-800 dark:text-slate-200"
+              className="w-full p-3 bg-white dark:bg-slate-900 border border-slate-205 dark:border-slate-800 rounded-xl focus:ring-1.5 focus:ring-emerald-500 focus:outline-none text-sm text-slate-800 dark:text-slate-200"
             />
           </div>
 
@@ -278,6 +401,80 @@ export default function RestaurantMenu() {
             className="w-full py-3 bg-emerald-500 text-white font-bold text-sm rounded-xl hover:bg-emerald-600 transition-colors shadow shadow-emerald-500/10 cursor-pointer"
           >
             Submit Review
+          </button>
+        </form>
+      </Modal>
+
+      {/* FOOD CATALOG CREATION MODAL */}
+      <Modal
+        isOpen={isFoodModalOpen}
+        onClose={() => setIsFoodModalOpen(false)}
+        title={foodFormId ? 'Modify Catalog Dish' : 'Add Dish to Restaurant Menu'}
+      >
+        <form onSubmit={handleFoodSubmit} className="space-y-4 font-sans">
+          {successMsg && <Alert type="success" message={successMsg} />}
+          <div>
+            <label className="block text-[10px] font-bold text-slate-450 uppercase tracking-widest mb-1">Dish Name</label>
+            <input required type="text" value={foodFormName} onChange={e => setFoodFormName(e.target.value)} className="w-full px-3 py-2 border border-slate-205 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-800 dark:text-white rounded-xl text-sm" />
+          </div>
+          <div>
+            <label className="block text-[10px] font-bold text-slate-455 uppercase tracking-widest mb-1">Price (₹)</label>
+            <input required type="number" value={foodFormPrice} onChange={e => setFoodFormPrice(e.target.value)} className="w-full px-3 py-2 border border-slate-205 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-800 dark:text-white rounded-xl text-sm" />
+          </div>
+          <div>
+            <label className="block text-[10px] font-bold text-slate-455 uppercase tracking-widest mb-1">Dish Image URL</label>
+            <input required type="text" value={foodFormImage} onChange={e => setFoodFormImage(e.target.value)} className="w-full px-3 py-2 border border-slate-205 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-800 dark:text-white rounded-xl text-sm" />
+          </div>
+          <div className="flex gap-4">
+            <label className="flex items-center text-xs text-slate-655 font-bold cursor-pointer">
+              <input type="checkbox" checked={foodFormVegan} onChange={e => setFoodFormVegan(e.target.checked)} className="mr-2" />
+              100% Vegan
+            </label>
+            <label className="flex items-center text-xs text-slate-655 font-bold cursor-pointer">
+              <input type="checkbox" checked={foodFormOrganic} onChange={e => setFoodFormOrganic(e.target.checked)} className="mr-2" />
+              Organic Sourced
+            </label>
+            <label className="flex items-center text-xs text-slate-655 font-bold cursor-pointer">
+              <input type="checkbox" checked={foodFormLocal} onChange={e => setFoodFormLocal(e.target.checked)} className="mr-2" />
+              Locally Grown
+            </label>
+          </div>
+          <div>
+            <label className="block text-[10px] font-bold text-slate-455 uppercase tracking-widest mb-1">Dish Sourcing details / description</label>
+            <textarea required rows="3" value={foodFormDesc} onChange={e => setFoodFormDesc(e.target.value)} className="w-full p-3 border border-slate-205 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-805 dark:text-white rounded-xl text-sm" />
+          </div>
+          <button type="submit" className="w-full py-3 skeuo-button-primary text-xs uppercase tracking-widest rounded-xl font-bold">
+            Save Dish to Inventory
+          </button>
+        </form>
+      </Modal>
+
+      {/* EDIT CERTIFICATIONS DIALOG MODAL */}
+      <Modal
+        isOpen={isCertModalOpen}
+        onClose={() => setIsCertModalOpen(false)}
+        title="Edit Restaurant Green Certifications"
+      >
+        <form onSubmit={handleCertSubmit} className="space-y-4 font-sans">
+          {certSuccessMsg && <Alert type="success" message={certSuccessMsg} />}
+          <div>
+            <label className="block text-[10px] font-bold text-slate-450 uppercase tracking-widest mb-2">
+              Certifications (comma separated)
+            </label>
+            <input
+              required
+              type="text"
+              value={certInput}
+              onChange={e => setCertInput(e.target.value)}
+              className="w-full px-3 py-3 bg-white dark:bg-slate-900 border border-slate-205 dark:border-slate-800 text-slate-800 dark:text-white rounded-xl focus:ring-1.5 focus:ring-emerald-500 focus:outline-none text-sm"
+              placeholder="e.g., Plastic Free, 100% Organic, Carbon Neutral"
+            />
+          </div>
+          <button
+            type="submit"
+            className="w-full py-3 skeuo-button-primary text-xs uppercase tracking-widest rounded-xl font-bold"
+          >
+            Save Certifications
           </button>
         </form>
       </Modal>

@@ -60,8 +60,10 @@ export const AppProvider = ({ children }) => {
       if (data.success) {
         setOrders(prev => prev.map(o => o.id === orderId ? data.order : o));
       }
+      return data;
     } catch (err) {
       console.error('Error updating order status:', err);
+      return { success: false };
     }
   };
 

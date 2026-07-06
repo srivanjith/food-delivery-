@@ -109,7 +109,7 @@ export default function Navbar() {
               <Link
                 to="/auth"
                 id="desktop-login-link"
-                className="flex items-center space-x-1.5 px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-semibold rounded-xl transition-all shadow-md shadow-emerald-500/10 hover:shadow-emerald-500/20"
+                className="flex items-center space-x-1.5 px-4 py-2 skeuo-button-primary text-sm font-semibold rounded-xl"
               >
                 <User className="w-4 h-4" />
                 <span>Sign In</span>
@@ -205,7 +205,7 @@ export default function Navbar() {
                 to="/auth"
                 id="mobile-login-link"
                 onClick={() => setIsOpen(false)}
-                className="mt-4 flex items-center justify-center space-x-2 mx-3 px-3 py-3 bg-emerald-500 text-white rounded-xl text-base font-semibold hover:bg-emerald-600 transition-colors"
+                className="mt-4 flex items-center justify-center space-x-2 mx-3 px-3 py-3 skeuo-button-primary rounded-xl text-base font-semibold"
               >
                 <User className="w-5 h-5" />
                 <span>Sign In / Create Account</span>

@@ -20,10 +20,10 @@ export default function MenuFilter({ searchQuery, setSearchQuery, activeFilter, 
             <button
               key={filter.id}
               onClick={() => setActiveFilter(filter.id)}
-              className={`flex items-center space-x-1.5 px-4 py-2.5 rounded-xl text-xs font-bold border transition-all duration-200 shrink-0 cursor-pointer ${
+              className={`transition-all duration-200 shrink-0 ${
                 isActive
-                  ? 'bg-emerald-500 text-white border-emerald-550 shadow-md shadow-emerald-500/10'
-                  : 'bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-350 border-slate-205 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-850'
+                  ? 'neumo-button-active'
+                  : 'neumo-button'
               }`}
             >
               {filter.icon}
@@ -43,7 +43,7 @@ export default function MenuFilter({ searchQuery, setSearchQuery, activeFilter, 
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           placeholder="Search this menu..."
-          className="block w-full pl-10 pr-4 py-2.5 bg-white dark:bg-slate-900 border border-slate-205 dark:border-slate-800 rounded-xl focus:outline-none focus:ring-1.5 focus:ring-emerald-500 focus:border-transparent text-sm text-slate-700 dark:text-slate-200 placeholder-slate-400 font-sans"
+          className="block w-full pl-10 pr-4 py-2.5 neumo-input rounded-xl placeholder-slate-400 font-sans"
         />
       </div>
 

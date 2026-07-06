@@ -7,88 +7,90 @@ export default {
   darkMode: 'class',
   theme: {
     extend: {
-       colors: {
+      colors: {
         primary: {
-          50: '#FFFDF5',
-          100: '#FFF3D6',
-          200: '#FFEEC4',
-          300: '#C5E1A5',
-          400: '#9CCC65',
-          500: '#8BC34A',
-          600: '#7CB342',
-          700: '#689F38',
-          800: '#558B2F',
-          900: '#33691E',
+          50: '#F0FDF4',
+          100: '#DCFCE7',
+          200: '#BBF7D0',
+          300: '#86EFAC',
+          400: '#4ADE80',
+          500: '#10B981',
+          600: '#059669',
+          700: '#047857',
+          800: '#065F46',
+          900: '#064E3B',
         },
         slate: {
-          50: '#FFF3D6',  // Main cream background
-          100: '#FFEEC4', // Light cream border/bg
-          200: '#F2DFB8', // Soft sandy beige
-          300: '#C7B59F', // Warm light taupe
-          400: '#7A6956', // Readable text color (contrast with cream)
-          500: '#665543', // Deep muted text
-          650: '#544434', // Secondary dark text
-          600: '#544434',
-          700: '#423427', // Dark text
-          800: '#33271D', // Charcoal brown
-          900: '#241B14', // Very dark coffee
-          950: '#1A120C', // Deepest dark mode background
+          50: '#F9FAFB',  // Main clean off-white background
+          100: '#F3F4F6', // Light gray border/bg
+          200: '#E5E7EB', // Soft gray
+          300: '#D1D5DB', // Warm neutral gray
+          400: '#9CA3AF', // Secondary text color
+          500: '#6B7280', // Muted text
+          650: '#374151', // Accent text
+          600: '#4B5563', // Text body
+          700: '#374151', // Dark text
+          800: '#1F2937', // Dark gray
+          850: '#182030', // Dark charcoal/navy-gray
+          855: '#121824', // Deep dark charcoal
+          900: '#111827', // Crisp dark text
+          950: '#0B0F19', // Deep obsidian dark mode background
         },
         emerald: {
-          50: '#FFFDF5',
-          100: '#FFF3D6',
-          200: '#FFEEC4',
-          300: '#C5E1A5',
-          400: '#9CCC65',
-          500: '#8BC34A',
-          600: '#7CB342',
-          700: '#689F38',
-          800: '#558B2F',
-          900: '#33691E',
+          50: '#F0FDF4',
+          100: '#DCFCE7',
+          200: '#BBF7D0',
+          300: '#86EFAC',
+          400: '#4ADE80',
+          500: '#10B981',
+          600: '#059669',
+          700: '#047857',
+          800: '#065F46',
+          900: '#064E3B',
         },
         green: {
-          50: '#FFFDF5',
-          100: '#FFF3D6',
-          200: '#FFEEC4',
-          300: '#C5E1A5',
-          400: '#9CCC65',
-          500: '#8BC34A',
-          600: '#7CB342',
-          700: '#689F38',
-          800: '#558B2F',
-          900: '#33691E',
+          50: '#F0FDF4',
+          100: '#DCFCE7',
+          200: '#BBF7D0',
+          300: '#86EFAC',
+          400: '#4ADE80',
+          500: '#10B981',
+          600: '#059669',
+          700: '#047857',
+          800: '#065F46',
+          900: '#064E3B',
         },
         teal: {
-          50: '#FFFDF5',
-          100: '#FFF3D6',
-          200: '#FFEEC4',
-          300: '#C5E1A5',
-          400: '#9CCC65',
-          500: '#8BC34A',
-          600: '#7CB342',
-          700: '#689F38',
-          800: '#558B2F',
-          900: '#33691E',
+          50: '#F0FDF4',
+          100: '#DCFCE7',
+          200: '#BBF7D0',
+          300: '#86EFAC',
+          400: '#4ADE80',
+          500: '#10B981',
+          600: '#059669',
+          700: '#047857',
+          800: '#065F46',
+          900: '#064E3B',
         },
         orange: {
-          50: '#FFFBEB',
-          100: '#FFECE6',
-          200: '#FFD4C4',
-          300: '#FFA88A',
-          400: '#FF7B52',
-          500: '#F05A28',
-          600: '#D84315',
-          700: '#BF360C',
+          50: '#FFF5F2',
+          100: '#FFE4DE',
+          200: '#FFC9BE',
+          300: '#FFA291',
+          400: '#FF7E66',
+          500: '#FF6B4A',
+          600: '#E05232',
+          700: '#B83E21',
         },
         amber: {
-          50: '#FFFDF5',
-          100: '#FFF3D6',
-          200: '#FFE6A3',
-          300: '#FAD36E',
-          400: '#F6C445',
-          500: '#E0B036',
-          600: '#C79B2A',
-          700: '#A8811E',
+          50: '#FEFDF0',
+          100: '#FEF9C3',
+          200: '#FEF08A',
+          300: '#FDE047',
+          400: '#FACC15',
+          500: '#F59E0B',
+          600: '#D97706',
+          700: '#B45309',
         }
       },
       fontFamily: {

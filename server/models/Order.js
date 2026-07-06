@@ -12,6 +12,8 @@ const OrderSchema = new mongoose.Schema({
   date: { type: String, required: true },
   restaurantName: { type: String, required: true },
   restaurantId: { type: String, required: true },
+  customerName: { type: String },
+  customerEmail: { type: String },
   items: [OrderItemSchema],
   subtotal: { type: Number, required: true },
   packagingCharge: { type: Number, default: 0 },
