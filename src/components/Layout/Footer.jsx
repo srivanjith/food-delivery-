@@ -3,9 +3,9 @@ import { Leaf, Heart, Globe, Footprints } from 'lucide-react';
 
 export default function Footer() {
   return (
-    <footer className="bg-slate-900 text-slate-400 dark:bg-slate-955 border-t border-slate-800 font-sans">
+    <footer className="bg-slate-900 text-slate-300 border-t border-slate-800 font-sans">
       {/* Community Impact Banner */}
-      <div className="bg-gradient-to-r from-emerald-900 to-teal-900 text-white py-6 px-4">
+      <div className="bg-gradient-to-r from-emerald-800 to-teal-800 text-white py-6 px-4">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between text-center md:text-left gap-4">
           <div className="flex items-center space-x-3 justify-center md:justify-start">
             <div className="p-2 bg-emerald-500/20 text-emerald-400 rounded-lg">
@@ -13,7 +13,7 @@ export default function Footer() {
             </div>
             <div>
               <h4 className="font-bold text-base md:text-lg">Our Community's Green Footprint</h4>
-              <p className="text-emerald-205 text-xs md:text-sm">Every meal ordered helps heal the planet.</p>
+              <p className="text-emerald-100 text-xs md:text-sm">Every meal ordered helps heal the planet.</p>
             </div>
           </div>
           <div className="flex flex-wrap justify-center gap-6 md:gap-10">
@@ -52,7 +52,7 @@ export default function Footer() {
           {/* Quick Links */}
           <div>
             <h5 className="font-bold text-white mb-4 text-sm uppercase tracking-wider">Sustainable Sourcing</h5>
-            <ul className="space-y-2 text-sm">
+            <ul className="space-y-2 text-sm text-slate-400">
               <li><a href="#/" className="hover:text-emerald-400 transition-colors">100% Organic Farms</a></li>
               <li><a href="#/" className="hover:text-emerald-400 transition-colors">Zero-Waste Kitchen Standards</a></li>
               <li><a href="#/" className="hover:text-emerald-400 transition-colors">Self-Pickup Rewards</a></li>
@@ -63,7 +63,7 @@ export default function Footer() {
           {/* Delivery & Tech */}
           <div>
             <h5 className="font-bold text-white mb-4 text-sm uppercase tracking-wider">Green Fleet</h5>
-            <ul className="space-y-2 text-sm">
+            <ul className="space-y-2 text-sm text-slate-400">
               <li><a href="#/" className="hover:text-emerald-400 transition-colors">Bicycle Couriers</a></li>
               <li><a href="#/" className="hover:text-emerald-400 transition-colors">Electric Vehicles</a></li>
               <li><a href="#/" className="hover:text-emerald-400 transition-colors">Solar Drone Delivery</a></li>
@@ -74,7 +74,7 @@ export default function Footer() {
           {/* Contact / Newsletter */}
           <div>
             <h5 className="font-bold text-white mb-4 text-sm uppercase tracking-wider">Join the Movement</h5>
-            <p className="text-sm mb-4 leading-relaxed">Subscribe to get zero-waste recipes, green dining tips, and exclusive discounts.</p>
+            <p className="text-sm text-slate-400 mb-4 leading-relaxed">Subscribe to get zero-waste recipes, green dining tips, and exclusive discounts.</p>
             <div className="flex">
               <input
                 type="email"
@@ -92,7 +92,7 @@ export default function Footer() {
         <hr className="my-8 border-slate-800" />
 
         {/* Bottom Area */}
-        <div className="flex flex-col md:flex-row items-center justify-between text-xs text-slate-500 gap-4">
+        <div className="flex flex-col md:flex-row items-center justify-between text-xs text-slate-400 gap-4 font-sans">
           <p>© {new Date().getFullYear()} EcoEats Technologies Pvt Ltd. All rights reserved.</p>
           <p className="flex items-center">
             Made with <Heart className="w-3 h-3 text-red-500 mx-1 animate-pulse" /> for a healthier planet.

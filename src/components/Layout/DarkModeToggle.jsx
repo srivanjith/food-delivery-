@@ -5,11 +5,10 @@ export default function DarkModeToggle({ className = '' }) {
   const [isDark, setIsDark] = useState(false);
 
   useEffect(() => {
-    // Check initial state
+    // Default to light mode (cream background) instead of system dark preference
     const theme = localStorage.getItem('theme');
-    const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
     
-    if (theme === 'dark' || (!theme && systemPrefersDark)) {
+    if (theme === 'dark') {
       setIsDark(true);
       document.documentElement.classList.add('dark');
     } else {

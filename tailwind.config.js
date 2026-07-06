@@ -7,42 +7,88 @@ export default {
   darkMode: 'class',
   theme: {
     extend: {
-      colors: {
+       colors: {
         primary: {
-          50: '#ecfdf5',
-          100: '#d1fae5',
-          200: '#a7f3d0',
-          300: '#6ee7b7',
-          400: '#34d399',
-          500: '#10b981', // Emerald green
-          600: '#059669',
-          700: '#047857',
-          800: '#065f46',
-          900: '#064e3b',
-          950: '#022c22',
+          50: '#FFFDF5',
+          100: '#FFF3D6',
+          200: '#FFEEC4',
+          300: '#C5E1A5',
+          400: '#9CCC65',
+          500: '#8BC34A',
+          600: '#7CB342',
+          700: '#689F38',
+          800: '#558B2F',
+          900: '#33691E',
         },
-        secondary: {
-          50: '#f8fafc',
-          100: '#f1f5f9',
-          200: '#e2e8f0',
-          300: '#cbd5e1',
-          400: '#94a3b8',
-          500: '#64748b',
-          600: '#475569',
-          700: '#334155',
-          800: '#1e293b',
-          900: '#0f172a',
-          950: '#020617',
+        slate: {
+          50: '#FFF3D6',  // Main cream background
+          100: '#FFEEC4', // Light cream border/bg
+          200: '#F2DFB8', // Soft sandy beige
+          300: '#C7B59F', // Warm light taupe
+          400: '#7A6956', // Readable text color (contrast with cream)
+          500: '#665543', // Deep muted text
+          650: '#544434', // Secondary dark text
+          600: '#544434',
+          700: '#423427', // Dark text
+          800: '#33271D', // Charcoal brown
+          900: '#241B14', // Very dark coffee
+          950: '#1A120C', // Deepest dark mode background
         },
-        accent: {
-          50: '#fffbeb',
-          100: '#fef3c7',
-          200: '#fde68a',
-          300: '#fcd34d',
-          400: '#fbbf24',
-          500: '#f59e0b',
-          600: '#d97706',
-          700: '#b45309',
+        emerald: {
+          50: '#FFFDF5',
+          100: '#FFF3D6',
+          200: '#FFEEC4',
+          300: '#C5E1A5',
+          400: '#9CCC65',
+          500: '#8BC34A',
+          600: '#7CB342',
+          700: '#689F38',
+          800: '#558B2F',
+          900: '#33691E',
+        },
+        green: {
+          50: '#FFFDF5',
+          100: '#FFF3D6',
+          200: '#FFEEC4',
+          300: '#C5E1A5',
+          400: '#9CCC65',
+          500: '#8BC34A',
+          600: '#7CB342',
+          700: '#689F38',
+          800: '#558B2F',
+          900: '#33691E',
+        },
+        teal: {
+          50: '#FFFDF5',
+          100: '#FFF3D6',
+          200: '#FFEEC4',
+          300: '#C5E1A5',
+          400: '#9CCC65',
+          500: '#8BC34A',
+          600: '#7CB342',
+          700: '#689F38',
+          800: '#558B2F',
+          900: '#33691E',
+        },
+        orange: {
+          50: '#FFFBEB',
+          100: '#FFECE6',
+          200: '#FFD4C4',
+          300: '#FFA88A',
+          400: '#FF7B52',
+          500: '#F05A28',
+          600: '#D84315',
+          700: '#BF360C',
+        },
+        amber: {
+          50: '#FFFDF5',
+          100: '#FFF3D6',
+          200: '#FFE6A3',
+          300: '#FAD36E',
+          400: '#F6C445',
+          500: '#E0B036',
+          600: '#C79B2A',
+          700: '#A8811E',
         }
       },
       fontFamily: {

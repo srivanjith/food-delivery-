@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useApp } from '../context/AppContext';
 import { Link } from 'react-router-dom';
-import { MapPin, ClipboardList, Settings, Trash2, Edit, Plus } from 'lucide-react';
+import { MapPin, ClipboardList, Settings, Trash2, Edit, Plus, Camera } from 'lucide-react';
+import Modal from '../components/Common/Modal';
 
 export default function UserDashboard() {
   const { user, removeAddress, addAddress, updateProfile } = useAuth();
@@ -14,6 +15,40 @@ export default function UserDashboard() {
   const [isAddingAddress, setIsAddingAddress] = useState(false);
   const [newLabel, setNewLabel] = useState('');
   const [newValue, setNewValue] = useState('');
+
+  // Profile Edit State
+  const [isEditProfileOpen, setIsEditProfileOpen] = useState(false);
+  const [editName, setEditName] = useState('');
+  const [editAvatar, setEditAvatar] = useState('');
+
+  const handleOpenEditProfile = () => {
+    setEditName(user?.name || '');
+    setEditAvatar(user?.avatar || '');
+    setIsEditProfileOpen(true);
+  };
+
+  const handleSaveProfile = async () => {
+    if (!editName.trim()) return;
+    const success = await updateProfile({ name: editName, avatar: editAvatar });
+    if (success) {
+      setIsEditProfileOpen(false);
+    }
+  };
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      if (file.size > 2 * 1024 * 1024) {
+        alert('File is too large! Please select an image under 2MB.');
+        return;
+      }
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setEditAvatar(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   if (!user) {
     return (
@@ -83,14 +118,21 @@ export default function UserDashboard() {
         {/* Profile Card Header */}
         <div className="bg-white dark:bg-slate-900 border border-slate-205 dark:border-slate-800 rounded-3xl p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="flex flex-col md:flex-row items-center text-center md:text-left gap-4">
-            <img
-              src={user.avatar}
-              alt={user.name}
-              className="w-20 h-20 rounded-full object-cover border-2 border-emerald-500 shadow-md"
-            />
+            <div className="relative group cursor-pointer shrink-0" onClick={handleOpenEditProfile} title="Change Profile Photo">
+              <img
+                src={user.avatar}
+                alt={user.name}
+                className="w-20 h-20 rounded-full object-cover border-2 border-emerald-500 shadow-md group-hover:brightness-90 transition-all duration-300"
+              />
+              <div className="absolute inset-0 bg-black/40 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                <Camera className="w-5 h-5 text-white" />
+              </div>
+            </div>
             <div>
               <div className="flex flex-wrap items-center justify-center md:justify-start gap-2">
-                <h1 className="text-2xl font-extrabold text-slate-800 dark:text-white">{user.name}</h1>
+                <h1 className="text-2xl font-extrabold text-slate-800 dark:text-white flex items-center gap-1">
+                  {user.name}
+                </h1>
                 <span className="px-2 py-0.5 bg-emerald-50 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-400 text-[10px] font-bold uppercase rounded-md tracking-wider">
                   Verified Eco-Citizen
                 </span>
@@ -116,11 +158,18 @@ export default function UserDashboard() {
                 const el = document.getElementById('address-book-section');
                 if (el) el.scrollIntoView({ behavior: 'smooth' });
               }}
-              className="px-4 py-2 border border-slate-202 dark:border-slate-800 rounded-xl text-xs font-bold text-slate-655 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-850 cursor-pointer"
+              className="px-4 py-2 border border-slate-200 dark:border-slate-800 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer"
             >
               Edit Addresses
             </button>
-            <button className="p-2 border border-slate-202 dark:border-slate-800 rounded-xl text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-850 cursor-pointer">
+            <button 
+              onClick={handleOpenEditProfile}
+              className="px-4 py-2 bg-emerald-50 text-emerald-600 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-900/30 rounded-xl text-xs font-bold hover:bg-emerald-100 dark:hover:bg-emerald-900/50 cursor-pointer flex items-center gap-1.5"
+            >
+              <Edit className="w-3.5 h-3.5" />
+              Edit Profile
+            </button>
+            <button className="p-2 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer">
               <Settings className="w-4.5 h-4.5" />
             </button>
           </div>
@@ -382,6 +431,77 @@ export default function UserDashboard() {
         </div>
 
       </div>
+
+      {/* EDIT PROFILE MODAL */}
+      <Modal
+        isOpen={isEditProfileOpen}
+        onClose={() => setIsEditProfileOpen(false)}
+        title="Edit Eco-Citizen Profile"
+        size="md"
+      >
+        <div className="space-y-6">
+          {/* Avatar Preview */}
+          <div className="flex flex-col items-center">
+            <img
+              src={editAvatar || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80'}
+              alt="Avatar Preview"
+              className="w-24 h-24 rounded-full object-cover border-4 border-emerald-500 shadow-lg"
+            />
+            <span className="text-[10px] font-extrabold text-slate-400 mt-2 uppercase tracking-wider">Avatar Preview</span>
+          </div>
+
+          {/* Name Input */}
+          <div className="space-y-1.5">
+            <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">
+              Display Name
+            </label>
+            <input
+              type="text"
+              value={editName}
+              onChange={(e) => setEditName(e.target.value)}
+              placeholder="Your full name"
+              className="w-full px-3.5 py-2.5 border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 rounded-xl text-slate-805 dark:text-slate-100 font-sans text-xs focus:outline-none focus:border-emerald-500"
+            />
+          </div>          {/* Local File Upload Input */}
+          <div className="space-y-1.5">
+            <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">
+              Upload Profile Photo from Computer
+            </label>
+            <div className="flex flex-wrap items-center gap-3">
+              <label className="flex items-center justify-center px-4 py-2 border border-emerald-500 text-emerald-600 dark:text-emerald-455 hover:bg-emerald-50 dark:hover:bg-emerald-950/20 rounded-xl text-xs font-bold cursor-pointer transition-colors gap-1.5">
+                <Camera className="w-4 h-4" />
+                Choose Image File
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleFileChange}
+                  className="hidden"
+                />
+              </label>
+              <span className="text-[10px] text-slate-400">
+                Supports JPG, PNG or WEBP (Max 2MB)
+              </span>
+            </div>
+          </div>
+
+          {/* Modal Actions */}
+          <div className="flex justify-end space-x-3 pt-4 border-t border-slate-100 dark:border-slate-800">
+            <button
+              onClick={() => setIsEditProfileOpen(false)}
+              className="px-4 py-2 border border-slate-200 dark:border-slate-800 rounded-xl text-xs font-bold text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-850 cursor-pointer transition-colors"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleSaveProfile}
+              className="px-5 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl text-xs font-bold shadow-md hover:shadow-emerald-500/10 transition-all cursor-pointer"
+            >
+              Save Changes
+            </button>
+          </div>
+        </div>
+      </Modal>
+
     </div>
   );
 }

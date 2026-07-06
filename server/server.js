@@ -15,7 +15,8 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ limit: '10mb', extended: true }));
 
 // Initialize MongoDB connection
 mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/ecoeats')
@@ -87,11 +88,13 @@ app.post('/api/auth/signup', async (req, res) => {
 });
 
 app.put('/api/auth/profile', async (req, res) => {
-  const { userId, savedAddresses, ecoPoints } = req.body;
+  const { userId, savedAddresses, ecoPoints, name, avatar } = req.body;
   try {
     const updateFields = {};
     if (savedAddresses !== undefined) updateFields.savedAddresses = savedAddresses;
     if (ecoPoints !== undefined) updateFields.ecoPoints = ecoPoints;
+    if (name !== undefined) updateFields.name = name;
+    if (avatar !== undefined) updateFields.avatar = avatar;
 
     const updatedUser = await User.findOneAndUpdate(
       { id: userId },

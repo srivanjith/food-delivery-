@@ -74,7 +74,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   const updateProfile = async (updatedData) => {
-    if (!user) return;
+    if (!user) return false;
     try {
       const response = await fetch('/api/auth/profile', {
         method: 'PUT',
@@ -85,11 +85,14 @@ export const AuthProvider = ({ children }) => {
       if (response.ok && data.success) {
         setUser(data.user);
         localStorage.setItem('ecoeats_user', JSON.stringify(data.user));
+        return true;
       } else {
         throw new Error(data.message || 'Profile update failed');
       }
     } catch (err) {
       console.error('Update profile error:', err);
+      alert(`Profile update failed: ${err.message}`);
+      return false;
     }
   };
 

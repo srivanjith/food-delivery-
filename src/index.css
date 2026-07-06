@@ -1,5 +1,80 @@
 @import "tailwindcss";
 
+@theme {
+  /* Leafy Green / Lime Green (#8BC34A) as primary */
+  --color-emerald-50: #FFFDF5;
+  --color-emerald-100: #FFF3D6;
+  --color-emerald-200: #FFEEC4;
+  --color-emerald-300: #C5E1A5;
+  --color-emerald-400: #9CCC65;
+  --color-emerald-500: #8BC34A;
+  --color-emerald-600: #7CB342;
+  --color-emerald-700: #689F38;
+  --color-emerald-800: #558B2F;
+  --color-emerald-900: #33691E;
+
+  /* Teal overrides (blend into Leafy Green) */
+  --color-teal-50: #FFFDF5;
+  --color-teal-100: #FFF3D6;
+  --color-teal-200: #FFEEC4;
+  --color-teal-300: #C5E1A5;
+  --color-teal-400: #9CCC65;
+  --color-teal-500: #8BC34A;
+  --color-teal-600: #7CB342;
+  --color-teal-700: #689F38;
+  --color-teal-800: #558B2F;
+  --color-teal-900: #33691E;
+
+  /* Green overrides (blend into Leafy Green) */
+  --color-green-50: #FFFDF5;
+  --color-green-100: #FFF3D6;
+  --color-green-200: #FFEEC4;
+  --color-green-300: #C5E1A5;
+  --color-green-400: #9CCC65;
+  --color-green-500: #8BC34A;
+  --color-green-600: #7CB342;
+  --color-green-700: #689F38;
+  --color-green-800: #558B2F;
+  --color-green-900: #33691E;
+
+  /* Warm Orange / Coral (#F05A28) as secondary */
+  --color-orange-50: #FFFBEB;
+  --color-orange-100: #FFECE6;
+  --color-orange-200: #FFD4C4;
+  --color-orange-300: #FFA88A;
+  --color-orange-400: #FF7B52;
+  --color-orange-500: #F05A28;
+  --color-orange-600: #D84315;
+  --color-orange-700: #BF360C;
+
+  /* Gold / Yellow (#F6C445) as accent */
+  --color-amber-50: #FFFDF5;
+  --color-amber-100: #FFF3D6;
+  --color-amber-200: #FFE6A3;
+  --color-amber-300: #FAD36E;
+  --color-amber-400: #F6C445;
+  --color-amber-500: #E0B036;
+  --color-amber-600: #C79B2A;
+  --color-amber-700: #A8811E;
+
+  /* Cream (#FFF3D6) as background bases */
+  --color-cream: #FFF3D6;
+  
+  /* Slate overrides using Dark Brown / Charcoal (#3B2F2F) and Cream (#FFF3D6) */
+  --color-slate-50: #FFF3D6; /* Base cream bg for light mode */
+  --color-slate-100: #FFEEC4;
+  --color-slate-200: #F2DFB8;
+  --color-slate-300: #C7B59F;
+  --color-slate-400: #7A6956;
+  --color-slate-500: #665543;
+  --color-slate-650: #544434;
+  --color-slate-600: #544434;
+  --color-slate-700: #423427;
+  --color-slate-800: #33271D;
+  --color-slate-900: #241B14; /* Primary dark brown text */
+  --color-slate-950: #1A120C; /* Dark mode deep chocolate brown background */
+}
+
 @layer base {
   body {
     @apply bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100 transition-colors duration-300;
@@ -21,15 +96,15 @@
 
 /* Premium gradient backgrounds */
 .hero-gradient {
-  background: radial-gradient(circle at 10% 20%, rgba(16, 185, 129, 0.08) 0%, rgba(52, 211, 153, 0.03) 90%);
+  background: radial-gradient(circle at 10% 20%, rgba(139, 195, 74, 0.1) 0%, rgba(240, 90, 40, 0.04) 90%);
 }
 
 .dark .hero-gradient {
-  background: radial-gradient(circle at 10% 20%, rgba(2, 44, 34, 0.4) 0%, rgba(15, 23, 42, 0.1) 90%);
+  background: radial-gradient(circle at 10% 20%, rgba(59, 47, 47, 0.4) 0%, rgba(41, 32, 32, 0.15) 90%);
 }
 
 .green-gradient-text {
-  @apply bg-gradient-to-r from-emerald-600 to-teal-500 bg-clip-text text-transparent dark:from-emerald-400 dark:to-teal-300;
+  @apply bg-gradient-to-r from-emerald-500 to-amber-500 bg-clip-text text-transparent;
 }
 
 /* Custom Scrollbar */
@@ -64,4 +139,9 @@
 /* Skeleton Loading Animation */
 .skeleton {
   @apply animate-pulse bg-slate-200 dark:bg-slate-800 rounded-xl;
+}
+
+/* Global premium background color override */
+body, html, #root, .min-h-screen, .bg-slate-50 {
+  background-color: #FFF3D6 !important;
 }

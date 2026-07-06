@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useCart } from '../../context/CartContext';
-import DarkModeToggle from './DarkModeToggle';
 import { ShoppingCart, User, LogOut, Menu, X, Leaf, ShieldAlert } from 'lucide-react';
 
 export default function Navbar() {
@@ -22,9 +21,8 @@ export default function Navbar() {
 
   const isActive = (path) => location.pathname === path;
 
-
   return (
-    <nav className="sticky top-0 z-40 w-full glass-effect transition-all duration-300">
+    <nav className="sticky top-0 z-40 w-full bg-slate-900/95 backdrop-blur-md border-b border-slate-800 text-slate-200 shadow-lg transition-all duration-300">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
@@ -32,7 +30,7 @@ export default function Navbar() {
             <div className="p-2 bg-emerald-500 rounded-xl text-white group-hover:scale-105 transition-transform duration-250">
               <Leaf className="w-5 h-5" />
             </div>
-            <span className="text-xl font-bold tracking-tight bg-gradient-to-r from-emerald-600 to-teal-500 bg-clip-text text-transparent dark:from-emerald-400 dark:to-teal-300 font-sans">
+            <span className="text-xl font-bold tracking-tight bg-gradient-to-r from-emerald-500 to-amber-400 bg-clip-text text-transparent font-sans">
               EcoEats
             </span>
           </Link>
@@ -42,7 +40,7 @@ export default function Navbar() {
             <Link
               to="/"
               className={`text-sm font-semibold transition-colors duration-200 ${
-                isActive('/') ? 'text-emerald-500 dark:text-emerald-400' : 'text-slate-600 dark:text-slate-350 hover:text-emerald-500 dark:hover:text-emerald-400'
+                isActive('/') ? 'text-emerald-500' : 'text-slate-300 hover:text-emerald-400'
               }`}
             >
               Order Meals
@@ -52,10 +50,10 @@ export default function Navbar() {
               <Link
                 to="/admin"
                 className={`flex items-center text-sm font-semibold transition-colors duration-200 ${
-                  isActive('/admin') ? 'text-emerald-500 dark:text-emerald-400' : 'text-slate-600 dark:text-slate-350 hover:text-emerald-500 dark:hover:text-emerald-400'
+                  isActive('/admin') ? 'text-emerald-500' : 'text-slate-300 hover:text-emerald-400'
                 }`}
               >
-                <ShieldAlert className="w-4 h-4 mr-1 text-amber-500" />
+                <ShieldAlert className="w-4 h-4 mr-1 text-amber-400" />
                 Admin Panel
               </Link>
             )}
@@ -64,7 +62,7 @@ export default function Navbar() {
               <Link
                 to="/dashboard"
                 className={`text-sm font-semibold transition-colors duration-200 ${
-                  isActive('/dashboard') ? 'text-emerald-500 dark:text-emerald-400' : 'text-slate-600 dark:text-slate-350 hover:text-emerald-500 dark:hover:text-emerald-400'
+                  isActive('/dashboard') ? 'text-emerald-500' : 'text-slate-300 hover:text-emerald-400'
                 }`}
               >
                 Dashboard
@@ -74,17 +72,15 @@ export default function Navbar() {
 
           {/* Desktop Right items */}
           <div className="hidden md:flex items-center space-x-4">
-            <DarkModeToggle />
-
             {/* Cart Button */}
             <Link
               to="/cart"
               id="desktop-cart-link"
-              className="relative p-2 text-slate-600 dark:text-slate-300 hover:text-emerald-500 dark:hover:text-emerald-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-all duration-200"
+              className="relative p-2 text-slate-300 hover:text-emerald-400 hover:bg-slate-800 rounded-xl transition-all duration-200"
             >
               <ShoppingCart className="w-5 h-5" />
               {cartCount > 0 && (
-                <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-emerald-500 text-[10px] font-bold text-white ring-2 ring-white dark:ring-slate-950 animate-bounce">
+                <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-emerald-500 text-[10px] font-bold text-white ring-2 ring-slate-900 animate-bounce">
                   {cartCount}
                 </span>
               )}
@@ -103,7 +99,7 @@ export default function Navbar() {
                 <button
                   onClick={handleLogout}
                   id="desktop-logout-btn"
-                  className="p-2 text-slate-500 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20 rounded-xl transition-colors cursor-pointer"
+                  className="p-2 text-slate-300 hover:text-red-400 hover:bg-slate-800 rounded-xl transition-colors cursor-pointer"
                   title="Logout"
                 >
                   <LogOut className="w-5 h-5" />
@@ -113,7 +109,7 @@ export default function Navbar() {
               <Link
                 to="/auth"
                 id="desktop-login-link"
-                className="flex items-center space-x-1.5 px-4 py-2 bg-emerald-500 hover:bg-emerald-600 dark:bg-emerald-600 dark:hover:bg-emerald-700 text-white text-sm font-semibold rounded-xl transition-all shadow-md shadow-emerald-500/10 hover:shadow-emerald-500/20"
+                className="flex items-center space-x-1.5 px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-semibold rounded-xl transition-all shadow-md shadow-emerald-500/10 hover:shadow-emerald-500/20"
               >
                 <User className="w-4 h-4" />
                 <span>Sign In</span>
@@ -123,21 +119,20 @@ export default function Navbar() {
 
           {/* Mobile menu button */}
           <div className="md:hidden flex items-center space-x-2">
-            <DarkModeToggle />
             <Link
               to="/cart"
-              className="relative p-2 text-slate-600 dark:text-slate-350 hover:text-emerald-500 dark:hover:text-emerald-400 rounded-xl"
+              className="relative p-2 text-slate-300 hover:text-emerald-400 rounded-xl"
             >
               <ShoppingCart className="w-5 h-5" />
               {cartCount > 0 && (
-                <span className="absolute top-0 right-0 flex h-4.5 w-4.5 items-center justify-center rounded-full bg-emerald-500 text-[9px] font-bold text-white ring-2 ring-white dark:ring-slate-900">
+                <span className="absolute top-0 right-0 flex h-4.5 w-4.5 items-center justify-center rounded-full bg-emerald-500 text-[9px] font-bold text-white ring-2 ring-slate-900">
                   {cartCount}
                 </span>
               )}
             </Link>
             <button
               onClick={() => setIsOpen(!isOpen)}
-              className="p-2 text-slate-600 dark:text-slate-350 hover:text-emerald-500 dark:hover:text-emerald-400 rounded-xl"
+              className="p-2 text-slate-300 hover:text-emerald-400 rounded-xl"
             >
               {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
@@ -147,13 +142,13 @@ export default function Navbar() {
 
       {/* Mobile Menu */}
       {isOpen && (
-        <div className="md:hidden border-t border-slate-100 dark:border-slate-800/80 bg-white/95 dark:bg-slate-950/95 backdrop-blur-md transition-all duration-300">
+        <div className="md:hidden border-t border-slate-800 bg-slate-900/95 backdrop-blur-md transition-all duration-300">
           <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 text-center">
             <Link
               to="/"
               onClick={() => setIsOpen(false)}
               className={`block px-3 py-2.5 rounded-xl text-base font-semibold ${
-                isActive('/') ? 'bg-emerald-50 dark:bg-emerald-950/30 text-emerald-500 dark:text-emerald-400' : 'text-slate-600 dark:text-slate-300'
+                isActive('/') ? 'bg-slate-800 text-emerald-500' : 'text-slate-300 hover:text-emerald-400'
               }`}
             >
               Order Meals
@@ -163,7 +158,7 @@ export default function Navbar() {
               <Link
                 to="/admin"
                 onClick={() => setIsOpen(false)}
-                className={`block px-3 py-2.5 rounded-xl text-base font-semibold text-amber-500 bg-amber-50 dark:bg-amber-950/20`}
+                className="block px-3 py-2.5 rounded-xl text-base font-semibold text-amber-400 bg-slate-800"
               >
                 Admin Panel Dashboard
               </Link>
@@ -174,7 +169,7 @@ export default function Navbar() {
                 to="/dashboard"
                 onClick={() => setIsOpen(false)}
                 className={`block px-3 py-2.5 rounded-xl text-base font-semibold ${
-                  isActive('/dashboard') ? 'bg-emerald-50 dark:bg-emerald-950/30 text-emerald-500 dark:text-emerald-400' : 'text-slate-600 dark:text-slate-300'
+                  isActive('/dashboard') ? 'bg-slate-800 text-emerald-500' : 'text-slate-300 hover:text-emerald-400'
                 }`}
               >
                 Dashboard
@@ -182,24 +177,24 @@ export default function Navbar() {
             )}
 
             {user ? (
-              <div className="pt-4 border-t border-slate-150 dark:border-slate-800">
+              <div className="pt-4 border-t border-slate-800">
                 <div className="flex items-center justify-center space-x-3 px-3 py-2">
                   <img
-                    src={user.avatar}
+                    src={user.avatar || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80'}
                     alt="User avatar"
                     className="w-10 h-10 rounded-full object-cover border border-emerald-500"
                   />
                   <div className="text-left">
-                    <div className="font-semibold text-slate-800 dark:text-slate-200">{user.name}</div>
+                    <div className="font-semibold text-slate-200">{user.name}</div>
                     {user.role === 'customer' && (
-                      <div className="text-emerald-500 dark:text-emerald-400 font-bold text-xs font-sans">🌱 {user.ecoPoints} Points</div>
+                      <div className="text-emerald-400 font-bold text-xs font-sans">🌱 {user.ecoPoints || 0} Points</div>
                     )}
                   </div>
                 </div>
                 <button
                   onClick={handleLogout}
                   id="mobile-logout-btn"
-                  className="w-full mt-2 flex items-center justify-center space-x-2 px-3 py-3 rounded-xl text-base font-semibold text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20 cursor-pointer"
+                  className="w-full mt-2 flex items-center justify-center space-x-2 px-3 py-3 rounded-xl text-base font-semibold text-red-400 hover:bg-slate-800 cursor-pointer"
                 >
                   <LogOut className="w-5 h-5" />
                   <span>Sign Out</span>
