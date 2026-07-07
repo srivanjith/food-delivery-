@@ -3,7 +3,7 @@ import { Search, Compass, ShieldCheck } from 'lucide-react';
 
 export default function Hero({ searchQuery, setSearchQuery }) {
   return (
-    <div className="relative overflow-hidden bg-slate-900 py-12 md:py-20 px-4 sm:px-6 lg:px-8 border-b border-slate-800 font-sans">
+    <div className="relative overflow-hidden bg-transparent py-12 md:py-20 px-4 sm:px-6 lg:px-8 border-b border-transparent font-sans">
       <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
         
         {/* Left Side: Copywriting & Search */}

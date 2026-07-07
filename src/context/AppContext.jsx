@@ -26,30 +26,52 @@ export const AppProvider = ({ children }) => {
     return headers;
   };
 
+  const loadOrders = async () => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      setOrders([]);
+      return;
+    }
+    try {
+      const res = await fetch('/api/orders', { headers: getAuthHeaders() });
+      if (res.status === 401) {
+        setOrders([]);
+        return;
+      }
+      const data = await res.json();
+      setOrders(Array.isArray(data) ? data : []);
+    } catch (e) {
+      console.error('Error fetching orders:', e);
+    }
+  };
+
   useEffect(() => {
     const loadInitialData = async () => {
       try {
         const headers = getAuthHeaders();
-        const [restRes, foodRes, ordersRes, reviewsRes] = await Promise.all([
+        const [restRes, foodRes, reviewsRes] = await Promise.all([
           fetch('/api/restaurants'),
           fetch('/api/food-items'),
-          fetch('/api/orders', { headers }),
           fetch('/api/reviews')
         ]);
         const rests = await restRes.json();
         const foods = await foodRes.json();
-        const ords = await ordersRes.json();
         const revs = await reviewsRes.json();
-        
+
         setRestaurants(rests);
         setFoodItems(foods);
-        setOrders(ords);
         setReviews(revs);
       } catch (e) {
         console.error('Error fetching backend data:', e);
       }
     };
+
     loadInitialData();
+    loadOrders();
+
+    // Re-fetch orders whenever login/logout happens
+    window.addEventListener('auth-changed', loadOrders);
+    return () => window.removeEventListener('auth-changed', loadOrders);
   }, []);
 
   const addOrder = async (order) => {

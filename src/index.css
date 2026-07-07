@@ -1,308 +1,685 @@
 @import "tailwindcss";
 
+/* ============================================================
+   MIDNIGHT PURPLE THEME — CSS CUSTOM PROPERTIES
+   Background : #0F172A  |  Cards    : #1E293B
+   Sidebar    : #111827  |  Primary  : #8B5CF6
+   Hover      : #7C3AED  |  Text     : #FFFFFF
+   Success    : #22C55E  |  Warning  : #F59E0B
+   ============================================================ */
+
+:root {
+  --mp-bg:       #0F172A;
+  --mp-sidebar:  #111827;
+  --mp-card:     #1E293B;
+  --mp-primary:  #8B5CF6;
+  --mp-hover:    #7C3AED;
+  --mp-text:     #FFFFFF;
+  --mp-muted:    #94A3B8;
+  --mp-border:   rgba(139, 92, 246, 0.18);
+  --mp-success:  #22C55E;
+  --mp-warning:  #F59E0B;
+  --mp-danger:   #EF4444;
+  --mp-glow:     rgba(139, 92, 246, 0.35);
+}
+
 @theme {
-  /* Forest Mint & Emerald Green (#10B981) as primary */
-  --color-emerald-50: #F0FDF4;
+  /* Purple primary palette */
+  --color-violet-50:  #F5F3FF;
+  --color-violet-100: #EDE9FE;
+  --color-violet-200: #DDD6FE;
+  --color-violet-300: #C4B5FD;
+  --color-violet-400: #A78BFA;
+  --color-violet-500: #8B5CF6;
+  --color-violet-600: #7C3AED;
+  --color-violet-700: #6D28D9;
+  --color-violet-800: #5B21B6;
+  --color-violet-900: #4C1D95;
+
+  /* Slate overrides → Midnight Purple neutrals */
+  --color-slate-50:  #F8FAFC;
+  --color-slate-100: #F1F5F9;
+  --color-slate-200: #E2E8F0;
+  --color-slate-300: #CBD5E1;
+  --color-slate-400: #94A3B8;
+  --color-slate-500: #64748B;
+  --color-slate-600: #475569;
+  --color-slate-650: #334155;
+  --color-slate-700: #334155;
+  --color-slate-800: #1E293B;
+  --color-slate-850: #172033;
+  --color-slate-855: #111827;
+  --color-slate-900: #111827;
+  --color-slate-950: #0F172A;
+
+  /* Emerald (keep for eco accents) */
+  --color-emerald-50:  #F0FDF4;
   --color-emerald-100: #DCFCE7;
-  --color-emerald-200: #BBF7D0;
-  --color-emerald-300: #86EFAC;
   --color-emerald-400: #4ADE80;
-  --color-emerald-500: #10B981;
-  --color-emerald-600: #059669;
-  --color-emerald-700: #047857;
-  --color-emerald-800: #065F46;
-  --color-emerald-900: #064E3B;
+  --color-emerald-500: #22C55E;
+  --color-emerald-600: #16A34A;
+  --color-emerald-700: #15803D;
+  --color-emerald-800: #166534;
+  --color-emerald-900: #14532D;
+  --color-emerald-950: #052e16;
 
-  /* Teal overrides (blend into Leafy Green) */
-  --color-teal-50: #F0FDF4;
-  --color-teal-100: #DCFCE7;
-  --color-teal-200: #BBF7D0;
-  --color-teal-300: #86EFAC;
-  --color-teal-400: #4ADE80;
-  --color-teal-500: #10B981;
-  --color-teal-600: #059669;
-  --color-teal-700: #047857;
-  --color-teal-800: #065F46;
-  --color-teal-900: #064E3B;
-
-  /* Green overrides (blend into Leafy Green) */
-  --color-green-50: #F0FDF4;
-  --color-green-100: #DCFCE7;
-  --color-green-200: #BBF7D0;
-  --color-green-300: #86EFAC;
-  --color-green-400: #4ADE80;
-  --color-green-500: #10B981;
-  --color-green-600: #059669;
-  --color-green-700: #047857;
-  --color-green-800: #065F46;
-  --color-green-900: #064E3B;
-
-  /* Coral Salmon (#FF6B4A) as secondary */
-  --color-orange-50: #FFF5F2;
-  --color-orange-100: #FFE4DE;
-  --color-orange-200: #FFC9BE;
-  --color-orange-300: #FFA291;
-  --color-orange-400: #FF7E66;
-  --color-orange-500: #FF6B4A;
-  --color-orange-600: #E05232;
-  --color-orange-700: #B83E21;
-
-  /* Honey Gold (#F59E0B) as accent */
-  --color-amber-50: #FEFDF0;
-  --color-amber-100: #FEF9C3;
-  --color-amber-200: #FEF08A;
-  --color-amber-300: #FDE047;
-  --color-amber-400: #FACC15;
+  /* Amber warning */
+  --color-amber-50:  #FFFBEB;
+  --color-amber-100: #FEF3C7;
+  --color-amber-300: #FCD34D;
+  --color-amber-400: #FBBF24;
   --color-amber-500: #F59E0B;
   --color-amber-600: #D97706;
   --color-amber-700: #B45309;
 
-  /* Clean background bases */
-  --color-cream: #F9FAFB;
-  
-  /* Slate overrides using premium Charcoal grays and Clean off-whites */
-  --color-slate-50: #F9FAFB; /* Base off-white bg for light mode */
-  --color-slate-100: #F3F4F6;
-  --color-slate-200: #E5E7EB;
-  --color-slate-300: #D1D5DB;
-  --color-slate-400: #9CA3AF;
-  --color-slate-500: #6B7280;
-  --color-slate-650: #374151;
-  --color-slate-600: #4B5563;
-  --color-slate-700: #374151;
-  --color-slate-800: #1F2937;
-  --color-slate-850: #182030;
-  --color-slate-855: #121824;
-  --color-slate-900: #111827; /* Primary crisp dark text */
-  --color-slate-950: #0B0F19; /* Obsidian black dark mode background */
+  /* Orange */
+  --color-orange-400: #FB923C;
+  --color-orange-500: #F97316;
+  --color-orange-600: #EA580C;
+
+  /* Teal */
+  --color-teal-400: #2DD4BF;
+  --color-teal-500: #14B8A6;
+  --color-teal-600: #0D9488;
+
+  /* Font */
+  --font-sans: 'Outfit', 'Inter', sans-serif;
+
+  /* Animations */
+  --animate-bounce-slow: bounce 3s infinite;
+  --animate-pulse-slow:  pulse 4s infinite;
+  --animate-float:       float 3s ease-in-out infinite;
 }
 
+/* ============================================================
+   GLOBAL BASE
+   ============================================================ */
 @layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
   body {
-    @apply bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100 transition-colors duration-300;
+    background-color: var(--mp-bg);
+    color: var(--mp-text);
+    font-family: 'Outfit', 'Inter', sans-serif;
+    transition: background-color 0.3s, color 0.3s;
+  }
+
+  /* Force dark mode always on — Midnight Purple IS the theme */
+  :root {
+    color-scheme: dark;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    color: var(--mp-text);
+  }
+
+  p {
+    color: var(--mp-muted);
   }
 }
 
-/* Glassmorphism helpers */
+/* ============================================================
+   SCROLLBAR — Purple tinted
+   ============================================================ */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--mp-sidebar);
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--mp-primary);
+  border-radius: 999px;
+  opacity: 0.7;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--mp-hover);
+}
+
+/* ============================================================
+   MIDNIGHT PURPLE CARD / PANEL UTILITY CLASSES
+   ============================================================ */
+.mp-card {
+  background-color: var(--mp-card);
+  border: 1px solid var(--mp-border);
+  border-radius: 1.25rem;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.35),
+              inset 0 1px 0 rgba(139, 92, 246, 0.08);
+}
+
+.mp-card-hover {
+  transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+}
+.mp-card-hover:hover {
+  border-color: rgba(139, 92, 246, 0.45);
+  box-shadow: 0 8px 32px rgba(139, 92, 246, 0.18);
+  transform: translateY(-2px);
+}
+
+.mp-sidebar {
+  background-color: var(--mp-sidebar);
+  border-right: 1px solid var(--mp-border);
+}
+
+.mp-btn-primary {
+  background: linear-gradient(135deg, var(--mp-primary), var(--mp-hover));
+  color: #fff;
+  border: none;
+  border-radius: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.15s, box-shadow 0.2s;
+  box-shadow: 0 4px 16px rgba(139, 92, 246, 0.4);
+}
+.mp-btn-primary:hover {
+  opacity: 0.92;
+  box-shadow: 0 6px 24px rgba(124, 58, 237, 0.55);
+  transform: translateY(-1px);
+}
+.mp-btn-primary:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(124, 58, 237, 0.3);
+}
+
+.mp-btn-secondary {
+  background-color: rgba(139, 92, 246, 0.12);
+  color: var(--mp-primary);
+  border: 1px solid rgba(139, 92, 246, 0.3);
+  border-radius: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 0.2s, border-color 0.2s;
+}
+.mp-btn-secondary:hover {
+  background-color: rgba(139, 92, 246, 0.22);
+  border-color: rgba(139, 92, 246, 0.5);
+}
+
+.mp-input {
+  background-color: rgba(15, 23, 42, 0.8);
+  border: 1px solid var(--mp-border);
+  border-radius: 0.75rem;
+  color: var(--mp-text);
+  transition: border-color 0.2s, box-shadow 0.2s;
+  outline: none;
+}
+.mp-input:focus {
+  border-color: var(--mp-primary);
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2);
+}
+.mp-input::placeholder {
+  color: var(--mp-muted);
+  opacity: 0.6;
+}
+
+.mp-badge-success {
+  background-color: rgba(34, 197, 94, 0.12);
+  color: var(--mp-success);
+  border: 1px solid rgba(34, 197, 94, 0.25);
+  border-radius: 9999px;
+  font-weight: 700;
+  font-size: 0.65rem;
+  padding: 0.15rem 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.mp-badge-warning {
+  background-color: rgba(245, 158, 11, 0.12);
+  color: var(--mp-warning);
+  border: 1px solid rgba(245, 158, 11, 0.25);
+  border-radius: 9999px;
+  font-weight: 700;
+  font-size: 0.65rem;
+  padding: 0.15rem 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.mp-badge-primary {
+  background-color: rgba(139, 92, 246, 0.15);
+  color: var(--mp-primary);
+  border: 1px solid rgba(139, 92, 246, 0.3);
+  border-radius: 9999px;
+  font-weight: 700;
+  font-size: 0.65rem;
+  padding: 0.15rem 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* ============================================================
+   GLASSMORPHISM — Purple-tinted glass
+   ============================================================ */
 .glass-effect {
-  @apply backdrop-blur-md bg-white/75 dark:bg-slate-900/75 border border-white/20 dark:border-slate-800/50 shadow-lg;
+  backdrop-filter: blur(14px);
+  background: rgba(17, 24, 39, 0.75);
+  border: 1px solid rgba(139, 92, 246, 0.15);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
 }
 
 .glass-card {
-  @apply backdrop-blur-sm bg-white/40 dark:bg-slate-900/40 border border-white/10 dark:border-slate-800/30 rounded-2xl shadow-md transition-all duration-300;
+  backdrop-filter: blur(10px);
+  background: rgba(30, 41, 59, 0.6);
+  border: 1px solid rgba(139, 92, 246, 0.12);
+  border-radius: 1rem;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  transition: all 0.3s;
 }
 
-.glass-card-hover {
-  @apply hover:bg-white/60 dark:hover:bg-slate-900/60 hover:border-white/20 dark:hover:border-slate-800/50 hover:shadow-xl hover:-translate-y-1;
+.glass-card-hover:hover {
+  background: rgba(30, 41, 59, 0.8);
+  border-color: rgba(139, 92, 246, 0.3);
+  box-shadow: 0 8px 32px rgba(139, 92, 246, 0.15);
+  transform: translateY(-2px);
 }
 
-/* Premium gradient backgrounds */
-.hero-gradient {
-  background: radial-gradient(circle at 10% 20%, rgba(16, 185, 129, 0.1) 0%, rgba(255, 107, 74, 0.04) 90%);
+/* ============================================================
+   SKEUO GLASS CARD — Purple aurora
+   ============================================================ */
+.skeuo-glass-card {
+  backdrop-filter: blur(16px);
+  background: rgba(17, 24, 39, 0.65);
+  border: 1px solid rgba(139, 92, 246, 0.18);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3),
+              inset 0 1px 0 rgba(139, 92, 246, 0.1);
 }
 
-.dark .hero-gradient {
-  background: radial-gradient(circle at 10% 20%, rgba(16, 185, 129, 0.08) 0%, rgba(255, 107, 74, 0.02) 90%);
-}
-
-.green-gradient-text {
-  @apply bg-gradient-to-r from-emerald-500 to-amber-500 bg-clip-text text-transparent;
-}
-
-/* Custom Scrollbar */
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-
-::-webkit-scrollbar-track {
-  @apply bg-slate-100 dark:bg-slate-900 rounded-full;
-}
-
-::-webkit-scrollbar-thumb {
-  @apply bg-slate-300 dark:bg-slate-700 hover:bg-emerald-500 dark:hover:bg-emerald-400 rounded-full transition-colors duration-200;
-}
-
-/* Leaf Animation for Growing Tree in dashboard */
-@keyframes sway {
-  0%, 100% { transform: rotate(0deg); }
-  50% { transform: rotate(5deg); }
-}
-
-.animate-sway {
-  animation: sway 4s ease-in-out infinite;
-}
-
-/* Clean Custom Form Inputs */
-.form-input {
-  @apply w-full px-4 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:focus:ring-emerald-400 focus:border-transparent transition-all duration-200;
-}
-
-/* Skeleton Loading Animation */
-.skeleton {
-  @apply animate-pulse bg-slate-200 dark:bg-slate-800 rounded-xl;
-}
-
-/* Premium Skeuomorphism Utilities */
+/* ============================================================
+   SKEUOMORPHIC UTILITIES
+   ============================================================ */
 .skeuo-card {
-  box-shadow: 
-    0 4px 6px -1px rgba(0, 0, 0, 0.05), 
-    0 2px 4px -1px rgba(0, 0, 0, 0.03), 
-    inset 0 1px 0 0 rgba(255, 255, 255, 0.5);
-  @apply border border-slate-200 dark:border-slate-800 bg-gradient-to-b from-white to-slate-50 dark:from-slate-900 dark:to-slate-950/80;
-}
-
-.dark .skeuo-card {
-  box-shadow: 
-    0 4px 6px -1px rgba(0, 0, 0, 0.3), 
-    0 2px 4px -1px rgba(0, 0, 0, 0.2), 
-    inset 0 1px 0 0 rgba(255, 255, 255, 0.08);
+  background: linear-gradient(160deg, var(--mp-card), #151f35);
+  border: 1px solid var(--mp-border);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.3),
+              inset 0 1px 0 rgba(139, 92, 246, 0.08);
 }
 
 .skeuo-input {
-  box-shadow: 
-    inset 0 2px 4px 0 rgba(0, 0, 0, 0.06), 
-    0 1px 0 0 rgba(255, 255, 255, 0.8);
-  @apply bg-slate-50 dark:bg-slate-950/50 border border-slate-200 dark:border-slate-800;
-}
-
-.dark .skeuo-input {
-  box-shadow: 
-    inset 0 2px 4px 0 rgba(0, 0, 0, 0.35), 
-    0 1px 0 0 rgba(255, 255, 255, 0.03);
+  background: rgba(15, 23, 42, 0.7);
+  border: 1px solid var(--mp-border);
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.4);
 }
 
 .skeuo-button-primary {
-  @apply bg-gradient-to-b from-emerald-400 to-emerald-500 hover:from-emerald-500 hover:to-emerald-600 
-         border border-emerald-600/30 border-t-white/35 text-white shadow-md shadow-emerald-500/25 
-         transition-all active:translate-y-[1px] active:shadow-[inset_0_2px_4px_rgba(0,0,0,0.2)] 
-         duration-150 cursor-pointer;
+  background: linear-gradient(to bottom, #9D6FF8, #8B5CF6);
+  border: 1px solid rgba(124, 58, 237, 0.4);
+  color: white;
+  box-shadow: 0 4px 14px rgba(139, 92, 246, 0.35);
+  transition: all 0.15s;
+  cursor: pointer;
+}
+.skeuo-button-primary:hover {
+  background: linear-gradient(to bottom, #8B5CF6, #7C3AED);
+  box-shadow: 0 6px 20px rgba(124, 58, 237, 0.5);
+}
+.skeuo-button-primary:active {
+  transform: translateY(1px);
+  box-shadow: inset 0 2px 6px rgba(0,0,0,0.3);
 }
 
 .skeuo-button-secondary {
-  @apply bg-gradient-to-b from-slate-50 to-slate-100 hover:from-slate-100 hover:to-slate-200 
-         border border-slate-300 border-t-white/80 text-slate-800 shadow-sm 
-         transition-all active:translate-y-[1px] active:shadow-[inset_0_2px_3px_rgba(0,0,0,0.1)] 
-         duration-150 cursor-pointer 
-         dark:from-slate-800 dark:to-slate-900 dark:hover:from-slate-900 dark:hover:to-slate-950
-         dark:border-slate-700 dark:border-t-white/10 dark:text-slate-100;
+  background: linear-gradient(to bottom, #1E293B, #172033);
+  border: 1px solid rgba(139, 92, 246, 0.2);
+  color: #CBD5E1;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+  transition: all 0.15s;
+  cursor: pointer;
+}
+.skeuo-button-secondary:hover {
+  border-color: rgba(139, 92, 246, 0.4);
+  color: #fff;
 }
 
 .skeuo-badge {
-  box-shadow: 
-    0 1px 2px 0 rgba(0, 0, 0, 0.05), 
-    inset 0 1px 0 0 rgba(255, 255, 255, 0.4);
-  @apply border border-emerald-200 bg-gradient-to-b from-emerald-50 to-emerald-100/50 dark:from-emerald-950/30 dark:to-emerald-950/60 dark:border-emerald-900/40;
+  background: linear-gradient(to bottom, rgba(139,92,246,0.15), rgba(139,92,246,0.08));
+  border: 1px solid rgba(139,92,246,0.25);
+  color: #A78BFA;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
 }
 
-/* Aurora UI Animations & Frosted Skeuo-Glass Card */
+/* ============================================================
+   FORM INPUT HELPER
+   ============================================================ */
+.form-input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background-color: rgba(15, 23, 42, 0.8);
+  border: 1px solid var(--mp-border);
+  border-radius: 0.75rem;
+  color: var(--mp-text);
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.form-input:focus {
+  border-color: var(--mp-primary);
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2);
+}
+
+/* ============================================================
+   SKELETON LOADER
+   ============================================================ */
+.skeleton {
+  background: linear-gradient(90deg, #1E293B 25%, #263347 50%, #1E293B 75%);
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.5s infinite;
+  border-radius: 0.75rem;
+}
+@keyframes skeleton-shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* ============================================================
+   GRADIENT TEXT — Purple
+   ============================================================ */
+.green-gradient-text {
+  background: linear-gradient(135deg, #8B5CF6, #A78BFA, #F59E0B);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.purple-gradient-text {
+  background: linear-gradient(135deg, #A78BFA, #8B5CF6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ============================================================
+   HERO GRADIENT — Purple aura
+   ============================================================ */
+.hero-gradient {
+  background: radial-gradient(circle at 15% 25%, rgba(139, 92, 246, 0.12) 0%, rgba(245, 158, 11, 0.04) 80%);
+}
+
+/* ============================================================
+   AURORA ANIMATIONS — Purple glow blobs
+   ============================================================ */
 @keyframes aurora-float {
-  0%, 100% {
-    transform: translate(0, 0) scale(1);
-  }
-  33% {
-    transform: translate(30px, -50px) scale(1.15);
-  }
-  66% {
-    transform: translate(-30px, 20px) scale(0.92);
-  }
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33%       { transform: translate(30px, -50px) scale(1.15); }
+  66%       { transform: translate(-30px, 20px) scale(0.92); }
 }
 
-.animate-aurora-1 {
-  animation: aurora-float 22s ease-in-out infinite;
-}
+.animate-aurora-1 { animation: aurora-float 22s ease-in-out infinite; }
+.animate-aurora-2 { animation: aurora-float 28s ease-in-out infinite reverse; }
+.animate-aurora-3 { animation: aurora-float 34s ease-in-out infinite 4s; }
 
-.animate-aurora-2 {
-  animation: aurora-float 28s ease-in-out infinite reverse;
+/* ============================================================
+   FLOAT / SWAY ANIMATIONS
+   ============================================================ */
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-8px); }
 }
+.animate-float { animation: float 3s ease-in-out infinite; }
 
-.animate-aurora-3 {
-  animation: aurora-float 34s ease-in-out infinite 4s;
+@keyframes sway {
+  0%, 100% { transform: rotate(0deg); }
+  50%       { transform: rotate(5deg); }
 }
+.animate-sway { animation: sway 4s ease-in-out infinite; }
 
-.skeuo-glass-card {
-  box-shadow: 
-    0 8px 32px 0 rgba(0, 0, 0, 0.04), 
-    inset 0 1px 0 0 rgba(255, 255, 255, 0.45);
-  @apply border border-white/20 dark:border-slate-800/45 backdrop-blur-lg bg-white/70 dark:bg-slate-900/65;
-}
-
-.dark .skeuo-glass-card {
-  box-shadow: 
-    0 8px 32px 0 rgba(0, 0, 0, 0.2), 
-    inset 0 1px 0 0 rgba(255, 255, 255, 0.06);
-}
-
-/* Neumorphic soft-extrusion elements */
+/* ============================================================
+   NEUMORPHIC — Dark purple flavour
+   ============================================================ */
 .neumo-card {
-  @apply bg-slate-50 dark:bg-slate-950 border-0 transition-all duration-300;
-  box-shadow: 4px 4px 8px rgba(163, 177, 198, 0.3), -4px -4px 8px rgba(255, 255, 255, 0.85);
+  background-color: var(--mp-card);
+  border: 0;
+  transition: all 0.3s;
+  box-shadow: 4px 4px 10px rgba(0,0,0,0.5), -2px -2px 8px rgba(139,92,246,0.06);
 }
-
 .neumo-card-pressed {
-  @apply bg-slate-50 dark:bg-slate-950 border-0 transition-all duration-300;
-  box-shadow: inset 3px 3px 6px rgba(163, 177, 198, 0.4), inset -3px -3px 6px rgba(255, 255, 255, 0.9);
+  background-color: var(--mp-card);
+  border: 0;
+  transition: all 0.3s;
+  box-shadow: inset 3px 3px 8px rgba(0,0,0,0.5), inset -2px -2px 6px rgba(139,92,246,0.08);
 }
-
 .neumo-input {
-  @apply w-full px-4 py-3 bg-slate-50 dark:bg-slate-950 border-0 text-slate-800 dark:text-white rounded-xl focus:outline-none transition-all duration-300;
-  box-shadow: inset 3px 3px 6px rgba(163, 177, 198, 0.3), inset -3px -3px 6px rgba(255, 255, 255, 0.85);
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background-color: rgba(15, 23, 42, 0.7);
+  border: 0;
+  color: var(--mp-text);
+  border-radius: 0.75rem;
+  outline: none;
+  transition: all 0.3s;
+  box-shadow: inset 3px 3px 8px rgba(0,0,0,0.5), inset -1px -1px 4px rgba(139,92,246,0.08);
 }
-
 .neumo-button {
-  @apply flex items-center space-x-1.5 px-4 py-2.5 bg-slate-50 dark:bg-slate-950 border-0 text-xs font-bold text-slate-700 dark:text-slate-300 rounded-xl transition-all duration-200 cursor-pointer;
-  box-shadow: 3px 3px 6px rgba(163, 177, 198, 0.3), -3px -3px 6px rgba(255, 255, 255, 0.85);
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.625rem 1rem;
+  background-color: var(--mp-card);
+  border: 0;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--mp-muted);
+  border-radius: 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 3px 3px 8px rgba(0,0,0,0.4), -2px -2px 6px rgba(139,92,246,0.06);
 }
-.neumo-button:hover {
-  @apply text-emerald-600 dark:text-emerald-400;
-}
+.neumo-button:hover { color: var(--mp-primary); }
 .neumo-button:active {
-  @apply text-emerald-600 dark:text-emerald-400;
-  box-shadow: inset 3px 3px 6px rgba(163, 177, 198, 0.45), inset -3px -3px 6px rgba(255, 255, 255, 0.9);
+  color: var(--mp-primary);
+  box-shadow: inset 3px 3px 6px rgba(0,0,0,0.5), inset -2px -2px 4px rgba(139,92,246,0.08);
 }
-
 .neumo-button-active {
-  @apply flex items-center space-x-1.5 px-4 py-2.5 bg-slate-50 dark:bg-slate-950 border-0 text-xs font-bold text-emerald-600 dark:text-emerald-400 rounded-xl transition-all duration-200 cursor-pointer;
-  box-shadow: inset 3px 3px 6px rgba(163, 177, 198, 0.45), inset -3px -3px 6px rgba(255, 255, 255, 0.9);
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.625rem 1rem;
+  background-color: var(--mp-card);
+  border: 0;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--mp-primary);
+  border-radius: 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: inset 3px 3px 6px rgba(0,0,0,0.5), inset -2px -2px 4px rgba(139,92,246,0.08);
 }
 
-/* Dark Mode Overrides for Neumorphic Elements */
-@media (prefers-color-scheme: dark) {
-  .neumo-card {
-    box-shadow: 4px 4px 8px rgba(4, 5, 8, 0.75), -4px -4px 8px rgba(24, 34, 52, 0.15);
+/* ============================================================
+   PURPLE GLOW PULSE — for active/special elements
+   ============================================================ */
+@keyframes glow-pulse {
+  0%, 100% { box-shadow: 0 0 8px rgba(139,92,246,0.4); }
+  50%       { box-shadow: 0 0 20px rgba(139,92,246,0.7), 0 0 40px rgba(139,92,246,0.2); }
+}
+.animate-glow-pulse {
+  animation: glow-pulse 2.5s ease-in-out infinite;
+}
+
+/* ============================================================
+   TABLE OVERRIDES — Dark purple
+   ============================================================ */
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+th {
+  color: var(--mp-muted);
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--mp-border);
+}
+td {
+  color: #CBD5E1;
+  font-size: 0.75rem;
+  padding: 0.875rem 0.5rem;
+  border-bottom: 1px solid rgba(139, 92, 246, 0.07);
+}
+tr:hover td {
+  background-color: rgba(139, 92, 246, 0.05);
+}
+
+/* ============================================================
+   SELECT / OPTION OVERRIDES
+   ============================================================ */
+select {
+  background-color: var(--mp-card);
+  color: var(--mp-text);
+  border: 1px solid var(--mp-border);
+  border-radius: 0.5rem;
+  outline: none;
+}
+select:focus {
+  border-color: var(--mp-primary);
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2);
+}
+option {
+  background-color: var(--mp-card);
+  color: var(--mp-text);
+}
+
+/* ============================================================
+   COLORED BORDER GLOW CARDS — Admin Portal
+   ============================================================ */
+.glow-card {
+  background: var(--mp-card);
+  border-radius: 1.25rem;
+  transition: box-shadow 0.3s ease, border-color 0.3s ease, transform 0.2s ease;
+}
+.glow-card:hover { transform: translateY(-2px); }
+
+.glow-blue {
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  box-shadow: 0 4px 20px rgba(59, 130, 246, 0.1), inset 0 1px 0 rgba(59, 130, 246, 0.06);
+}
+.glow-blue:hover {
+  border-color: rgba(59, 130, 246, 0.6);
+  box-shadow: 0 8px 32px rgba(59, 130, 246, 0.25), 0 0 60px rgba(59, 130, 246, 0.07);
+}
+
+.glow-emerald {
+  border: 1px solid rgba(34, 197, 94, 0.3);
+  box-shadow: 0 4px 20px rgba(34, 197, 94, 0.1), inset 0 1px 0 rgba(34, 197, 94, 0.06);
+}
+.glow-emerald:hover {
+  border-color: rgba(34, 197, 94, 0.6);
+  box-shadow: 0 8px 32px rgba(34, 197, 94, 0.25), 0 0 60px rgba(34, 197, 94, 0.07);
+}
+
+.glow-amber {
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  box-shadow: 0 4px 20px rgba(245, 158, 11, 0.1), inset 0 1px 0 rgba(245, 158, 11, 0.06);
+}
+.glow-amber:hover {
+  border-color: rgba(245, 158, 11, 0.6);
+  box-shadow: 0 8px 32px rgba(245, 158, 11, 0.25), 0 0 60px rgba(245, 158, 11, 0.07);
+}
+
+.glow-teal {
+  border: 1px solid rgba(20, 184, 166, 0.3);
+  box-shadow: 0 4px 20px rgba(20, 184, 166, 0.1), inset 0 1px 0 rgba(20, 184, 166, 0.06);
+}
+.glow-teal:hover {
+  border-color: rgba(20, 184, 166, 0.6);
+  box-shadow: 0 8px 32px rgba(20, 184, 166, 0.25), 0 0 60px rgba(20, 184, 166, 0.07);
+}
+
+.glow-orange {
+  border: 1px solid rgba(249, 115, 22, 0.3);
+  box-shadow: 0 4px 20px rgba(249, 115, 22, 0.1), inset 0 1px 0 rgba(249, 115, 22, 0.06);
+}
+.glow-orange:hover {
+  border-color: rgba(249, 115, 22, 0.6);
+  box-shadow: 0 8px 32px rgba(249, 115, 22, 0.25), 0 0 60px rgba(249, 115, 22, 0.07);
+}
+
+.glow-red {
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  box-shadow: 0 4px 20px rgba(239, 68, 68, 0.1), inset 0 1px 0 rgba(239, 68, 68, 0.06);
+}
+.glow-red:hover {
+  border-color: rgba(239, 68, 68, 0.6);
+  box-shadow: 0 8px 32px rgba(239, 68, 68, 0.25), 0 0 60px rgba(239, 68, 68, 0.07);
+}
+
+.glow-purple {
+  border: 1px solid rgba(139, 92, 246, 0.3);
+  box-shadow: 0 4px 20px rgba(139, 92, 246, 0.1), inset 0 1px 0 rgba(139, 92, 246, 0.06);
+}
+.glow-purple:hover {
+  border-color: rgba(139, 92, 246, 0.6);
+  box-shadow: 0 8px 32px rgba(139, 92, 246, 0.25), 0 0 60px rgba(139, 92, 246, 0.07);
+}
+
+/* ============================================================
+   FUZZY TEXT GLITCH EFFECT
+   ============================================================ */
+.fuzzy-text {
+  position: relative;
+  display: inline-block;
+  color: #ffffff;
+  animation: fuzzy-glow-main 4s infinite ease-in-out;
+}
+
+.fuzzy-text::before,
+.fuzzy-text::after {
+  content: attr(data-text);
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: inherit;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  opacity: 0.75;
+}
+
+.fuzzy-text::before {
+  left: 1px;
+  text-shadow: -1px 0 rgba(139, 92, 246, 0.8);
+  animation: fuzzy-glitch-1 3s infinite linear alternate-reverse;
+}
+
+.fuzzy-text::after {
+  left: -1px;
+  text-shadow: -1.5px 0 rgba(245, 158, 11, 0.8);
+  animation: fuzzy-glitch-2 2.5s infinite linear alternate-reverse;
+}
+
+@keyframes fuzzy-glow-main {
+  0%, 100% {
+    filter: blur(0.2px);
+    text-shadow: 0 0 8px rgba(139, 92, 246, 0.4);
   }
-  .neumo-card-pressed {
-    box-shadow: inset 3px 3px 6px rgba(4, 5, 8, 0.75), inset -3px -3px 6px rgba(24, 34, 52, 0.2);
-  }
-  .neumo-input {
-    box-shadow: inset 3px 3px 6px rgba(4, 5, 8, 0.75), inset -3px -3px 6px rgba(24, 34, 52, 0.15);
-  }
-  .neumo-button {
-    box-shadow: 3px 3px 6px rgba(4, 5, 8, 0.75), -3px -3px 6px rgba(24, 34, 52, 0.15);
-  }
-  .neumo-button:active {
-    box-shadow: inset 3px 3px 6px rgba(4, 5, 8, 0.75), inset -3px -3px 6px rgba(24, 34, 52, 0.2);
-  }
-  .neumo-button-active {
-    box-shadow: inset 3px 3px 6px rgba(4, 5, 8, 0.75), inset -3px -3px 6px rgba(24, 34, 52, 0.2);
+  50% {
+    filter: blur(0.6px);
+    text-shadow: 0 0 14px rgba(139, 92, 246, 0.8), 0 0 4px rgba(245, 158, 11, 0.4);
   }
 }
 
-.dark .neumo-card {
-  box-shadow: 4px 4px 8px rgba(4, 5, 8, 0.75), -4px -4px 8px rgba(24, 34, 52, 0.15);
+@keyframes fuzzy-glitch-1 {
+  0% { clip-path: inset(20% 0 60% 0); }
+  20% { clip-path: inset(80% 0 5% 0); }
+  40% { clip-path: inset(10% 0 75% 0); }
+  60% { clip-path: inset(70% 0 15% 0); }
+  80% { clip-path: inset(5% 0 85% 0); }
+  100% { clip-path: inset(50% 0 30% 0); }
 }
-.dark .neumo-card-pressed {
-  box-shadow: inset 3px 3px 6px rgba(4, 5, 8, 0.75), inset -3px -3px 6px rgba(24, 34, 52, 0.2);
+
+@keyframes fuzzy-glitch-2 {
+  0% { clip-path: inset(15% 0 70% 0); }
+  20% { clip-path: inset(60% 0 25% 0); }
+  40% { clip-path: inset(45% 0 45% 0); }
+  60% { clip-path: inset(75% 0 5% 0); }
+  80% { clip-path: inset(10% 0 80% 0); }
+  100% { clip-path: inset(35% 0 55% 0); }
 }
-.dark .neumo-input {
-  box-shadow: inset 3px 3px 6px rgba(4, 5, 8, 0.75), inset -3px -3px 6px rgba(24, 34, 52, 0.15);
-}
-.dark .neumo-button {
-  box-shadow: 3px 3px 6px rgba(4, 5, 8, 0.75), -3px -3px 6px rgba(24, 34, 52, 0.15);
-}
-.dark .neumo-button:active {
-  box-shadow: inset 3px 3px 6px rgba(4, 5, 8, 0.75), inset -3px -3px 6px rgba(24, 34, 52, 0.2);
-}
-.dark .neumo-button-active {
-  box-shadow: inset 3px 3px 6px rgba(4, 5, 8, 0.75), inset -3px -3px 6px rgba(24, 34, 52, 0.2);
-}
+

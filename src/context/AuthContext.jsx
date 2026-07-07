@@ -30,6 +30,11 @@ export const AuthProvider = ({ children }) => {
       if (response.ok && data.success) {
         setUser(data.user);
         localStorage.setItem('ecoeats_user', JSON.stringify(data.user));
+        // Save JWT token so AppContext can attach it as Bearer header
+        if (data.token) {
+          localStorage.setItem('token', data.token);
+        }
+        window.dispatchEvent(new Event('auth-changed'));
         return data.user;
       } else {
         throw new Error(data.message || 'Invalid email or password');
@@ -56,6 +61,11 @@ export const AuthProvider = ({ children }) => {
       if (response.ok && data.success) {
         setUser(data.user);
         localStorage.setItem('ecoeats_user', JSON.stringify(data.user));
+        // Save JWT token so AppContext can attach it as Bearer header
+        if (data.token) {
+          localStorage.setItem('token', data.token);
+        }
+        window.dispatchEvent(new Event('auth-changed'));
         return data.user;
       } else {
         throw new Error(data.message || 'Signup failed');
@@ -71,6 +81,8 @@ export const AuthProvider = ({ children }) => {
   const logout = () => {
     setUser(null);
     localStorage.removeItem('ecoeats_user');
+    localStorage.removeItem('token');
+    window.dispatchEvent(new Event('auth-changed'));
   };
 
   const updateProfile = async (updatedData) => {

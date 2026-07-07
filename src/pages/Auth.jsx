@@ -3,6 +3,43 @@ import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import Alert from '../components/Common/Alert';
 import { Leaf, Mail, Lock, User, KeyRound, ArrowLeft } from 'lucide-react';
+import Hyperspeed from '../components/Home/Hyperspeed';
+
+const HYPERSPEED_OPTIONS = {
+  distortion: 'turbulentDistortion',
+  length: 400,
+  roadWidth: 10,
+  islandWidth: 2,
+  lanesPerRoad: 4,
+  fov: 90,
+  fovSpeedUp: 150,
+  speedUp: 3.5,
+  carLightsFade: 0.4,
+  totalSideLightSticks: 25,
+  lightPairsPerRoadWay: 50,
+  shoulderLinesWidthPercentage: 0.05,
+  brokenLinesWidthPercentage: 0.1,
+  brokenLinesLengthPercentage: 0.5,
+  lightStickWidth: [0.12, 0.5],
+  lightStickHeight: [1.3, 1.7],
+  movingAwaySpeed: [90, 120],
+  movingCloserSpeed: [-150, -200],
+  carLightsLength: [400 * 0.03, 400 * 0.2],
+  carLightsRadius: [0.05, 0.14],
+  carWidthPercentage: [0.3, 0.5],
+  carShiftX: [-0.8, 0.8],
+  carFloorSeparation: [0, 5],
+  colors: {
+    roadColor: 0x0F172A,
+    islandColor: 0x111827,
+    background: 0x0F172A,
+    shoulderLines: 0x8B5CF6,
+    brokenLines: 0x7C3AED,
+    leftCars: [0x8B5CF6, 0x7C3AED, 0x5B21B6],
+    rightCars: [0x22C55E, 0xF59E0B, 0x8B5CF6],
+    sticks: 0x8B5CF6
+  }
+};
 
 export default function Auth() {
   const { login, signup } = useAuth();
@@ -17,21 +54,19 @@ export default function Auth() {
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
+  const [showGlitch, setShowGlitch] = useState(false);
+  const [isFadingOut, setIsFadingOut] = useState(false);
 
   const handleLogin = async (e) => {
     e.preventDefault();
     setErrorMsg('');
     setLoading(true);
     try {
-      const loggedUser = await login(email, password);
-      if (loggedUser.role === 'admin' || loggedUser.role === 'restaurant') {
-        navigate('/admin');
-      } else {
-        navigate('/');
-      }
+      await login(email, password);
+      // Directly navigate to Home with transition state parameter
+      navigate('/', { state: { showLoginTransition: true } });
     } catch (err) {
       setErrorMsg(err.message || 'Login failed. Please verify credentials.');
-    } finally {
       setLoading(false);
     }
   };
@@ -46,10 +81,10 @@ export default function Auth() {
     setLoading(true);
     try {
       await signup(name, email, password);
-      navigate('/');
+      // Directly navigate to Home with transition state parameter
+      navigate('/', { state: { showLoginTransition: true } });
     } catch (err) {
       setErrorMsg(err.message || 'Signup failed.');
-    } finally {
       setLoading(false);
     }
   };

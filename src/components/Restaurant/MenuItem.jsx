@@ -1,6 +1,7 @@
 import React from 'react';
 import { useCart } from '../../context/CartContext';
 import { ShoppingCart, Leaf, Star, Sparkles, Plus, Minus, Edit, Trash2 } from 'lucide-react';
+import StarBorder from '../Common/StarBorder';
 
 export default function MenuItem({ item, isAdmin = false, onEdit = null, onDelete = null }) {
   const { cartItems, addItem, updateQuantity } = useCart();
@@ -21,7 +22,8 @@ export default function MenuItem({ item, isAdmin = false, onEdit = null, onDelet
   };
 
   return (
-    <div className="neumo-card rounded-3xl p-5 flex flex-col md:flex-row gap-5 hover:scale-[1.005] hover:shadow-md transition-all duration-300 font-sans">
+    <StarBorder color="#8B5CF6" speed="4.5s" thickness={2}>
+      <div className="p-5 flex flex-col md:flex-row gap-5 hover:scale-[1.005] transition-all duration-300 font-sans">
       
       {/* Left/Top: Image & Indicators */}
       <div className="relative w-full md:w-40 h-40 md:h-auto rounded-2xl overflow-hidden bg-slate-105 shrink-0">
@@ -130,5 +132,6 @@ export default function MenuItem({ item, isAdmin = false, onEdit = null, onDelet
         </div>
       </div>
     </div>
+    </StarBorder>
   );
 }

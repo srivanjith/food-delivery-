@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { Link } from 'react-router-dom';
-import { Coins, Award, ArrowUpRight, ArrowDownRight, RefreshCw, Info, Calendar } from 'lucide-react';
+import { Coins, Award, ArrowUpRight, ArrowDownRight, RefreshCw, Info, Calendar, IndianRupee, TrendingUp } from 'lucide-react';
 
 export default function Wallet() {
   const { user } = useAuth();
@@ -16,6 +16,7 @@ export default function Wallet() {
   const [convertSuccess, setConvertSuccess] = useState('');
   const [convertError, setConvertError] = useState('');
   const [converting, setConverting] = useState(false);
+  const [conversionLog, setConversionLog] = useState([]);
 
   const fetchWalletData = async () => {
     setLoading(true);
@@ -84,7 +85,14 @@ export default function Wallet() {
       });
       const json = await res.json();
       if (json.success) {
+        const rupeesGained = (amt / 100).toFixed(2);
         setConvertSuccess(json.message);
+        setConversionLog(prev => [{
+          id: Date.now(),
+          coins: amt,
+          rupees: rupeesGained,
+          at: new Date()
+        }, ...prev]);
         setCoinsToConvert('');
         // Refresh wallet data to update balance
         fetchWalletData();
@@ -243,42 +251,56 @@ export default function Wallet() {
                   </button>
                 </form>
 
-                {/* Display Current Wallet cash balance */}
-                <div className="pt-2 border-t border-slate-100 dark:border-slate-800 flex justify-between items-center text-xs">
-                  <span className="text-slate-500">Wallet Cash Balance:</span>
-                  <span className="font-extrabold text-slate-800 dark:text-white">₹{wallet?.fiatBalance || '0.00'}</span>
+                {/* Converted Cash Balance Card */}
+                <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-amber-400 via-yellow-400 to-orange-400 p-5 shadow-lg">
+                  <div className="absolute -right-4 -top-4 w-24 h-24 bg-white/20 rounded-full blur-2xl pointer-events-none" />
+                  <div className="absolute left-10 -bottom-4 w-16 h-16 bg-white/10 rounded-full blur-xl pointer-events-none" />
+
+                  <div className="relative">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[9px] bg-white/30 text-amber-900 px-2.5 py-0.5 rounded-full uppercase font-extrabold tracking-widest">
+                        💰 Cash Balance
+                      </span>
+                      <div className="w-7 h-7 bg-white/25 rounded-xl flex items-center justify-center">
+                        <IndianRupee className="w-4 h-4 text-amber-900" />
+                      </div>
+                    </div>
+
+                    <div className="mt-3 flex items-baseline gap-1">
+                      <span className="text-3xl font-black text-amber-950">₹{parseFloat(wallet?.fiatBalance || 0).toFixed(2)}</span>
+                      <span className="text-[10px] font-semibold text-amber-800">available</span>
+                    </div>
+                    <p className="text-[9px] text-amber-800 mt-0.5 font-semibold">From converted Eco-Coins</p>
+
+                    {/* Conversion mini-log */}
+                    {conversionLog.length > 0 && (
+                      <div className="mt-4 pt-3 border-t border-white/30 space-y-1.5 max-h-28 overflow-y-auto pr-1">
+                        <span className="block text-[8px] font-extrabold uppercase tracking-widest text-amber-800 mb-1 flex items-center gap-1">
+                          <TrendingUp className="w-3 h-3" /> Conversion Log
+                        </span>
+                        {conversionLog.map(entry => (
+                          <div key={entry.id} className="flex justify-between items-center bg-white/20 rounded-lg px-2.5 py-1.5">
+                            <div>
+                              <span className="block text-[10px] font-black text-amber-950">
+                                {entry.coins} Coins → ₹{entry.rupees}
+                              </span>
+                              <span className="block text-[8px] text-amber-800">
+                                {entry.at.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                              </span>
+                            </div>
+                            <span className="text-xs font-black text-emerald-800">+₹{entry.rupees}</span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    {conversionLog.length === 0 && (
+                      <p className="mt-3 text-[9px] text-amber-800/70 italic">No conversions yet this session.</p>
+                    )}
+                  </div>
                 </div>
               </div>
 
-              {/* Active Reward Rules Info */}
-              <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 space-y-4">
-                <h3 className="text-xs font-black text-slate-800 dark:text-white uppercase tracking-widest flex items-center gap-1.5">
-                  <Info className="w-4 h-4 text-emerald-500" /> Active Loyalty Rules
-                </h3>
-                
-                <div className="space-y-3.5 text-xs text-slate-655 dark:text-slate-400">
-                  <div className="flex items-start gap-2.5">
-                    <div className="w-5 h-5 bg-emerald-50 dark:bg-emerald-950/45 rounded-lg flex items-center justify-center shrink-0 font-bold text-emerald-600">1</div>
-                    <p className="leading-relaxed">
-                      Earn **20 Coins** for every **₹100 spent** on food orders. Subtotal spent is calculated after discounts.
-                    </p>
-                  </div>
-
-                  <div className="flex items-start gap-2.5">
-                    <div className="w-5 h-5 bg-emerald-50 dark:bg-emerald-950/45 rounded-lg flex items-center justify-center shrink-0 font-bold text-emerald-600">2</div>
-                    <p className="leading-relaxed">
-                      Coin Conversion Value: **100 Coins = ₹1**. Coins can be directly redeemed on future orders at checkout.
-                    </p>
-                  </div>
-
-                  <div className="flex items-start gap-2.5">
-                    <div className="w-5 h-5 bg-emerald-50 dark:bg-emerald-950/45 rounded-lg flex items-center justify-center shrink-0 font-bold text-emerald-600">3</div>
-                    <p className="leading-relaxed">
-                      Redemption requires a minimum order amount of **₹200** and maximum coin payment value caps at **50%** of food total.
-                    </p>
-                  </div>
-                </div>
-              </div>
 
             </div>
 

@@ -7,13 +7,25 @@ import Navbar from './components/Layout/Navbar';
 import Footer from './components/Layout/Footer';
 import AppRoutes from './routes/AppRoutes';
 
+import { useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
+
+function ScrollToTop() {
+  const { pathname } = useLocation();
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+  return null;
+}
+
 function App() {
   return (
     <BrowserRouter>
+      <ScrollToTop />
       <AuthProvider>
         <AppProvider>
           <CartProvider>
-            <div className="flex flex-col min-h-screen bg-slate-50 dark:bg-slate-950 transition-colors duration-300">
+            <div className="flex flex-col min-h-screen transition-colors duration-300" style={{ backgroundColor: 'var(--mp-bg)', color: 'var(--mp-text)' }}>
               <Navbar />
               <main className="flex-grow">
                 <AppRoutes />

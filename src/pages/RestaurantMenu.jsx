@@ -6,6 +6,7 @@ import MenuItem from '../components/Restaurant/MenuItem';
 import MenuFilter from '../components/Restaurant/MenuFilter';
 import Modal from '../components/Common/Modal';
 import Alert from '../components/Common/Alert';
+import StarBorder from '../components/Common/StarBorder';
 import { Star, Clock, MapPin, Award, ArrowLeft, MessageSquare, PenTool, Plus } from 'lucide-react';
 
 export default function RestaurantMenu() {
@@ -232,31 +233,33 @@ export default function RestaurantMenu() {
         <div className="lg:col-span-8 space-y-8">
           
           {/* Restaurant certifications section */}
-          <div className="neumo-card rounded-3xl p-6">
-            <div className="flex justify-between items-center mb-3">
-              <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest">Verified Green Certifications</h3>
-              {(user?.role === 'admin' || user?.role === 'restaurant') && (
-                <button
-                  onClick={openCertModal}
-                  className="p-1 text-slate-450 hover:text-emerald-500 dark:hover:text-emerald-400 transition-colors cursor-pointer"
-                  title="Edit Certifications"
-                >
-                  <PenTool className="w-3.5 h-3.5" />
-                </button>
-              )}
+          <StarBorder color="#22C55E" speed="5s" thickness={2}>
+            <div className="p-6">
+              <div className="flex justify-between items-center mb-3">
+                <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest">Verified Green Certifications</h3>
+                {(user?.role === 'admin' || user?.role === 'restaurant') && (
+                  <button
+                    onClick={openCertModal}
+                    className="p-1 text-slate-450 hover:text-emerald-500 dark:hover:text-emerald-400 transition-colors cursor-pointer"
+                    title="Edit Certifications"
+                  >
+                    <PenTool className="w-3.5 h-3.5" />
+                  </button>
+                )}
+              </div>
+              <div className="flex flex-wrap gap-2.5">
+                {restaurant.certifications && restaurant.certifications.map((cert, index) => (
+                  <span
+                    key={index}
+                    className="inline-flex items-center text-xs font-bold text-emerald-800 bg-emerald-50 dark:bg-emerald-950/40 dark:text-emerald-305 px-3 py-1.5 rounded-xl border border-emerald-100 dark:border-emerald-900"
+                  >
+                    <Award className="w-3.5 h-3.5 mr-1 text-emerald-500" />
+                    {cert}
+                  </span>
+                ))}
+              </div>
             </div>
-            <div className="flex flex-wrap gap-2.5">
-              {restaurant.certifications && restaurant.certifications.map((cert, index) => (
-                <span
-                  key={index}
-                  className="inline-flex items-center text-xs font-bold text-emerald-800 bg-emerald-50 dark:bg-emerald-950/40 dark:text-emerald-305 px-3 py-1.5 rounded-xl border border-emerald-100 dark:border-emerald-900"
-                >
-                  <Award className="w-3.5 h-3.5 mr-1 text-emerald-500" />
-                  {cert}
-                </span>
-              ))}
-            </div>
-          </div>
+          </StarBorder>
 
           {/* Dishes menu filter */}
           <div>
@@ -305,48 +308,50 @@ export default function RestaurantMenu() {
 
         {/* Right Column: Reviews */}
         <div className="lg:col-span-4 space-y-6">
-          <div className="neumo-card rounded-3xl p-6 flex flex-col">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-sm font-black text-slate-805 dark:text-white uppercase tracking-wider flex items-center">
-                <MessageSquare className="w-4 h-4 mr-1.5 text-emerald-500" />
-                Sustaina-Reviews
-              </h3>
-              
-              <button
-                onClick={() => setIsReviewModalOpen(true)}
-                id="open-review-modal-btn"
-                className="p-1.5 bg-emerald-50 text-emerald-600 dark:bg-emerald-950 dark:text-emerald-400 rounded-lg hover:scale-105 transition-transform cursor-pointer"
-                title="Write a review"
-              >
-                <PenTool className="w-4 h-4" />
-              </button>
-            </div>
+          <StarBorder color="#F59E0B" speed="6s" thickness={2}>
+            <div className="p-6 flex flex-col">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-sm font-black text-slate-805 dark:text-white uppercase tracking-wider flex items-center">
+                  <MessageSquare className="w-4 h-4 mr-1.5 text-emerald-500" />
+                  Sustaina-Reviews
+                </h3>
+                
+                <button
+                  onClick={() => setIsReviewModalOpen(true)}
+                  id="open-review-modal-btn"
+                  className="p-1.5 bg-emerald-50 text-emerald-600 dark:bg-emerald-950 dark:text-emerald-400 rounded-lg hover:scale-105 transition-transform cursor-pointer"
+                  title="Write a review"
+                >
+                  <PenTool className="w-4 h-4" />
+                </button>
+              </div>
 
-            {/* Reviews display listing */}
-            <div className="space-y-4 max-h-[450px] overflow-y-auto pr-1">
-              {restaurantReviews.length === 0 ? (
-                <div className="text-center py-8 text-slate-400 text-xs">
-                  No reviews yet. Be the first to review their zero-waste packaging!
-                </div>
-              ) : (
-                restaurantReviews.map((rev) => (
-                  <div key={rev.id} className="border-b border-slate-100 dark:border-slate-800 pb-3 last:border-0 last:pb-0 space-y-1.5">
-                    <div className="flex justify-between items-center text-xs font-semibold text-slate-600 dark:text-slate-400">
-                      <span>{rev.user}</span>
-                      <span className="flex items-center text-amber-500 font-bold">
-                        <Star className="w-3.5 h-3.5 fill-amber-500 text-amber-500 mr-0.5" />
-                        {rev.rating}/5
-                      </span>
-                    </div>
-                    <p className="text-xs text-slate-500 dark:text-slate-400 italic">
-                      "{rev.comment}"
-                    </p>
-                    <span className="block text-[10px] text-slate-400 text-right">{rev.date}</span>
+              {/* Reviews display listing */}
+              <div className="space-y-4 max-h-[450px] overflow-y-auto pr-1">
+                {restaurantReviews.length === 0 ? (
+                  <div className="text-center py-8 text-slate-400 text-xs">
+                    No reviews yet. Be the first to review their zero-waste packaging!
                   </div>
-                ))
-              )}
+                ) : (
+                  restaurantReviews.map((rev) => (
+                    <div key={rev.id} className="border-b border-slate-100 dark:border-slate-800 pb-3 last:border-0 last:pb-0 space-y-1.5">
+                      <div className="flex justify-between items-center text-xs font-semibold text-slate-600 dark:text-slate-400">
+                        <span>{rev.user}</span>
+                        <span className="flex items-center text-amber-500 font-bold">
+                          <Star className="w-3.5 h-3.5 fill-amber-500 text-amber-500 mr-0.5" />
+                          {rev.rating}/5
+                        </span>
+                      </div>
+                      <p className="text-xs text-slate-500 dark:text-slate-400 italic">
+                        "{rev.comment}"
+                      </p>
+                      <span className="block text-[10px] text-slate-400 text-right">{rev.date}</span>
+                    </div>
+                  ))
+                )}
+              </div>
             </div>
-          </div>
+          </StarBorder>
         </div>
       </div>
 

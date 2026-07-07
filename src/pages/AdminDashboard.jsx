@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useApp } from '../context/AppContext';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import Modal from '../components/Common/Modal';
 import Alert from '../components/Common/Alert';
 import { Bar, Line } from 'react-chartjs-2';
@@ -75,10 +75,21 @@ export default function AdminDashboard() {
     deleteFoodItem
   } = useApp();
 
-  const [activeTab, setActiveTab] = useState('dashboard'); 
+  const location = useLocation();
+  const [activeTab, setActiveTab] = useState('dashboard');
   const [successMsg, setSuccessMsg] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
   const [selectedDate, setSelectedDate] = useState('');
+
+  // Sync active tab with navigation state (from dock items)
+  useEffect(() => {
+    const tab = location.state?.tab;
+    if (tab) {
+      setActiveTab(tab);
+      // Clear the state so back-navigation doesn't force a tab
+      window.history.replaceState({}, document.title);
+    }
+  }, [location.state]);
 
   // Rewards configuration state & stats
   const [rewardsSettings, setRewardsSettings] = useState({
@@ -657,8 +668,6 @@ export default function AdminDashboard() {
             { id: 'orders', label: 'Orders Pipeline', icon: <ClipboardList className="w-4 h-4 mr-1.5" /> },
             { id: 'offers', label: 'Offers', icon: <Gift className="w-4 h-4 mr-1.5" /> },
             { id: 'reviews', label: 'Reviews', icon: <Star className="w-4 h-4 mr-1.5" /> },
-            { id: 'rewards', label: 'Rewards Control', icon: <Coins className="w-4 h-4 mr-1.5" /> },
-            { id: 'reports', label: 'Reports', icon: <BarChart3 className="w-4 h-4 mr-1.5" /> }
           ].map((tab) => (
             <button
               key={tab.id}
@@ -708,7 +717,7 @@ export default function AdminDashboard() {
               <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest mb-4">Main Dashboard Cards</h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                 
-                <div className="neumo-card p-6 rounded-3xl flex items-center justify-between">
+                <div className="glow-card glow-blue p-6 rounded-3xl flex items-center justify-between">
                   <div>
                     <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Total Orders</span>
                     <span className="text-2xl font-black text-slate-800 dark:text-white mt-1 block">{filteredOrdersByDate.length}</span>
@@ -718,7 +727,7 @@ export default function AdminDashboard() {
                   </div>
                 </div>
 
-                <div className="neumo-card p-6 rounded-3xl flex items-center justify-between">
+                <div className="glow-card glow-emerald p-6 rounded-3xl flex items-center justify-between">
                   <div>
                     <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Total Revenue</span>
                     <span className="text-2xl font-black text-slate-805 dark:text-white mt-1 block">{formatCurrency(totalRevenue)}</span>
@@ -728,7 +737,7 @@ export default function AdminDashboard() {
                   </div>
                 </div>
 
-                <div className="neumo-card p-6 rounded-3xl flex items-center justify-between">
+                <div className="glow-card glow-amber p-6 rounded-3xl flex items-center justify-between">
                   <div>
                     <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Today's Orders</span>
                     <span className="text-2xl font-black text-slate-805 dark:text-white mt-1 block">
@@ -740,7 +749,7 @@ export default function AdminDashboard() {
                   </div>
                 </div>
 
-                <div className="neumo-card p-6 rounded-3xl flex items-center justify-between">
+                <div className="glow-card glow-teal p-6 rounded-3xl flex items-center justify-between">
                   <div>
                     <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Total Customers</span>
                     <span className="text-2xl font-black text-slate-805 dark:text-white mt-1 block">
@@ -762,7 +771,7 @@ export default function AdminDashboard() {
               <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest mb-4">Quick Statistics</h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                 
-                <div className="neumo-card p-5 rounded-2xl flex items-center space-x-3.5">
+                <div className="glow-card glow-emerald p-5 rounded-2xl flex items-center space-x-3.5">
                   <div className="p-2.5 bg-emerald-50 dark:bg-emerald-950/20 text-emerald-500 dark:text-emerald-400 rounded-xl">
                     <Utensils className="w-5 h-5" />
                   </div>
@@ -778,7 +787,7 @@ export default function AdminDashboard() {
                   </div>
                 </div>
 
-                <div className="neumo-card p-5 rounded-2xl flex items-center space-x-3.5">
+                <div className="glow-card glow-amber p-5 rounded-2xl flex items-center space-x-3.5">
                   <div className="p-2.5 bg-amber-50 dark:bg-amber-950/20 text-amber-500 dark:text-amber-400 rounded-xl">
                     <Star className="w-5 h-5" />
                   </div>
@@ -792,7 +801,7 @@ export default function AdminDashboard() {
                   </div>
                 </div>
 
-                <div className="neumo-card p-5 rounded-2xl flex items-center space-x-3.5">
+                <div className="glow-card glow-orange p-5 rounded-2xl flex items-center space-x-3.5">
                   <div className="p-2.5 bg-orange-50 dark:bg-orange-950/20 text-orange-500 dark:text-orange-400 rounded-xl">
                     <Flame className="w-5 h-5" />
                   </div>
@@ -804,7 +813,7 @@ export default function AdminDashboard() {
                   </div>
                 </div>
 
-                <div className="neumo-card p-5 rounded-2xl flex items-center space-x-3.5">
+                <div className="glow-card glow-red p-5 rounded-2xl flex items-center space-x-3.5">
                   <div className="p-2.5 bg-red-50 dark:bg-red-950/20 text-red-500 dark:text-red-400 rounded-xl">
                     <AlertCircle className="w-5 h-5" />
                   </div>
@@ -820,7 +829,7 @@ export default function AdminDashboard() {
             {/* Recent Activity */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               
-              <div className="neumo-card p-6 rounded-3xl space-y-4">
+              <div className="glow-card glow-emerald p-6 rounded-3xl space-y-4">
                 <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest flex items-center">
                   <ClipboardList className="w-4 h-4 mr-1.5 text-emerald-500" />
                   Recent Orders
@@ -842,7 +851,7 @@ export default function AdminDashboard() {
                 </div>
               </div>
 
-              <div className="neumo-card p-6 rounded-3xl space-y-4">
+              <div className="glow-card glow-amber p-6 rounded-3xl space-y-4">
                 <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest flex items-center">
                   <Star className="w-4 h-4 mr-1.5 text-amber-500" />
                   Latest Customer Reviews
@@ -872,7 +881,7 @@ export default function AdminDashboard() {
              {/* Charts Row */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               
-              <div className="neumo-card p-6 rounded-3xl space-y-4">
+              <div className="glow-card glow-emerald p-6 rounded-3xl space-y-4">
                 <div className="flex justify-between items-center">
                   <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest flex items-center">
                     <BarChart3 className="w-4 h-4 mr-1.5 text-emerald-500" />
@@ -886,7 +895,7 @@ export default function AdminDashboard() {
                 </div>
               </div>
 
-              <div className="neumo-card p-6 rounded-3xl space-y-4">
+              <div className="glow-card glow-teal p-6 rounded-3xl space-y-4">
                 <div className="flex justify-between items-center">
                   <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest flex items-center">
                     <FileText className="w-4 h-4 mr-1.5 text-teal-500" />
