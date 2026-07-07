@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
 import { useAuth } from '../context/AuthContext';
@@ -7,11 +7,13 @@ import MenuFilter from '../components/Restaurant/MenuFilter';
 import Modal from '../components/Common/Modal';
 import Alert from '../components/Common/Alert';
 import StarBorder from '../components/Common/StarBorder';
-import { Star, Clock, MapPin, Award, ArrowLeft, MessageSquare, PenTool, Plus } from 'lucide-react';
+import BounceCards from '../components/Common/BounceCards';
+import { Star, Clock, MapPin, Award, ArrowLeft, MessageSquare, PenTool, Plus, Sparkles } from 'lucide-react';
 
 export default function RestaurantMenu() {
   const { id } = useParams();
   const { user } = useAuth();
+  const menuSectionRef = useRef(null);
   const {
     restaurants,
     foodItems,
@@ -66,6 +68,12 @@ export default function RestaurantMenu() {
 
   // Filter restaurant items
   const menuItems = foodItems.filter((item) => item.restaurantId === restaurant.id);
+  const bounceImages = menuItems.map(item => item.image);
+  while (bounceImages.length < 5) {
+    bounceImages.push(restaurant.image);
+  }
+  const displayBounceImages = bounceImages.slice(0, 5);
+
   const filteredMenuItems = menuItems.filter((item) => {
     const matchesSearch = item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
                           item.description.toLowerCase().includes(searchQuery.toLowerCase());
@@ -172,103 +180,247 @@ export default function RestaurantMenu() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 pb-16 font-sans">
+    <div className="min-h-screen pb-24 font-sans bg-[#0F172A] text-white">
       
-      {/* Header Banner */}
-      <div className="relative h-64 sm:h-80 w-full overflow-hidden bg-slate-900">
-        <img
-          src={restaurant.image}
-          alt={restaurant.name}
-          className="w-full h-full object-cover opacity-70 filter brightness-90"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-900/40 to-transparent" />
+      {/* 1. Header Navigation & Banner Hero Area */}
+      <div 
+        className="relative w-full overflow-hidden bg-cover bg-center"
+        style={{ backgroundImage: 'url("/feast.png")' }}
+      >
+        {/* Dark Blending Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-b from-[#111827]/93 via-[#0F172A]/95 to-[#0F172A] z-0" />
         
-        {/* Navigation back */}
-        <div className="absolute top-4 left-4 max-w-7xl mx-auto w-full px-4">
-          <Link
-            to="/"
-            className="inline-flex items-center space-x-1.5 px-4 py-2 bg-white/10 dark:bg-slate-900/60 backdrop-blur-md text-white text-xs font-bold rounded-xl border border-white/15 hover:bg-white/20 transition-all"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            <span>All Restaurants</span>
-          </Link>
+        {/* Glowing Background Blobs */}
+        <div className="absolute inset-0 z-0 pointer-events-none">
+          <div className="absolute top-[10%] right-[10%] w-[450px] h-[450px] bg-violet-600/20 rounded-full filter blur-[120px]" />
+          <div className="absolute bottom-[20%] left-[5%] w-[350px] h-[350px] bg-emerald-500/10 rounded-full filter blur-[100px]" />
         </div>
 
-        {/* Restaurant Profile details absolute position inside banner */}
-        <div className="absolute bottom-6 left-0 right-0">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-white space-y-3">
-            <div className="flex flex-wrap gap-2">
-            </div>
-            
-            <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight font-sans">
+        {/* mini Navbar */}
+        <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between py-6 border-b border-white/5">
+          <div className="flex items-center space-x-3">
+            <Link to="/" className="text-white hover:text-violet-400 transition-all cursor-pointer">
+              <ArrowLeft className="w-5 h-5" />
+            </Link>
+            <span 
+              className="text-2xl font-semibold tracking-wider text-white italic"
+              style={{ fontFamily: "'Playfair Display', serif" }}
+            >
               {restaurant.name}
+            </span>
+          </div>
+          
+          <div className="hidden md:flex items-center space-x-8 text-xs font-semibold text-slate-350 tracking-wider uppercase">
+            <a href="#about" className="hover:text-violet-400 transition-colors">Our Story</a>
+            <button onClick={() => menuSectionRef.current?.scrollIntoView({ behavior: 'smooth' })} className="hover:text-violet-400 transition-colors cursor-pointer">Menu</button>
+            <span className="flex items-center text-amber-450 bg-amber-500/10 px-3 py-1 rounded-full border border-amber-500/20 text-[10px]">
+              <Star className="w-3.5 h-3.5 fill-amber-500 text-amber-500 mr-1" />
+              {restaurant.rating} Rating
+            </span>
+          </div>
+
+          <button 
+            onClick={() => menuSectionRef.current?.scrollIntoView({ behavior: 'smooth' })}
+            className="px-5 py-2.5 bg-violet-500 hover:bg-violet-600 text-white font-extrabold text-xs rounded-full uppercase tracking-wider transition-all shadow-lg shadow-violet-550/15 cursor-pointer"
+          >
+            Order Now
+          </button>
+        </div>
+
+        {/* Hero Section Container */}
+        <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center py-14 md:py-24">
+          
+          {/* Left Column: Heading and description */}
+          <div className="lg:col-span-6 space-y-6 md:space-y-8">
+            <h1 
+              className="text-5xl md:text-7xl font-extralight text-white leading-tight tracking-wider select-none"
+              style={{ fontFamily: "'Playfair Display', serif" }}
+            >
+              <span className="italic text-violet-300">Purely</span> <span className="text-white/20">—</span> <span className="italic font-normal">Handcrafted</span>
             </h1>
             
-            <p className="text-xs sm:text-sm text-slate-350 max-w-2xl font-normal leading-relaxed">
-              {restaurant.description}
+            <p className="text-xs sm:text-sm text-slate-300 max-w-xl font-light leading-relaxed">
+              {restaurant.description || "Freshly prepared meals with organic, locally sourced ingredients and low-carbon delivery, crafted with care to make every bite feel special."}
             </p>
 
-            <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-slate-300 pt-1">
-              <span className="flex items-center">
-                <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400 mr-1" />
-                {restaurant.rating} ({restaurantReviews.length} reviews)
-              </span>
-              <span>•</span>
-              <span className="flex items-center">
-                <Clock className="w-3.5 h-3.5 mr-1" />
-                {restaurant.deliveryTime} mins delivery
-              </span>
-              <span>•</span>
-              <span className="flex items-center">
-                <MapPin className="w-3.5 h-3.5 mr-1" />
-                {restaurant.location} ({restaurant.distance} km)
-              </span>
+            <div className="pt-2 flex items-center space-x-4">
+              <button 
+                onClick={() => menuSectionRef.current?.scrollIntoView({ behavior: 'smooth' })}
+                className="group inline-flex items-center space-x-3 bg-white text-slate-950 hover:bg-violet-300 font-extrabold text-xs uppercase tracking-widest px-6 py-4 rounded-full transition-all duration-300 shadow-xl shadow-white/5 cursor-pointer"
+              >
+                <span>Explore Our Menu</span>
+                <div className="w-6 h-6 bg-slate-950 group-hover:bg-slate-900 rounded-full flex items-center justify-center transition-colors">
+                  <Plus className="w-3.5 h-3.5 text-white transition-transform group-hover:rotate-90" />
+                </div>
+              </button>
             </div>
           </div>
+
+          {/* Right Column: Hero Showcase BounceCards */}
+          <div className="lg:col-span-6 flex flex-col items-center justify-center space-y-6 relative z-10 select-none">
+            <div className="w-full flex justify-center items-center h-[340px] md:h-[400px]">
+              <BounceCards 
+                images={displayBounceImages}
+                containerWidth={400}
+                containerHeight={320}
+                enableHover={true}
+                className="scale-90 sm:scale-100"
+              />
+            </div>
+            
+            {/* Quick stats floating bar below BounceCards */}
+            <div className="w-full max-w-md bg-[#111827]/90 backdrop-blur-md rounded-2xl p-4 border border-white/5 flex justify-between items-center text-[10px] text-white">
+              <div>
+                <span className="block text-[8px] text-slate-400 uppercase tracking-widest font-bold">Delivery Time</span>
+                <span className="font-extrabold text-xs sm:text-sm">{restaurant.deliveryTime} mins</span>
+              </div>
+              <div className="border-l border-white/10 h-8" />
+              <div>
+                <span className="block text-[8px] text-slate-400 uppercase tracking-widest font-bold">Distance</span>
+                <span className="font-extrabold text-xs sm:text-sm">{restaurant.distance} km</span>
+              </div>
+              <div className="border-l border-white/10 h-8" />
+              <div>
+                <span className="block text-[8px] text-slate-400 uppercase tracking-widest font-bold">Eco rating</span>
+                <span className="font-extrabold text-xs sm:text-sm text-emerald-400 flex items-center gap-0.5">🌱 Certified</span>
+              </div>
+            </div>
+          </div>
+
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8 grid grid-cols-1 lg:grid-cols-12 gap-8">
-        {/* Left Column: Menu items & deals */}
-        <div className="lg:col-span-8 space-y-8">
+      {/* 2. About Us / Our Story Section */}
+      <div id="about" className="w-full bg-[#0F172A] py-16 md:py-24 border-t border-white/5">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
           
-          {/* Restaurant certifications section */}
-          <StarBorder color="#22C55E" speed="5s" thickness={2}>
-            <div className="p-6">
-              <div className="flex justify-between items-center mb-3">
-                <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest">Verified Green Certifications</h3>
-                {(user?.role === 'admin' || user?.role === 'restaurant') && (
-                  <button
-                    onClick={openCertModal}
-                    className="p-1 text-slate-450 hover:text-emerald-500 dark:hover:text-emerald-400 transition-colors cursor-pointer"
-                    title="Edit Certifications"
-                  >
-                    <PenTool className="w-3.5 h-3.5" />
-                  </button>
-                )}
-              </div>
-              <div className="flex flex-wrap gap-2.5">
-                {restaurant.certifications && restaurant.certifications.map((cert, index) => (
-                  <span
-                    key={index}
-                    className="inline-flex items-center text-xs font-bold text-emerald-800 bg-emerald-50 dark:bg-emerald-950/40 dark:text-emerald-305 px-3 py-1.5 rounded-xl border border-emerald-100 dark:border-emerald-900"
-                  >
-                    <Award className="w-3.5 h-3.5 mr-1 text-emerald-500" />
-                    {cert}
-                  </span>
-                ))}
-              </div>
-            </div>
-          </StarBorder>
+          {/* Left Column: Details */}
+          <div className="lg:col-span-6 space-y-6">
+            <span className="text-[10px] font-black text-slate-450 tracking-widest uppercase block">About Us</span>
+            <h2 
+              className="text-3xl sm:text-4xl font-extralight text-white leading-tight font-serif"
+              style={{ fontFamily: "'Playfair Display', serif" }}
+            >
+              Crafted with Heart, <span className="italic text-violet-300">Baked to Perfection</span>
+            </h2>
+            <p className="text-xs sm:text-sm text-slate-350 leading-relaxed font-light">
+              At <strong className="font-semibold text-white">{restaurant.name}</strong>, we prepare every dish with organic locally sourced ingredients and low-carbon emission practices. Our zero-waste standard ensures clean dining that preserves the planet while delivering delectable gourmet quality to your doorstep.
+            </p>
 
-          {/* Dishes menu filter */}
+            <div className="p-5 rounded-2xl bg-[#1E293B] border border-white/5 space-y-3">
+              <span className="text-[9px] font-black text-emerald-400 uppercase tracking-widest block">Zero-Waste Sourcing</span>
+              <p className="text-xs text-slate-300 font-light">
+                We partner exclusively with local eco-certified kitchens and organic growers, utilizing biodegradable packaging and sustainable carbon offset initiatives.
+              </p>
+            </div>
+          </div>
+
+          {/* Right Column: Signature Categories / Mockup collection lists */}
+          <div className="lg:col-span-6 space-y-6">
+            <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest mb-4">Explore Our Specialties</h3>
+            
+            <div className="space-y-3">
+              {restaurant.certifications && restaurant.certifications.slice(0, 4).map((cert, index) => (
+                <div key={index} className="flex justify-between items-center bg-[#1E293B]/60 hover:bg-[#1E293B] rounded-xl p-3.5 border border-white/5 transition-all">
+                  <div className="flex items-center space-x-3">
+                    <span className="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center">
+                      <Award className="w-4 h-4 text-emerald-500" />
+                    </span>
+                    <span className="text-xs font-bold tracking-wide text-white">{cert}</span>
+                  </div>
+                  <span className="text-[10px] font-extrabold text-violet-300 hover:text-white transition-colors cursor-pointer">
+                    Verified Green ✓
+                  </span>
+                </div>
+              ))}
+              
+              {(!restaurant.certifications || restaurant.certifications.length === 0) && (
+                ['Organic Sourced', '100% Vegan Options', 'Locally Sourced Food', 'Compostable Packaging'].map((spec, index) => (
+                  <div key={index} className="flex justify-between items-center bg-[#1E293B]/60 hover:bg-[#1E293B] rounded-xl p-3.5 border border-white/5 transition-all">
+                    <div className="flex items-center space-x-3">
+                      <span className="w-8 h-8 rounded-lg bg-violet-500/10 flex items-center justify-center">
+                        <Award className="w-4 h-4 text-violet-500" />
+                      </span>
+                      <span className="text-xs font-bold tracking-wide text-white">{spec}</span>
+                    </div>
+                    <span className="text-[10px] font-extrabold text-violet-350 hover:text-white transition-colors cursor-pointer">
+                      Explore Spec
+                    </span>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      {/* 3. Daily Baking / Chef's Specials Row */}
+      {menuItems.filter(i => i.popular).length > 0 && (
+        <div className="w-full bg-[#111827]/40 py-12 border-t border-b border-white/5">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+            <div className="flex justify-between items-baseline">
+              <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest">Our Daily Specials</h3>
+              <button 
+                onClick={() => menuSectionRef.current?.scrollIntoView({ behavior: 'smooth' })}
+                className="text-[10px] font-black uppercase text-violet-300 hover:text-white tracking-widest transition-colors cursor-pointer"
+              >
+                See Full Menu →
+              </button>
+            </div>
+            
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+              {menuItems.filter(i => i.popular).slice(0, 3).map(item => (
+                <div key={item.id} className="bg-[#1E293B] rounded-2xl overflow-hidden border border-white/5 flex flex-col justify-between">
+                  <div className="relative aspect-[16/10] overflow-hidden">
+                    <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+                    <div className="absolute top-2.5 left-2.5 bg-amber-500 text-white font-extrabold text-[9px] px-2 py-0.5 rounded flex items-center">
+                      <Sparkles className="w-2.5 h-2.5 mr-0.5" /> Special
+                    </div>
+                  </div>
+                  <div className="p-4 space-y-2 flex-grow flex flex-col justify-between">
+                    <div>
+                      <h4 className="text-sm font-bold text-white">{item.name}</h4>
+                      <p className="text-[11px] text-slate-400 line-clamp-2 mt-1">{item.description}</p>
+                    </div>
+                    <div className="flex justify-between items-center pt-3 border-t border-white/5 mt-3">
+                      <span className="text-sm font-black">₹{item.price}</span>
+                      <button
+                        onClick={() => menuSectionRef.current?.scrollIntoView({ behavior: 'smooth' })}
+                        className="px-3 py-1.5 bg-violet-500 hover:bg-violet-650 text-[10px] font-extrabold uppercase rounded-lg text-white transition-colors cursor-pointer"
+                      >
+                        Add to Cart
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 4. Active Dishes Menu List & Reviews */}
+      <div 
+        ref={menuSectionRef}
+        id="menu-list"
+        className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 grid grid-cols-1 lg:grid-cols-12 gap-8 items-start scroll-mt-6"
+      >
+        
+        {/* Left Column: Menu Items list */}
+        <div className="lg:col-span-8 space-y-8">
           <div>
             <div className="flex justify-between items-center mb-6">
-              <h3 className="text-lg font-bold text-slate-800 dark:text-white">Restaurant Menu</h3>
+              <h3 
+                className="text-2xl font-light text-white font-serif"
+                style={{ fontFamily: "'Playfair Display', serif" }}
+              >
+                Signature <span className="italic text-violet-300">Menu List</span>
+              </h3>
               {(user?.role === 'admin' || user?.role === 'restaurant') && (
                 <button
                   onClick={openFoodAddModal}
-                  className="inline-flex items-center space-x-1.5 px-3.5 py-2 skeuo-button-primary text-xs font-bold rounded-xl"
+                  className="inline-flex items-center space-x-1.5 px-3.5 py-2 bg-violet-500 hover:bg-violet-600 text-white text-xs font-bold rounded-xl cursor-pointer shadow-lg shadow-violet-550/15"
                 >
                   <Plus className="w-3.5 h-3.5" />
                   <span>Add Dish to Menu</span>
@@ -283,13 +435,13 @@ export default function RestaurantMenu() {
               setActiveFilter={setActiveFilter}
             />
 
-            {/* Menu items listing */}
-            <div className="space-y-4 mt-6">
+            {/* Dishes list */}
+            <div className="space-y-5 mt-6">
               {filteredMenuItems.length === 0 ? (
-                <div className="text-center py-12 bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800">
-                  <span className="text-3xl">🥗</span>
-                  <h4 className="text-sm font-bold text-slate-700 dark:text-slate-300 mt-2">No dishes match filters</h4>
-                  <p className="text-xs text-slate-400 mt-1">Try resetting menu search queries.</p>
+                <div className="text-center py-16 bg-[#1E293B] rounded-3xl border border-white/5">
+                  <span className="text-4xl">🥗</span>
+                  <h4 className="text-sm font-bold text-slate-305 mt-3">No dishes match filters</h4>
+                  <p className="text-xs text-slate-450 mt-1">Try resetting menu search queries.</p>
                 </div>
               ) : (
                 filteredMenuItems.map((item) => (
@@ -308,18 +460,49 @@ export default function RestaurantMenu() {
 
         {/* Right Column: Reviews */}
         <div className="lg:col-span-4 space-y-6">
+          
+          {/* Certifications Box */}
+          <StarBorder color="#22C55E" speed="5s" thickness={2}>
+            <div className="p-6 space-y-3">
+              <div className="flex justify-between items-center">
+                <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest">Green Certifications</h3>
+                {(user?.role === 'admin' || user?.role === 'restaurant') && (
+                  <button
+                    onClick={openCertModal}
+                    className="p-1 text-slate-450 hover:text-emerald-400 transition-colors cursor-pointer"
+                    title="Edit Certifications"
+                  >
+                    <PenTool className="w-3.5 h-3.5" />
+                  </button>
+                )}
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {restaurant.certifications && restaurant.certifications.map((cert, index) => (
+                  <span
+                    key={index}
+                    className="inline-flex items-center text-[10px] font-bold text-emerald-350 bg-emerald-950/40 px-2.5 py-1 rounded-lg border border-emerald-900"
+                  >
+                    <Award className="w-3 h-3 mr-1 text-emerald-500" />
+                    {cert}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </StarBorder>
+
+          {/* Testimonial reviews block */}
           <StarBorder color="#F59E0B" speed="6s" thickness={2}>
             <div className="p-6 flex flex-col">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-sm font-black text-slate-805 dark:text-white uppercase tracking-wider flex items-center">
-                  <MessageSquare className="w-4 h-4 mr-1.5 text-emerald-500" />
+                <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest flex items-center">
+                  <MessageSquare className="w-4 h-4 mr-1.5 text-amber-500" />
                   Sustaina-Reviews
                 </h3>
                 
                 <button
                   onClick={() => setIsReviewModalOpen(true)}
                   id="open-review-modal-btn"
-                  className="p-1.5 bg-emerald-50 text-emerald-600 dark:bg-emerald-950 dark:text-emerald-400 rounded-lg hover:scale-105 transition-transform cursor-pointer"
+                  className="p-1.5 bg-amber-500/10 text-amber-400 rounded-lg hover:scale-105 transition-transform cursor-pointer"
                   title="Write a review"
                 >
                   <PenTool className="w-4 h-4" />
@@ -334,18 +517,18 @@ export default function RestaurantMenu() {
                   </div>
                 ) : (
                   restaurantReviews.map((rev) => (
-                    <div key={rev.id} className="border-b border-slate-100 dark:border-slate-800 pb-3 last:border-0 last:pb-0 space-y-1.5">
-                      <div className="flex justify-between items-center text-xs font-semibold text-slate-600 dark:text-slate-400">
+                    <div key={rev.id} className="border-b border-white/5 pb-3 last:border-0 last:pb-0 space-y-1.5">
+                      <div className="flex justify-between items-center text-[11px] font-bold text-slate-350">
                         <span>{rev.user}</span>
                         <span className="flex items-center text-amber-500 font-bold">
                           <Star className="w-3.5 h-3.5 fill-amber-500 text-amber-500 mr-0.5" />
                           {rev.rating}/5
                         </span>
                       </div>
-                      <p className="text-xs text-slate-500 dark:text-slate-400 italic">
+                      <p className="text-xs text-slate-400 italic">
                         "{rev.comment}"
                       </p>
-                      <span className="block text-[10px] text-slate-400 text-right">{rev.date}</span>
+                      <span className="block text-[9px] text-slate-500 text-right">{rev.date}</span>
                     </div>
                   ))
                 )}
@@ -353,6 +536,7 @@ export default function RestaurantMenu() {
             </div>
           </StarBorder>
         </div>
+
       </div>
 
       {/* SUBMIT REVIEW DIALOG MODAL */}

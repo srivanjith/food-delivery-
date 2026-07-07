@@ -52,14 +52,12 @@ export default function Home() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
   
-  const [showTransition, setShowTransition] = useState(false);
+  const [showTransition, setShowTransition] = useState(!!location.state?.showLoginTransition);
   const [isFadingOut, setIsFadingOut] = useState(false);
 
   // Monitor navigation state triggers for transition
   useEffect(() => {
     if (location.state?.showLoginTransition) {
-      setShowTransition(true);
-      setIsFadingOut(false);
       
       const fadeTimer = setTimeout(() => {
         setIsFadingOut(true);
@@ -110,10 +108,10 @@ export default function Home() {
           </div>
           <div className="relative z-10 text-center space-y-4">
             <h2 className="text-4xl font-extrabold text-white tracking-widest uppercase animate-pulse">
-              Connecting...
+              Welcome....... 🤝
             </h2>
             <p className="text-violet-300 text-sm tracking-wide">
-              Entering the EcoEats Portal
+              Enjoy your meal! 🌿
             </p>
           </div>
         </div>
