@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { useApp } from '../context/AppContext';
@@ -18,7 +18,9 @@ export default function Checkout() {
   const [newAddressLabel, setNewAddressLabel] = useState('');
   const [newAddressValue, setNewAddressValue] = useState('');
 
-  // Points state
+  // Real-time Rewards Settings & Wallet State
+  const [wallet, setWallet] = useState(null);
+  const [settings, setSettings] = useState(null);
   const [usePointsDiscount, setUsePointsDiscount] = useState(false);
 
   // Payment states
@@ -33,10 +35,51 @@ export default function Checkout() {
   const [gatewayMessage, setGatewayMessage] = useState('');
   const [isGatewayOpen, setIsGatewayOpen] = useState(false);
 
-  // Calculations for points discount
-  const pointsDiscountAmount = usePointsDiscount ? Math.min(Math.floor((user?.ecoPoints || 0) / 10), grandTotal) : 0;
-  const pointsToRedeem = pointsDiscountAmount * 10;
-  const finalPaidTotal = grandTotal - pointsDiscountAmount;
+  // Fetch real-time settings and wallet details
+  useEffect(() => {
+    const fetchCheckoutRewards = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const headers = { 'Content-Type': 'application/json' };
+        if (token) {
+          headers['Authorization'] = `Bearer ${token}`;
+        } else if (user?.id) {
+          headers['x-user-id'] = user.id;
+        }
+
+        const res = await fetch('http://localhost:5000/api/rewards/wallet', { headers });
+        const json = await res.json();
+        if (json.success) {
+          setWallet(json.wallet);
+          setSettings(json.settings);
+        }
+      } catch (err) {
+        console.error('Checkout rewards load failed', err);
+      }
+    };
+    if (user) {
+      fetchCheckoutRewards();
+    }
+  }, [user]);
+
+  // Dynamic calculations based on backend database settings
+  const coinConversionRate = settings?.coinConversionRate || 100;
+  const minOrderAmount = settings?.minOrderAmount || 200;
+  const maxRedemptionPercentage = settings?.maxRedemptionPercentage || 50;
+  const systemEnabled = settings?.rewardSystemEnabled !== false;
+
+  const isEligibleForRedeem = systemEnabled && subtotal >= minOrderAmount && (wallet?.coinBalance || 0) > 0;
+
+  // Max discount calculation based on percentage ceiling
+  const maxDiscountAllowedVal = (subtotal * maxRedemptionPercentage) / 100;
+  const maxCoinsToUse = Math.min(
+    wallet?.coinBalance || 0,
+    Math.floor(maxDiscountAllowedVal * coinConversionRate)
+  );
+
+  const pointsToRedeem = usePointsDiscount ? maxCoinsToUse : 0;
+  const pointsDiscountAmount = parseFloat((pointsToRedeem / coinConversionRate).toFixed(2));
+  const finalPaidTotal = parseFloat((grandTotal - pointsDiscountAmount).toFixed(2));
 
   if (cartItems.length === 0) {
     return (
@@ -84,7 +127,7 @@ export default function Checkout() {
     }, 100);
   };
 
-  const handlePlaceOrder = () => {
+  const handlePlaceOrder = async () => {
     let addressText = '';
     
     // Address validation (skip if self-pickup)
@@ -97,6 +140,33 @@ export default function Checkout() {
       addressText = addressObj.address;
     } else {
       addressText = 'Self-Pickup at Restaurant';
+    }
+
+    // Call secure rewards redemption API first if coins are redeemed
+    if (usePointsDiscount && pointsToRedeem > 0) {
+      try {
+        const token = localStorage.getItem('token');
+        const headers = { 'Content-Type': 'application/json' };
+        if (token) {
+          headers['Authorization'] = `Bearer ${token}`;
+        } else {
+          headers['x-user-id'] = user.id;
+        }
+
+        const res = await fetch('http://localhost:5000/api/rewards/wallet/redeem', {
+          method: 'POST',
+          headers,
+          body: JSON.stringify({ coinsToRedeem: pointsToRedeem, orderSubtotal: subtotal })
+        });
+        const json = await res.json();
+        if (!json.success) {
+          alert(`Redemption failed: ${json.message}`);
+          return;
+        }
+      } catch (err) {
+        alert('Failed to connect to rewards verification gateway. Please try again.');
+        return;
+      }
     }
 
     // Trigger Razorpay Simulated Gateway
@@ -142,21 +212,23 @@ export default function Checkout() {
       };
 
       // Add to Global Context
-      addOrder(newOrder);
-      
-      // Update User Eco-Points (Add earned points)
-      addEcoPoints(ecoPointsEarned);
-      
-      // Deduct redeemed points
-      if (pointsToRedeem > 0) {
-        deductEcoPoints(pointsToRedeem);
-      }
-      
-      // Clear Cart
-      clearCart();
+      addOrder(newOrder).then((savedOrder) => {
+        const actualOrderId = savedOrder ? savedOrder.id : orderId;
+        
+        // Update User Eco-Points (Add earned points)
+        addEcoPoints(ecoPointsEarned);
+        
+        // Deduct redeemed points
+        if (pointsToRedeem > 0) {
+          deductEcoPoints(pointsToRedeem);
+        }
+        
+        // Clear Cart
+        clearCart();
 
-      // Navigate to tracking screen
-      navigate(`/order-tracking/${orderId}`);
+        // Navigate to tracking screen
+        navigate(`/order-tracking/${actualOrderId}`);
+      });
 
     }, 4500);
   };
@@ -381,57 +453,69 @@ export default function Checkout() {
               {paymentMethod === 'points' && (
                 <div className="p-4 bg-emerald-500/5 border border-emerald-550/20 text-emerald-800 dark:text-emerald-300 rounded-2xl text-xs space-y-2 leading-relaxed">
                   <div>
-                    🌱 <strong>Redeem Eco-Points</strong>: You have <strong>{user.ecoPoints} points</strong> available.
+                    🌱 <strong>Redeem Eco-Coins</strong>: You have <strong>{wallet?.coinBalance || 0} Coins</strong> available.
                   </div>
-                  {user.ecoPoints < 100 ? (
+                  {wallet?.coinBalance < coinConversionRate ? (
                     <div className="text-red-500 font-bold text-[10px] uppercase">
-                      Insufficient Points! You need a minimum of 100 points to pay with green credit.
+                      Insufficient Coins! You need a minimum of {coinConversionRate} coins to redeem for discount.
                     </div>
                   ) : (
-                    <div className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase">
-                      Paying with points is eligible! Redemptions rate: 10 points = ₹1.
+                    <div className="text-[10px] font-bold text-emerald-650 dark:text-emerald-400 uppercase">
+                      Paying with green credit is active! Conversion rate: {coinConversionRate} Coins = ₹1.
                     </div>
                   )}
                 </div>
               )}
             </div>
 
-            {/* 3. Eco-Points Redemption Block */}
-            {user.ecoPoints > 0 && (
+            {/* 3. Eco-Coins Redemption Block */}
+            {wallet?.coinBalance > 0 && (
               <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 mt-6">
                 <h3 className="text-base font-bold text-slate-805 dark:text-white flex items-center mb-4">
                   <span className="mr-1.5 text-emerald-500">🌱</span>
-                  3. Redeem Eco-Points for Discount
+                  3. Redeem Eco-Coins for Discount
                 </h3>
-                <div className="p-4 bg-emerald-500/5 border border-emerald-500/20 text-emerald-800 dark:text-emerald-350 rounded-2xl text-xs space-y-3 leading-relaxed">
-                  <div className="flex justify-between items-center">
-                    <span>Your Current Balance: <strong>{user.ecoPoints} points</strong></span>
-                    <span className="text-[10px] font-bold bg-emerald-500 text-white px-2 py-0.5 rounded">10 pts = ₹1</span>
+                
+                {!systemEnabled ? (
+                  <div className="text-amber-500 font-bold text-xs">
+                    Reward system is temporarily offline for maintenance.
                   </div>
-                  
-                  <label className="flex items-start cursor-pointer select-none">
-                    <input
-                      type="checkbox"
-                      checked={usePointsDiscount}
-                      onChange={(e) => setUsePointsDiscount(e.target.checked)}
-                      className="mt-0.5 h-4 w-4 rounded border-slate-300 text-emerald-500 focus:ring-emerald-500 cursor-pointer"
-                    />
-                    <div className="ml-3">
-                      <span className="block font-bold text-slate-850 dark:text-slate-100">
-                        Redeem points to reduce order total (-₹{Math.min(Math.floor(user.ecoPoints / 10), grandTotal)})
-                      </span>
-                      <span className="block text-[10px] text-slate-400 mt-0.5">
-                        Uses up to {Math.min(user.ecoPoints, grandTotal * 10)} points.
-                      </span>
+                ) : subtotal < minOrderAmount ? (
+                  <div className="text-amber-550 dark:text-amber-400 font-semibold text-xs p-3 bg-amber-500/5 border border-amber-500/20 rounded-xl">
+                    ⚠️ Minimum order subtotal of ₹{minOrderAmount} required to redeem coins (Current subtotal: ₹{subtotal}).
+                  </div>
+                ) : (
+                  <div className="p-4 bg-emerald-500/5 border border-emerald-500/20 text-emerald-800 dark:text-emerald-350 rounded-2xl text-xs space-y-3 leading-relaxed">
+                    <div className="flex justify-between items-center">
+                      <span>Available Coins: <strong>{wallet.coinBalance} Coins</strong></span>
+                      <span className="text-[10px] font-bold bg-emerald-500 text-white px-2 py-0.5 rounded">{coinConversionRate} Coins = ₹1</span>
                     </div>
-                  </label>
-                  
-                  {usePointsDiscount && (
-                    <div className="text-[10px] font-bold text-emerald-600 dark:text-emerald-450 uppercase tracking-wide">
-                      Redeeming {pointsToRedeem} points for ₹{pointsDiscountAmount} off!
-                    </div>
-                  )}
-                </div>
+                    
+                    <label className="flex items-start cursor-pointer select-none">
+                      <input
+                        type="checkbox"
+                        checked={usePointsDiscount}
+                        disabled={!isEligibleForRedeem}
+                        onChange={(e) => setUsePointsDiscount(e.target.checked)}
+                        className="mt-0.5 h-4 w-4 rounded border-slate-300 text-emerald-500 focus:ring-emerald-500 cursor-pointer disabled:opacity-50"
+                      />
+                      <div className="ml-3">
+                        <span className="block font-bold text-slate-850 dark:text-slate-100">
+                          Redeem reward coins to get discount (-₹{pointsDiscountAmount || '0.00'})
+                        </span>
+                        <span className="block text-[10px] text-slate-400 mt-0.5">
+                          Redeems {pointsToRedeem} Coins out of {wallet.coinBalance} available. Caps at {maxRedemptionPercentage}% of food amount.
+                        </span>
+                      </div>
+                    </label>
+                    
+                    {usePointsDiscount && (
+                      <div className="text-[10px] font-bold text-emerald-600 dark:text-emerald-450 uppercase tracking-wide">
+                        Discount of ₹{pointsDiscountAmount} applied!
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
             )}
 

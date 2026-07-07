@@ -134,7 +134,7 @@ export default function UserDashboard() {
                   {user.name}
                 </h1>
                 <span className="px-2 py-0.5 bg-emerald-50 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-400 text-[10px] font-bold uppercase rounded-md tracking-wider">
-                  Verified Eco-Citizen
+                  {user.role === 'restaurant' ? 'Verified Restaurant Manager' : user.role === 'admin' ? 'Verified Platform Admin' : 'Verified Eco-Citizen'}
                 </span>
                 <span className={`px-2 py-0.5 text-[10px] font-extrabold uppercase rounded-md tracking-wider border ${ecoLevel.color}`}>
                   {ecoLevel.name}

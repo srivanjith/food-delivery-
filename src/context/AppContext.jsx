@@ -8,13 +8,32 @@ export const AppProvider = ({ children }) => {
   const [orders, setOrders] = useState([]);
   const [reviews, setReviews] = useState([]);
 
+  const getAuthHeaders = () => {
+    const token = localStorage.getItem('token');
+    const headers = { 'Content-Type': 'application/json' };
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+    const userStr = localStorage.getItem('user');
+    if (userStr) {
+      try {
+        const u = JSON.parse(userStr);
+        if (u && u.id) {
+          headers['x-user-id'] = u.id;
+        }
+      } catch (e) {}
+    }
+    return headers;
+  };
+
   useEffect(() => {
     const loadInitialData = async () => {
       try {
+        const headers = getAuthHeaders();
         const [restRes, foodRes, ordersRes, reviewsRes] = await Promise.all([
           fetch('/api/restaurants'),
           fetch('/api/food-items'),
-          fetch('/api/orders'),
+          fetch('/api/orders', { headers }),
           fetch('/api/reviews')
         ]);
         const rests = await restRes.json();
@@ -37,15 +56,18 @@ export const AppProvider = ({ children }) => {
     try {
       const response = await fetch('/api/orders', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: getAuthHeaders(),
         body: JSON.stringify(order)
       });
       const data = await response.json();
       if (data.success) {
         setOrders(prev => [data.order, ...prev]);
+        return data.order;
       }
+      return null;
     } catch (err) {
       console.error('Error placing order:', err);
+      return null;
     }
   };
 
@@ -53,7 +75,7 @@ export const AppProvider = ({ children }) => {
     try {
       const response = await fetch(`/api/orders/${orderId}/status`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: getAuthHeaders(),
         body: JSON.stringify({ status })
       });
       const data = await response.json();
@@ -77,7 +99,7 @@ export const AppProvider = ({ children }) => {
     try {
       const response = await fetch('/api/reviews', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: getAuthHeaders(),
         body: JSON.stringify(newReview)
       });
       const data = await response.json();
@@ -94,7 +116,7 @@ export const AppProvider = ({ children }) => {
     try {
       const response = await fetch('/api/restaurants', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: getAuthHeaders(),
         body: JSON.stringify(restaurant)
       });
       const data = await response.json();
@@ -110,7 +132,7 @@ export const AppProvider = ({ children }) => {
     try {
       const response = await fetch(`/api/restaurants/${updatedRest.id}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: getAuthHeaders(),
         body: JSON.stringify(updatedRest)
       });
       const data = await response.json();
@@ -125,7 +147,8 @@ export const AppProvider = ({ children }) => {
   const deleteRestaurant = async (restId) => {
     try {
       const response = await fetch(`/api/restaurants/${restId}`, {
-        method: 'DELETE'
+        method: 'DELETE',
+        headers: getAuthHeaders()
       });
       const data = await response.json();
       if (data.success) {
@@ -142,7 +165,7 @@ export const AppProvider = ({ children }) => {
     try {
       const response = await fetch('/api/food-items', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: getAuthHeaders(),
         body: JSON.stringify(item)
       });
       const data = await response.json();
@@ -158,7 +181,7 @@ export const AppProvider = ({ children }) => {
     try {
       const response = await fetch(`/api/food-items/${updatedItem.id}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: getAuthHeaders(),
         body: JSON.stringify(updatedItem)
       });
       const data = await response.json();
@@ -173,7 +196,8 @@ export const AppProvider = ({ children }) => {
   const deleteFoodItem = async (itemId) => {
     try {
       const response = await fetch(`/api/food-items/${itemId}`, {
-        method: 'DELETE'
+        method: 'DELETE',
+        headers: getAuthHeaders()
       });
       const data = await response.json();
       if (data.success) {

@@ -55,7 +55,8 @@ import {
   ShoppingCart,
   Flame,
   AlertCircle,
-  TrendingUp
+  TrendingUp,
+  Coins
 } from 'lucide-react';
 
 export default function AdminDashboard() {
@@ -78,6 +79,85 @@ export default function AdminDashboard() {
   const [successMsg, setSuccessMsg] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
   const [selectedDate, setSelectedDate] = useState('');
+
+  // Rewards configuration state & stats
+  const [rewardsSettings, setRewardsSettings] = useState({
+    coinsPer100: 20,
+    coinConversionRate: 100,
+    minOrderAmount: 200,
+    maxRedemptionPercentage: 50,
+    coinExpiryPeriod: 365,
+    rewardSystemEnabled: true
+  });
+  const [rewardsStats, setRewardsStats] = useState(null);
+  const [loadingRewards, setLoadingRewards] = useState(false);
+
+  const fetchRewardsData = async () => {
+    setLoadingRewards(true);
+    try {
+      const token = localStorage.getItem('token');
+      const headers = { 'Content-Type': 'application/json' };
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      } else if (user?.id) {
+        headers['x-user-id'] = user.id;
+      }
+
+      const settingsRes = await fetch('http://localhost:5000/api/rewards/reward/settings', { headers });
+      const settingsJson = await settingsRes.json();
+      if (settingsJson.success) {
+        setRewardsSettings(settingsJson.settings);
+      }
+
+      const statsRes = await fetch('http://localhost:5000/api/rewards/admin/stats', { headers });
+      const statsJson = await statsRes.json();
+      if (statsJson.success) {
+        setRewardsStats(statsJson.stats);
+      }
+    } catch (err) {
+      console.error('Failed to load rewards administration records', err);
+    } finally {
+      setLoadingRewards(false);
+    }
+  };
+
+  const handleSaveRewardsSettings = async (e) => {
+    e.preventDefault();
+    setSuccessMsg('');
+    setErrorMsg('');
+    try {
+      const token = localStorage.getItem('token');
+      const headers = { 'Content-Type': 'application/json' };
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      } else {
+        headers['x-user-id'] = user.id;
+      }
+
+      const res = await fetch('http://localhost:5000/api/rewards/reward/settings', {
+        method: 'PUT',
+        headers,
+        body: JSON.stringify(rewardsSettings)
+      });
+      const json = await res.json();
+      if (json.success) {
+        setSuccessMsg('Reward loyalty system configuration saved successfully!');
+        setRewardsSettings(json.settings);
+        fetchRewardsData();
+      } else {
+        setErrorMsg(json.message || 'Failed to save settings.');
+      }
+    } catch (err) {
+      setErrorMsg('Failed to connect to reward configuration service.');
+    }
+    setTimeout(() => { setSuccessMsg(''); setErrorMsg(''); }, 3000);
+  };
+
+  React.useEffect(() => {
+    if (activeTab === 'rewards' && user) {
+      fetchRewardsData();
+    }
+  }, [activeTab, user]);
 
   // Modals state
   const [isRestModalOpen, setIsRestModalOpen] = useState(false);
@@ -131,13 +211,13 @@ export default function AdminDashboard() {
   const [orderSearchQuery, setOrderSearchQuery] = useState('');
   const [foodSearchQuery, setFoodSearchQuery] = useState('');
 
-  if (!user || user.role !== 'admin') {
+  if (!user || (user.role !== 'admin' && user.role !== 'restaurant')) {
     return (
       <div className="min-h-[80vh] flex flex-col items-center justify-center font-sans text-center px-4">
         <ShieldAlert className="w-16 h-16 text-amber-500 mb-4 animate-bounce" />
-        <h2 className="text-2xl font-black text-slate-800 dark:text-white">Admin Authentication Required</h2>
+        <h2 className="text-2xl font-black text-slate-800 dark:text-white">Access Denied</h2>
         <p className="text-sm text-slate-500 mt-2 max-w-sm">
-          Please login with administrator credentials (admin@ecoeats.com / password) to access inventories and sales analytics.
+          Please login with administrator or manager credentials to access operations dashboard.
         </p>
         <Link
           to="/auth"
@@ -577,6 +657,7 @@ export default function AdminDashboard() {
             { id: 'orders', label: 'Orders Pipeline', icon: <ClipboardList className="w-4 h-4 mr-1.5" /> },
             { id: 'offers', label: 'Offers', icon: <Gift className="w-4 h-4 mr-1.5" /> },
             { id: 'reviews', label: 'Reviews', icon: <Star className="w-4 h-4 mr-1.5" /> },
+            { id: 'rewards', label: 'Rewards Control', icon: <Coins className="w-4 h-4 mr-1.5" /> },
             { id: 'reports', label: 'Reports', icon: <BarChart3 className="w-4 h-4 mr-1.5" /> }
           ].map((tab) => (
             <button
@@ -1190,6 +1271,196 @@ export default function AdminDashboard() {
                   </div>
                 </div>
               </div>
+            </div>
+          </div>
+        )}
+
+        {/* SECTION 7: REWARDS CONTROL */}
+        {activeTab === 'rewards' && (
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+            {/* Left side: config panel */}
+            <div className="lg:col-span-5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 space-y-6">
+              <div>
+                <h3 className="text-sm font-black text-slate-800 dark:text-white uppercase tracking-wider">
+                  Loyalty Program Parameters
+                </h3>
+                <p className="text-[10px] text-slate-400 mt-1">
+                  Adjust standard parameters immediately reflecting customer checkout conversions and earn ratios.
+                </p>
+              </div>
+
+              <form onSubmit={handleSaveRewardsSettings} className="space-y-4">
+                <div>
+                  <label className="block text-[10px] font-bold text-slate-505 uppercase tracking-wider mb-1">
+                    Coins Earned Per ₹100 Spent
+                  </label>
+                  <input
+                    type="number"
+                    value={rewardsSettings.coinsPer100}
+                    onChange={e => setRewardsSettings({ ...rewardsSettings, coinsPer100: parseInt(e.target.value) })}
+                    className="w-full px-3.5 py-2.5 border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-white rounded-xl text-xs"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[10px] font-bold text-slate-550 uppercase tracking-wider mb-1">
+                    Coin Conversion Rate (e.g. 100 Coins = ₹1)
+                  </label>
+                  <input
+                    type="number"
+                    value={rewardsSettings.coinConversionRate}
+                    onChange={e => setRewardsSettings({ ...rewardsSettings, coinConversionRate: parseInt(e.target.value) })}
+                    className="w-full px-3.5 py-2.5 border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-white rounded-xl text-xs"
+                    required
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-505 uppercase tracking-wider mb-1">
+                      Min Order Subtotal (₹)
+                    </label>
+                    <input
+                      type="number"
+                      value={rewardsSettings.minOrderAmount}
+                      onChange={e => setRewardsSettings({ ...rewardsSettings, minOrderAmount: parseFloat(e.target.value) })}
+                      className="w-full px-3.5 py-2.5 border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-white rounded-xl text-xs"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-505 uppercase tracking-wider mb-1">
+                      Max Discount Limit (%)
+                    </label>
+                    <input
+                      type="number"
+                      value={rewardsSettings.maxRedemptionPercentage}
+                      onChange={e => setRewardsSettings({ ...rewardsSettings, maxRedemptionPercentage: parseFloat(e.target.value) })}
+                      className="w-full px-3.5 py-2.5 border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-white rounded-xl text-xs"
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-[10px] font-bold text-slate-505 uppercase tracking-wider mb-1">
+                    Coin Expiry Period (Days)
+                  </label>
+                  <input
+                    type="number"
+                    value={rewardsSettings.coinExpiryPeriod}
+                    onChange={e => setRewardsSettings({ ...rewardsSettings, coinExpiryPeriod: parseInt(e.target.value) })}
+                    className="w-full px-3.5 py-2.5 border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-white rounded-xl text-xs"
+                    required
+                  />
+                </div>
+
+                <div className="pt-2">
+                  <label className="flex items-center space-x-2 text-xs font-bold text-slate-700 dark:text-slate-300 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={rewardsSettings.rewardSystemEnabled}
+                      onChange={e => setRewardsSettings({ ...rewardsSettings, rewardSystemEnabled: e.target.checked })}
+                      className="rounded border-slate-350 text-emerald-500 focus:ring-emerald-500"
+                    />
+                    <span>Loyalty Rewards Program Enabled</span>
+                  </label>
+                </div>
+
+                <button
+                  type="submit"
+                  className="w-full py-3 bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold uppercase tracking-wider rounded-xl cursor-pointer"
+                >
+                  Save Configuration
+                </button>
+              </form>
+            </div>
+
+            {/* Right side: stats & logs */}
+            <div className="lg:col-span-7 space-y-6">
+              
+              {/* Rewards metrics summary cards */}
+              <div className="grid grid-cols-3 gap-4">
+                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-4 rounded-2xl">
+                  <span className="text-[10px] font-bold text-slate-400 uppercase block">Total Coins Issued</span>
+                  <span className="text-lg font-black text-slate-800 dark:text-white mt-1 block">
+                    🌱 {rewardsStats?.stats?.totalCoinsIssued || 0}
+                  </span>
+                </div>
+                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-4 rounded-2xl">
+                  <span className="text-[10px] font-bold text-slate-400 uppercase block">Total Redeemed</span>
+                  <span className="text-lg font-black text-red-500 mt-1 block">
+                    🛒 {rewardsStats?.stats?.totalCoinsRedeemed || 0}
+                  </span>
+                </div>
+                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-4 rounded-2xl">
+                  <span className="text-[10px] font-bold text-slate-400 uppercase block font-sans">Active Circulation</span>
+                  <span className="text-lg font-black text-amber-500 mt-1 block">
+                    🪙 {rewardsStats?.stats?.activeCirculation || 0}
+                  </span>
+                </div>
+              </div>
+
+              {/* Top Users Balances */}
+              <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6">
+                <h3 className="text-xs font-black text-slate-800 dark:text-white uppercase tracking-widest mb-4">
+                  Top User Coin Balances
+                </h3>
+                {loadingRewards && !rewardsStats ? (
+                  <div className="text-center py-4 text-xs text-slate-405">Loading metrics...</div>
+                ) : !rewardsStats?.stats?.topUsersWallets?.length ? (
+                  <div className="text-center py-4 text-xs text-slate-405">No customer wallets located.</div>
+                ) : (
+                  <div className="overflow-x-auto text-xs">
+                    <table className="w-full text-left">
+                      <thead>
+                        <tr className="border-b border-slate-100 dark:border-slate-800 text-slate-405 font-bold uppercase tracking-wider">
+                          <th className="pb-2">User ID</th>
+                          <th className="pb-2">Coin Balance</th>
+                          <th className="pb-2">Lifetime Earned</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60 font-semibold text-slate-655 dark:text-slate-350">
+                        {rewardsStats.stats.topUsersWallets.map(w => (
+                          <tr key={w.holderId}>
+                            <td className="py-2.5">{w.holderId}</td>
+                            <td className="py-2.5 font-bold text-slate-808 dark:text-white">🌱 {w.coinBalance}</td>
+                            <td className="py-2.5">{w.totalEarned}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+
+              {/* Recent transactions log */}
+              <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6">
+                <h3 className="text-xs font-black text-slate-800 dark:text-white uppercase tracking-widest mb-4">
+                  Recent Coin Log (Platform-wide)
+                </h3>
+                {loadingRewards && !rewardsStats ? (
+                  <div className="text-center py-4 text-xs text-slate-405">Loading audit log...</div>
+                ) : !rewardsStats?.stats?.transactions?.length ? (
+                  <div className="text-center py-4 text-xs text-slate-405">No transactions recorded.</div>
+                ) : (
+                  <div className="space-y-3.5 max-h-[300px] overflow-y-auto pr-1 text-[11px] font-semibold text-slate-600 dark:text-slate-400">
+                    {rewardsStats.stats.transactions.map(tx => (
+                      <div key={tx.id} className="flex justify-between items-center gap-2 border-b border-slate-100 dark:border-slate-800/40 pb-2.5 last:border-0 last:pb-0">
+                        <div>
+                          <span className="block text-slate-808 dark:text-white font-bold">{tx.description}</span>
+                          <span className="block text-[9px] text-slate-400 font-normal mt-0.5">User: {tx.userId} | {new Date(tx.createdAt).toLocaleString()}</span>
+                        </div>
+                        <span className={`font-black shrink-0 ${tx.type === 'earned' ? 'text-emerald-500' : 'text-red-500'}`}>
+                          {tx.type === 'earned' ? '+' : '-'}{tx.amount}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
             </div>
           </div>
         )}

@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 
 const FoodItemSchema = new mongoose.Schema({
   id: { type: String, required: true, unique: true },
-  restaurantId: { type: String, required: true },
+  restaurantId: { type: String, required: true, index: true },
   name: { type: String, required: true },
   price: { type: Number, required: true },
   description: { type: String },
@@ -11,7 +11,8 @@ const FoodItemSchema = new mongoose.Schema({
   organic: { type: Boolean, default: false },
   vegan: { type: Boolean, default: false },
   localSourced: { type: Boolean, default: false },
-  popular: { type: Boolean, default: false }
+  popular: { type: Boolean, default: false },
+  available: { type: Boolean, default: true }
 }, { timestamps: true });
 
 export default mongoose.model('FoodItem', FoodItemSchema);

@@ -8,6 +8,7 @@ import Checkout from '../pages/Checkout';
 import OrderTracking from '../pages/OrderTracking';
 import UserDashboard from '../pages/UserDashboard';
 import AdminDashboard from '../pages/AdminDashboard';
+import Wallet from '../pages/Wallet';
 
 export default function AppRoutes() {
   return (
@@ -20,6 +21,7 @@ export default function AppRoutes() {
       <Route path="/order-tracking/:id" element={<OrderTracking />} />
       <Route path="/dashboard" element={<UserDashboard />} />
       <Route path="/admin" element={<AdminDashboard />} />
+      <Route path="/wallet" element={<Wallet />} />
       <Route path="*" element={<Home />} />
     </Routes>
   );

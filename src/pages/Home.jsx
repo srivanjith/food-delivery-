@@ -3,6 +3,7 @@ import { useApp } from '../context/AppContext';
 import Hero from '../components/Home/Hero';
 import Categories from '../components/Home/Categories';
 import PromotionalBanners from '../components/Home/PromotionalBanners';
+import FeatureShowcase from '../components/Home/FeatureShowcase';
 import RestaurantCard from '../components/Restaurant/RestaurantCard';
 import { Sparkles, HelpCircle } from 'lucide-react';
 
@@ -34,6 +35,9 @@ export default function Home() {
 
       {/* Sustainable promo banners */}
       <PromotionalBanners onSelectCategory={setSelectedCategory} />
+
+      {/* Premium UI Feature Showcase */}
+      <FeatureShowcase />
 
       {/* Sustainable Categories Filter */}
       <Categories selectedCategory={selectedCategory} onSelectCategory={setSelectedCategory} />

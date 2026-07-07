@@ -235,7 +235,7 @@ export default function RestaurantMenu() {
           <div className="neumo-card rounded-3xl p-6">
             <div className="flex justify-between items-center mb-3">
               <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest">Verified Green Certifications</h3>
-              {user?.role === 'admin' && (
+              {(user?.role === 'admin' || user?.role === 'restaurant') && (
                 <button
                   onClick={openCertModal}
                   className="p-1 text-slate-450 hover:text-emerald-500 dark:hover:text-emerald-400 transition-colors cursor-pointer"
@@ -262,7 +262,7 @@ export default function RestaurantMenu() {
           <div>
             <div className="flex justify-between items-center mb-6">
               <h3 className="text-lg font-bold text-slate-800 dark:text-white">Restaurant Menu</h3>
-              {user?.role === 'admin' && (
+              {(user?.role === 'admin' || user?.role === 'restaurant') && (
                 <button
                   onClick={openFoodAddModal}
                   className="inline-flex items-center space-x-1.5 px-3.5 py-2 skeuo-button-primary text-xs font-bold rounded-xl"
@@ -293,7 +293,7 @@ export default function RestaurantMenu() {
                   <MenuItem
                     key={item.id}
                     item={item}
-                    isAdmin={user?.role === 'admin'}
+                    isAdmin={user?.role === 'admin' || user?.role === 'restaurant'}
                     onEdit={openFoodEditModal}
                     onDelete={deleteFoodItem}
                   />

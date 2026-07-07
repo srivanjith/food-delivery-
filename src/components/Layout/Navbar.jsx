@@ -1,219 +1,128 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useCart } from '../../context/CartContext';
-import { ShoppingCart, User, LogOut, Menu, X, Leaf, ShieldAlert } from 'lucide-react';
+import { Home, ShoppingCart, User, LogOut, LogIn, Leaf, ShieldAlert, Coins } from 'lucide-react';
+import Dock from './Dock';
 
 export default function Navbar() {
   const { user, logout } = useAuth();
   const { cartItems } = useCart();
   const navigate = useNavigate();
   const location = useLocation();
-  const [isOpen, setIsOpen] = useState(false);
 
   const cartCount = cartItems.reduce((acc, item) => acc + item.quantity, 0);
 
-  const handleLogout = () => {
-    logout();
-    setIsOpen(false);
-    navigate('/');
-  };
+  // Map Dock Items based on login state and user role
+  const dockItems = [
+    {
+      icon: <Home className="w-5 h-5" />,
+      label: 'Home',
+      onClick: () => navigate('/'),
+      className: location.pathname === '/' ? 'border-emerald-500/50 bg-emerald-500/10' : ''
+    },
+    {
+      icon: (
+        <div className="relative">
+          <ShoppingCart className="w-5 h-5" />
+          {cartCount > 0 && (
+            <span className="dock-cart-badge">{cartCount}</span>
+          )}
+        </div>
+      ),
+      label: 'Cart',
+      onClick: () => navigate('/cart'),
+      className: location.pathname === '/cart' ? 'border-emerald-500/50 bg-emerald-500/10' : ''
+    }
+  ];
 
-  const isActive = (path) => location.pathname === path;
+  // User Reward Wallet (visible if logged in)
+  if (user) {
+    dockItems.push({
+      icon: <Coins className="w-5 h-5 text-emerald-400" />,
+      label: 'Wallet',
+      onClick: () => navigate('/wallet'),
+      className: location.pathname === '/wallet' ? 'border-emerald-500/50 bg-emerald-500/10' : ''
+    });
+  }
+
+  // User details dashboard
+  if (user && (user.role === 'customer' || user.role === 'restaurant')) {
+    dockItems.push({
+      icon: <User className="w-5 h-5" />,
+      label: 'Dashboard',
+      onClick: () => navigate('/dashboard'),
+      className: location.pathname === '/dashboard' ? 'border-emerald-500/50 bg-emerald-500/10' : ''
+    });
+  }
+
+  // Admin and operations manager
+  if (user && (user.role === 'admin' || user.role === 'restaurant')) {
+    dockItems.push({
+      icon: <ShieldAlert className="w-5 h-5 text-amber-400" />,
+      label: 'Admin Panel',
+      onClick: () => navigate('/admin'),
+      className: location.pathname === '/admin' ? 'border-amber-500/50 bg-amber-500/10' : ''
+    });
+  }
+
+  // Sign out / Sign In
+  if (user) {
+    dockItems.push({
+      icon: <LogOut className="w-5 h-5 text-red-400" />,
+      label: 'Sign Out',
+      onClick: () => {
+        logout();
+        navigate('/');
+      }
+    });
+  } else {
+    dockItems.push({
+      icon: <LogIn className="w-5 h-5 text-emerald-450" />,
+      label: 'Sign In',
+      onClick: () => navigate('/auth'),
+      className: location.pathname === '/auth' ? 'border-emerald-500/50 bg-emerald-500/10' : ''
+    });
+  }
 
   return (
-    <nav className="sticky top-0 z-40 w-full bg-slate-900/95 backdrop-blur-md border-b border-slate-800 text-slate-200 shadow-lg transition-all duration-300">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
-          {/* Logo */}
+    <>
+      {/* Top Header Branding Banner */}
+      <header className="sticky top-0 z-40 w-full bg-slate-950/70 backdrop-blur-md border-b border-slate-900 text-slate-200 py-3 select-none">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center h-10">
+          
+          {/* Logo link */}
           <Link to="/" className="flex items-center space-x-2 flex-shrink-0 group">
             <div className="p-2 bg-emerald-500 rounded-xl text-white group-hover:scale-105 transition-transform duration-250">
-              <Leaf className="w-5 h-5" />
+              <Leaf className="w-4.5 h-4.5" />
             </div>
-            <span className="text-xl font-bold tracking-tight bg-gradient-to-r from-emerald-500 to-amber-400 bg-clip-text text-transparent font-sans">
+            <span className="text-lg font-bold tracking-tight bg-gradient-to-r from-emerald-500 to-amber-400 bg-clip-text text-transparent font-sans">
               EcoEats
             </span>
           </Link>
 
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-6">
-            <Link
-              to="/"
-              className={`text-sm font-semibold transition-colors duration-200 ${
-                isActive('/') ? 'text-emerald-500' : 'text-slate-300 hover:text-emerald-400'
-              }`}
-            >
-              Order Meals
-            </Link>
-
-            {user && user.role === 'admin' && (
-              <Link
-                to="/admin"
-                className={`flex items-center text-sm font-semibold transition-colors duration-200 ${
-                  isActive('/admin') ? 'text-emerald-500' : 'text-slate-300 hover:text-emerald-400'
-                }`}
-              >
-                <ShieldAlert className="w-4 h-4 mr-1 text-amber-400" />
-                Admin Panel
-              </Link>
-            )}
-
-            {user && user.role === 'customer' && (
-              <Link
-                to="/dashboard"
-                className={`text-sm font-semibold transition-colors duration-200 ${
-                  isActive('/dashboard') ? 'text-emerald-500' : 'text-slate-300 hover:text-emerald-400'
-                }`}
-              >
-                Dashboard
-              </Link>
-            )}
-          </div>
-
-          {/* Desktop Right items */}
-          <div className="hidden md:flex items-center space-x-4">
-            {/* Cart Button */}
-            <Link
-              to="/cart"
-              id="desktop-cart-link"
-              className="relative p-2 text-slate-300 hover:text-emerald-400 hover:bg-slate-800 rounded-xl transition-all duration-200"
-            >
-              <ShoppingCart className="w-5 h-5" />
-              {cartCount > 0 && (
-                <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-emerald-500 text-[10px] font-bold text-white ring-2 ring-slate-900 animate-bounce">
-                  {cartCount}
-                </span>
-              )}
-            </Link>
-
-            {/* Auth Buttons */}
-            {user ? (
-              <div className="flex items-center space-x-3">
-                <Link to={user.role === 'admin' ? '/admin' : '/dashboard'}>
-                  <img
-                    src={user.avatar || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80'}
-                    alt="Profile avatar"
-                    className="w-8 h-8 rounded-full object-cover border border-emerald-500 hover:scale-105 transition-transform"
-                  />
-                </Link>
-                <button
-                  onClick={handleLogout}
-                  id="desktop-logout-btn"
-                  className="p-2 text-slate-300 hover:text-red-400 hover:bg-slate-800 rounded-xl transition-colors cursor-pointer"
-                  title="Logout"
-                >
-                  <LogOut className="w-5 h-5" />
-                </button>
-              </div>
-            ) : (
-              <Link
-                to="/auth"
-                id="desktop-login-link"
-                className="flex items-center space-x-1.5 px-4 py-2 skeuo-button-primary text-sm font-semibold rounded-xl"
-              >
-                <User className="w-4 h-4" />
-                <span>Sign In</span>
-              </Link>
-            )}
-          </div>
-
-          {/* Mobile menu button */}
-          <div className="md:hidden flex items-center space-x-2">
-            <Link
-              to="/cart"
-              className="relative p-2 text-slate-300 hover:text-emerald-400 rounded-xl"
-            >
-              <ShoppingCart className="w-5 h-5" />
-              {cartCount > 0 && (
-                <span className="absolute top-0 right-0 flex h-4.5 w-4.5 items-center justify-center rounded-full bg-emerald-500 text-[9px] font-bold text-white ring-2 ring-slate-900">
-                  {cartCount}
-                </span>
-              )}
-            </Link>
-            <button
-              onClick={() => setIsOpen(!isOpen)}
-              className="p-2 text-slate-300 hover:text-emerald-400 rounded-xl"
-            >
-              {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-            </button>
-          </div>
+          {/* User profile status badge */}
+          {user && (
+            <div className="flex items-center space-x-2.5 bg-slate-900 border border-slate-800 rounded-full pl-2.5 pr-3 py-1">
+              <img
+                src={user.avatar || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80'}
+                alt="Profile"
+                className="w-5 h-5 rounded-full object-cover border border-emerald-500"
+              />
+              <span className="text-[10px] font-extrabold text-slate-350 tracking-wide uppercase">{user.name.split(' ')[0]}</span>
+            </div>
+          )}
         </div>
-      </div>
+      </header>
 
-      {/* Mobile Menu */}
-      {isOpen && (
-        <div className="md:hidden border-t border-slate-800 bg-slate-900/95 backdrop-blur-md transition-all duration-300">
-          <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 text-center">
-            <Link
-              to="/"
-              onClick={() => setIsOpen(false)}
-              className={`block px-3 py-2.5 rounded-xl text-base font-semibold ${
-                isActive('/') ? 'bg-slate-800 text-emerald-500' : 'text-slate-300 hover:text-emerald-400'
-              }`}
-            >
-              Order Meals
-            </Link>
-
-            {user && user.role === 'admin' && (
-              <Link
-                to="/admin"
-                onClick={() => setIsOpen(false)}
-                className="block px-3 py-2.5 rounded-xl text-base font-semibold text-amber-400 bg-slate-800"
-              >
-                Admin Panel Dashboard
-              </Link>
-            )}
-
-            {user && user.role === 'customer' && (
-              <Link
-                to="/dashboard"
-                onClick={() => setIsOpen(false)}
-                className={`block px-3 py-2.5 rounded-xl text-base font-semibold ${
-                  isActive('/dashboard') ? 'bg-slate-800 text-emerald-500' : 'text-slate-300 hover:text-emerald-400'
-                }`}
-              >
-                Dashboard
-              </Link>
-            )}
-
-            {user ? (
-              <div className="pt-4 border-t border-slate-800">
-                <div className="flex items-center justify-center space-x-3 px-3 py-2">
-                  <img
-                    src={user.avatar || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80'}
-                    alt="User avatar"
-                    className="w-10 h-10 rounded-full object-cover border border-emerald-500"
-                  />
-                  <div className="text-left">
-                    <div className="font-semibold text-slate-200">{user.name}</div>
-                    {user.role === 'customer' && (
-                      <div className="text-emerald-400 font-bold text-xs font-sans">🌱 {user.ecoPoints || 0} Points</div>
-                    )}
-                  </div>
-                </div>
-                <button
-                  onClick={handleLogout}
-                  id="mobile-logout-btn"
-                  className="w-full mt-2 flex items-center justify-center space-x-2 px-3 py-3 rounded-xl text-base font-semibold text-red-400 hover:bg-slate-800 cursor-pointer"
-                >
-                  <LogOut className="w-5 h-5" />
-                  <span>Sign Out</span>
-                </button>
-              </div>
-            ) : (
-              <Link
-                to="/auth"
-                id="mobile-login-link"
-                onClick={() => setIsOpen(false)}
-                className="mt-4 flex items-center justify-center space-x-2 mx-3 px-3 py-3 skeuo-button-primary rounded-xl text-base font-semibold"
-              >
-                <User className="w-5 h-5" />
-                <span>Sign In / Create Account</span>
-              </Link>
-            )}
-          </div>
-        </div>
-      )}
-    </nav>
+      {/* Floating Left Sidebar Navigation Dock */}
+      <Dock 
+        items={dockItems} 
+        panelWidth={52} 
+        baseItemSize={42} 
+        magnification={54} 
+        distance={150} 
+      />
+    </>
   );
 }
