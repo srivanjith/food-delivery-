@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useApp } from '../context/AppContext';
 import { Link } from 'react-router-dom';
@@ -9,7 +9,32 @@ export default function UserDashboard() {
   const { user, removeAddress, addAddress, updateProfile } = useAuth();
   const { orders } = useApp();
 
+  const [wallet, setWallet] = useState(null);
   const [editingAddressId, setEditingAddressId] = useState(null);
+
+  useEffect(() => {
+    if (user) {
+      const fetchWallet = async () => {
+        try {
+          const token = localStorage.getItem('token');
+          const headers = { 'Content-Type': 'application/json' };
+          if (token) {
+            headers['Authorization'] = `Bearer ${token}`;
+          } else if (user?.id) {
+            headers['x-user-id'] = user.id;
+          }
+          const res = await fetch('http://localhost:5000/api/rewards/wallet', { headers });
+          const data = await res.json();
+          if (data.success) {
+            setWallet(data.wallet);
+          }
+        } catch (err) {
+          console.error('Error fetching wallet:', err);
+        }
+      };
+      fetchWallet();
+    }
+  }, [user]);
   const [editLabel, setEditLabel] = useState('');
   const [editValue, setEditValue] = useState('');
   const [isAddingAddress, setIsAddingAddress] = useState(false);
@@ -83,6 +108,9 @@ export default function UserDashboard() {
   };
 
   const ecoLevel = getEcoLevel(user.ecoPoints || 0);
+  const maxCoinsEarned = orders && orders.length > 0
+    ? Math.max(...orders.map(o => o.rewardCoinsEarned || 0))
+    : 0;
 
   const startEditingAddress = (addr) => {
     setEditingAddressId(addr.id);
@@ -145,8 +173,19 @@ export default function UserDashboard() {
                 <span className="flex items-center text-emerald-605 dark:text-emerald-400 font-bold">
                   🌱 {user.ecoPoints} Eco-Points
                 </span>
-                <span className="text-slate-400 dark:text-slate-500 font-medium">
+                <span className="text-slate-405 dark:text-slate-500 font-semibold">
                   ({getNextLevelInfo(user.ecoPoints || 0)})
+                </span>
+                <span className="flex items-center text-amber-600 dark:text-amber-405 font-bold">
+                  🏆 Max Earned (Order): {maxCoinsEarned} Coins
+                </span>
+                {wallet && (
+                  <span className="flex items-center text-teal-605 dark:text-teal-400 font-bold">
+                    📈 Lifetime Earned: {wallet.totalEarned || 0} Coins
+                  </span>
+                )}
+                <span className="flex items-center text-indigo-650 dark:text-indigo-400 font-bold">
+                  👤 User Type: {ecoLevel.name}
                 </span>
               </div>
             </div>
@@ -413,12 +452,21 @@ export default function UserDashboard() {
                           </span>
                         </td>
                         <td className="py-4.5 text-right">
-                          <Link
-                            to={`/order-tracking/${order.id}`}
-                            className="inline-flex px-2.5 py-1 bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-[10px] rounded-lg shadow-sm transition-colors"
-                          >
-                            Track Logistics
-                          </Link>
+                          {order.status === 'Delivered' ? (
+                            <button
+                              disabled
+                              className="inline-flex px-2.5 py-1 bg-slate-200 dark:bg-slate-800 text-slate-400 dark:text-slate-500 font-bold text-[10px] rounded-lg cursor-not-allowed"
+                            >
+                              Track Logistics
+                            </button>
+                          ) : (
+                            <Link
+                              to={`/order-tracking/${order.id}`}
+                              className="inline-flex px-2.5 py-1 bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-[10px] rounded-lg shadow-sm transition-colors"
+                            >
+                              Track Logistics
+                            </Link>
+                          )}
                         </td>
                       </tr>
                     ))}

@@ -402,6 +402,7 @@
       "total": 813,
       "packagingChoice": "Compostable Paper",
       "deliveryMethod": "Bicycle",
+      "address": "Apartment 4B, Emerald Heights, Sector 4, Green Glen Layout, Bengaluru",
       "status": "Delivered"
     },
     {
@@ -421,6 +422,7 @@
       "total": 408,
       "packagingChoice": "Compostable Paper",
       "deliveryMethod": "Electric Vehicle",
+      "address": "Eco-Solutions Hub, 5th Floor, Block C, Koramangala, Bengaluru",
       "status": "Delivered"
     }
   ],

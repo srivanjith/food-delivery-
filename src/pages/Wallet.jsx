@@ -188,8 +188,8 @@ export default function Wallet() {
 
                 <div className="grid grid-cols-2 gap-4 mt-6 pt-6 border-t border-white/10 text-center text-xs">
                   <div className="border-r border-white/10 pr-2">
-                    <span className="block text-[10px] text-emerald-150 font-bold uppercase tracking-wider">Lifetime Earned</span>
-                    <span className="block font-black text-sm text-white mt-1">🌱 {wallet?.totalEarned || 0}</span>
+                    <span className="block text-[10px] text-emerald-150 font-bold uppercase tracking-wider">Money Redeemed</span>
+                    <span className="block font-black text-sm text-white mt-1">₹{((wallet?.totalRedeemed || 0) / 100).toFixed(2)}</span>
                   </div>
                   <div className="pl-2">
                     <span className="block text-[10px] text-emerald-150 font-bold uppercase tracking-wider">Lifetime Spent</span>

@@ -178,6 +178,7 @@ async function seed() {
         total: o.total,
         packagingChoice: o.packagingChoice,
         deliveryMethod: o.deliveryMethod,
+        address: o.address || 'Apartment 4B, Emerald Heights, Sector 4, Green Glen Layout, Bengaluru',
         status: o.status,
         coinsProcessed: true
       });

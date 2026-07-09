@@ -24,6 +24,7 @@ const OrderSchema = new mongoose.Schema({
   total: { type: Number, required: true },
   packagingChoice: { type: String },
   deliveryMethod: { type: String },
+  address: { type: String },
   status: { 
     type: String, 
     enum: ['Order Received', 'Preparing', 'Out for Delivery', 'Delivered', 'Cancelled'],
