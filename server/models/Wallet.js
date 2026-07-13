@@ -2,6 +2,7 @@ import mongoose from 'mongoose';
 
 const WalletSchema = new mongoose.Schema({
   holderId: { type: String, required: true, unique: true, index: true },
+  holderEmail: { type: String, index: true },
   holderType: { type: String, enum: ['customer', 'restaurant', 'platform'], required: true },
   coinBalance: { type: Number, default: 0 },
   totalEarned: { type: Number, default: 0 },

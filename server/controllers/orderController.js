@@ -13,6 +13,7 @@ export const createOrder = async (req, res, next) => {
     // Check if redeeming coins
     const coinsRedeemed = Number(orderData.rewardCoinsRedeemed) || 0;
     const customerId = req.user?.id || orderData.customerId || 'user-888';
+    const customerEmail = req.user?.email || orderData.customerEmail || 'user@ecoeats.com';
     
     let settings = await AdminSettings.findOne();
     if (!settings) {
@@ -52,6 +53,7 @@ export const createOrder = async (req, res, next) => {
       await CoinHistory.create({
         id: coinTxnId,
         userId: customerId,
+        userEmail: customerEmail,
         orderId,
         type: 'redeemed',
         amount: coinsRedeemed,
@@ -67,7 +69,7 @@ export const createOrder = async (req, res, next) => {
       id: orderId,
       customerId,
       customerName: req.user?.name || orderData.customerName || 'Eco-Citizen',
-      customerEmail: req.user?.email || orderData.customerEmail || 'user@ecoeats.com',
+      customerEmail,
       date: new Date().toISOString()
     };
 
@@ -78,6 +80,7 @@ export const createOrder = async (req, res, next) => {
       if (!customerWallet) {
         customerWallet = await Wallet.create({
           holderId: customerId,
+          holderEmail: customerEmail,
           holderType: 'customer',
           coinBalance: 0,
           totalEarned: 0,
@@ -86,6 +89,9 @@ export const createOrder = async (req, res, next) => {
       }
       customerWallet.coinBalance += coinsEarned;
       customerWallet.totalEarned += coinsEarned;
+      if (!customerWallet.holderEmail) {
+        customerWallet.holderEmail = customerEmail;
+      }
       await customerWallet.save();
 
       // Write CoinHistory log for earned coins
@@ -93,6 +99,7 @@ export const createOrder = async (req, res, next) => {
       await CoinHistory.create({
         id: earnTxnId,
         userId: customerId,
+        userEmail: customerEmail,
         orderId,
         type: 'earned',
         amount: coinsEarned,

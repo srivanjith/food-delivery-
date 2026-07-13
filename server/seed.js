@@ -108,9 +108,10 @@ async function seed() {
       });
       await user.save();
 
-      // Create wallet
+      // Create wallet linked to registered email
       await Wallet.create({
         holderId: u.id,
+        holderEmail: u.email,
         holderType: u.role === 'admin' ? 'platform' : u.role === 'restaurant' ? 'restaurant' : 'customer',
         coinBalance: u.ecoPoints || 0,
         fiatBalance: 0
@@ -213,11 +214,12 @@ async function seed() {
         { $inc: { fiatBalance: restSettlementAmt } }
       );
 
-      // Create CoinHistory record for customer earning
+      // Create CoinHistory record for customer earning linked to registered email
       const customerId = 'user-888';
       await CoinHistory.create({
         id: `coin-txn-${order.id}`,
         userId: customerId,
+        userEmail: order.customerEmail || 'user@ecoeats.com',
         orderId: order.id,
         type: 'earned',
         amount: coinsEarned,

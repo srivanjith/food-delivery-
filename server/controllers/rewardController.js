@@ -114,11 +114,13 @@ export const redeemCoins = async (req, res, next) => {
     wallet.totalRedeemed += coinsToRedeem;
     await wallet.save();
 
-    // Create CoinHistory log
+    // Create CoinHistory log linked to registered email
+    const userEmail = req.user?.email || 'user@ecoeats.com';
     const txId = 'tx-' + Math.random().toString(36).substr(2, 9).toUpperCase();
     await CoinHistory.create({
       id: txId,
       userId,
+      userEmail,
       type: 'redeemed',
       amount: coinsToRedeem,
       description: `Redeemed coins for ₹${discountAmount.toFixed(2)} discount on food purchase`
@@ -168,16 +170,25 @@ export const earnCoins = async (req, res, next) => {
     // Calculate coins based on spend configuration
     const coinsToEarn = Math.floor(foodAmount / 100) * settings.coinsPer100;
 
+    // Get target user's registered email
+    const User = (await import('../models/User.js')).default;
+    const targetUserDoc = await User.findOne({ id: targetUser });
+    const userEmail = targetUserDoc?.email || req.user?.email || 'user@ecoeats.com';
+
     let wallet = await Wallet.findOne({ holderId: targetUser });
     if (!wallet) {
       wallet = await Wallet.create({
         holderId: targetUser,
+        holderEmail: userEmail,
         holderType: 'customer',
         coinBalance: 0,
         totalEarned: 0,
         totalRedeemed: 0,
         fiatBalance: 0
       });
+    } else if (!wallet.holderEmail) {
+      wallet.holderEmail = userEmail;
+      await wallet.save();
     }
 
     if (coinsToEarn > 0) {
@@ -185,11 +196,12 @@ export const earnCoins = async (req, res, next) => {
       wallet.totalEarned += coinsToEarn;
       await wallet.save();
 
-      // Save History log
+      // Save History log linked to registered email
       const txId = 'tx-' + Math.random().toString(36).substr(2, 9).toUpperCase();
       await CoinHistory.create({
         id: txId,
         userId: targetUser,
+        userEmail,
         orderId,
         type: 'earned',
         amount: coinsToEarn,
@@ -353,11 +365,13 @@ export const convertCoinsToMoney = async (req, res, next) => {
       );
     });
 
-    // Write CoinHistory log for conversion
+    // Write CoinHistory log for conversion linked to registered email
+    const userEmail = req.user?.email || 'user@ecoeats.com';
     const txnId = `coin-txn-${Date.now()}`;
     await CoinHistory.create({
       id: txnId,
       userId,
+      userEmail,
       type: 'redeemed',
       amount: coinsToConvert,
       description: `Converted ${coinsToConvert} coins to ₹${moneyValue} store credit`
