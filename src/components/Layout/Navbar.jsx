@@ -25,7 +25,7 @@ export default function Navbar() {
     }
   ];
 
-  // 2nd slot: Delivery (admin) or Cart (others)
+  // 2nd slot: Delivery (admin) or Cart (customers / non-logged in)
   if (isAdmin) {
     dockItems.push({
       icon: <Truck className="w-5 h-5" style={{ color: '#A78BFA' }} />,
@@ -33,7 +33,7 @@ export default function Navbar() {
       onClick: () => navigate('/admin', { state: { tab: 'orders' } }),
       className: isActive('/admin') ? 'border-emerald-500/50 bg-emerald-500/10' : ''
     });
-  } else {
+  } else if (!user || user.role === 'customer') {
     dockItems.push({
       icon: (
         <div className="relative">
@@ -47,7 +47,7 @@ export default function Navbar() {
     });
   }
 
-  // 3rd slot: Financial Planning (admin) or Wallet (others)
+  // 3rd slot: Financial Planning (admin) or Wallet (customers)
   if (user) {
     if (isAdmin) {
       dockItems.push({
@@ -56,7 +56,7 @@ export default function Navbar() {
         onClick: () => navigate('/admin', { state: { tab: 'offers' } }),
         className: ''
       });
-    } else {
+    } else if (user.role === 'customer') {
       dockItems.push({
         icon: <Coins className="w-5 h-5" style={{ color: 'var(--mp-warning)' }} />,
         label: 'Wallet',
@@ -66,18 +66,24 @@ export default function Navbar() {
     }
   }
 
-  // Dashboard (customer / restaurant)
-  if (user && (user.role === 'customer' || user.role === 'restaurant')) {
+  // Dashboard / Portal Link
+  if (user && user.role !== 'admin') {
+    const dashboardPath = user.role === 'restaurant' 
+      ? '/restaurant-dashboard' 
+      : (user.role === 'delivery' ? '/delivery-dashboard' : '/dashboard');
+    
     dockItems.push({
       icon: <User className="w-5 h-5" />,
-      label: 'Dashboard',
-      onClick: () => navigate('/dashboard'),
-      className: isActive('/dashboard') ? 'border-emerald-500/50 bg-emerald-500/10' : ''
+      label: user.role === 'restaurant' 
+        ? 'Hotel Portal' 
+        : (user.role === 'delivery' ? 'Courier Portal' : 'Dashboard'),
+      onClick: () => navigate(dashboardPath),
+      className: isActive(dashboardPath) ? 'border-emerald-500/50 bg-emerald-500/10' : ''
     });
   }
 
-  // Admin Panel — opens the full dashboard tab
-  if (user && (user.role === 'admin' || user.role === 'restaurant')) {
+  // Admin Panel Link
+  if (user && user.role === 'admin') {
     dockItems.push({
       icon: <ShieldAlert className="w-5 h-5" style={{ color: 'var(--mp-warning)' }} />,
       label: 'Admin Panel',

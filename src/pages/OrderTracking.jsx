@@ -2,66 +2,166 @@ import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
 import { CheckCircle2, Navigation, Clock, Sparkles, Map, RefreshCw } from 'lucide-react';
+import { io } from 'socket.io-client';
 
 export default function OrderTracking() {
   const { id } = useParams();
-  const { orders, updateOrderStatus } = useApp();
+  const { orders, updateOrderStatus, loadOrders, restaurants } = useApp();
   
   const order = orders.find(o => o.id === id);
+  const restaurant = restaurants?.find(r => r.id === order?.restaurantId);
+  const deliveryIcon = order ? ({
+    Bicycle: '🚲',
+    'Electric Vehicle': '⚡',
+    'Solar Drone': '🛸'
+  }[order.deliveryMethod] || '🚚') : '🚚';
 
   // Simulation steps
-  const statusSteps = ['Order Received', 'Preparing', 'Out for Delivery', 'Delivered'];
+  const statusSteps = ['Order Received', 'Preparing', 'Ready for Pickup', 'Out for Delivery', 'Delivered'];
   
-  // Custom mock map animation states
-  const [liveProgress, setLiveProgress] = useState(10);
-  const [coords, setCoords] = useState({ x: 120, y: 80 });
+  const [localStatus, setLocalStatus] = useState(order?.status || 'Order Received');
+  const [leafletLoaded, setLeafletLoaded] = useState(false);
 
+  // Keep localStatus in sync with context order.status when it loads or changes
   useEffect(() => {
-    if (!order) return;
-
-    let startVal = 10;
-    let endVal = 10;
-    if (order.status === 'Order Received') { startVal = 8; endVal = 15; }
-    else if (order.status === 'Preparing') { startVal = 20; endVal = 45; }
-    else if (order.status === 'Out for Delivery') { startVal = 50; endVal = 95; }
-    else if (order.status === 'Delivered') { startVal = 100; endVal = 100; }
-
-    setLiveProgress(startVal);
-
-    if (order.status === 'Delivered') return;
-
-    const interval = setInterval(() => {
-      setLiveProgress(prev => {
-        const step = 0.5;
-        const next = prev + step;
-        return next > endVal ? startVal : next;
-      });
-    }, 50);
-
-    return () => clearInterval(interval);
-  }, [order?.status, order]);
-
-  useEffect(() => {
-    const t = liveProgress / 100;
-    if (t <= 0.5) {
-      const lt = t * 2;
-      const mt = 1 - lt;
-      const x = mt * mt * 120 + 2 * mt * lt * 250 + lt * lt * 380;
-      const y = mt * mt * 80 + 2 * mt * lt * 160 + lt * lt * 70;
-      setCoords({ x, y });
-    } else {
-      const lt = (t - 0.5) * 2;
-      const mt = 1 - lt;
-      const x = mt * mt * 380 + 2 * mt * lt * 510 + lt * lt * 640;
-      const y = mt * mt * 70 + 2 * mt * lt * (-20) + lt * lt * 180;
-      setCoords({ x, y });
+    if (order) {
+      setLocalStatus(order.status);
     }
-  }, [liveProgress]);
+  }, [order?.status]);
+
+  // Connect to Socket.io for live status updates
+  useEffect(() => {
+    if (!id) return;
+    
+    // Connect to WebSocket server on port 5000 (proxied or direct)
+    const socket = io('http://localhost:5000');
+
+    socket.on('connect', () => {
+      console.log(`🔌 [WEBSOCKET CLIENT] Connected to server. Joining room order:${id}...`);
+      socket.emit('join-order-room', id);
+    });
+
+    socket.on('orderStatusUpdated', (data) => {
+      console.log('🔌 [WEBSOCKET CLIENT] Received live order status update:', data);
+      if (data.orderId === id) {
+        setLocalStatus(data.status);
+        // Refresh context orders list to keep the rest of the application synchronized
+        loadOrders();
+      }
+    });
+
+    return () => {
+      console.log(`🔌 [WEBSOCKET CLIENT] Disconnecting socket for order:${id}...`);
+      socket.disconnect();
+    };
+  }, [id, loadOrders]);
+
+  useEffect(() => {
+    // Dynamically load Leaflet.js assets
+    const loadLeaflet = () => {
+      if (window.L) {
+        setLeafletLoaded(true);
+        return;
+      }
+
+      if (!document.getElementById('leaflet-css')) {
+        const link = document.createElement('link');
+        link.id = 'leaflet-css';
+        link.rel = 'stylesheet';
+        link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
+        document.head.appendChild(link);
+      }
+
+      const script = document.createElement('script');
+      script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+      script.onload = () => setLeafletLoaded(true);
+      document.body.appendChild(script);
+    };
+
+    loadLeaflet();
+  }, []);
+
+  useEffect(() => {
+    if (!leafletLoaded || !order) return;
+
+    const L = window.L;
+    const mapElement = document.getElementById('osm-map');
+    if (!mapElement || mapElement._leaflet_id) return; // Already loaded
+
+    const restCoords = [restaurant?.lat || 12.9279, restaurant?.lng || 77.6271];
+    const customerCoords = [12.9716, 77.5946];
+
+    // Center map between restaurant and customer
+    const centerLat = (restCoords[0] + customerCoords[0]) / 2;
+    const centerLng = (restCoords[1] + customerCoords[1]) / 2;
+    
+    const map = L.map('osm-map', { zoomControl: false }).setView([centerLat, centerLng], 12);
+    
+    L.control.zoom({ position: 'bottomright' }).addTo(map);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+
+    // Setup Custom Icons
+    const restIcon = L.divIcon({
+      className: 'custom-div-icon',
+      html: `<div class="bg-emerald-500 text-white p-2 rounded-full shadow-lg border-2 border-white text-sm">🏪</div>`,
+      iconSize: [32, 32],
+      iconAnchor: [16, 16]
+    });
+
+    const destIcon = L.divIcon({
+      className: 'custom-div-icon',
+      html: `<div class="bg-red-500 text-white p-2 rounded-full shadow-lg border-2 border-white text-sm">🏡</div>`,
+      iconSize: [32, 32],
+      iconAnchor: [16, 16]
+    });
+
+    // Add Markers
+    L.marker(restCoords, { icon: restIcon }).addTo(map).bindPopup(`<strong>${order.restaurantName}</strong><br/>Pickup`);
+    L.marker(customerCoords, { icon: destIcon }).addTo(map).bindPopup('<strong>Customer Address</strong><br/>Delivery Point');
+
+    // Add dashed polyline path
+    L.polyline([restCoords, customerCoords], {
+      color: '#10b981',
+      weight: 4,
+      dashArray: '5, 10',
+      opacity: 0.8
+    }).addTo(map);
+
+    // Calculate courier marker placement
+    let progress = 0;
+    if (localStatus === 'Preparing') progress = 0.15;
+    else if (localStatus === 'Ready for Pickup') progress = 0.35;
+    else if (localStatus === 'Out for Delivery') progress = 0.7;
+    else if (localStatus === 'Delivered') progress = 1.0;
+
+    const courierLat = restCoords[0] + (customerCoords[0] - restCoords[0]) * progress;
+    const courierLng = restCoords[1] + (customerCoords[1] - restCoords[1]) * progress;
+
+    const courierIcon = L.divIcon({
+      className: 'custom-div-icon',
+      html: `<div class="bg-slate-900 border-2 border-emerald-400 text-white p-2 rounded-full shadow-2xl text-base animate-pulse">${deliveryIcon}</div>`,
+      iconSize: [36, 36],
+      iconAnchor: [18, 18]
+    });
+
+    L.marker([courierLat, courierLng], { icon: courierIcon }).addTo(map).bindPopup('<strong>Courier</strong>');
+
+    // Fit boundary bounds
+    const bounds = L.latLngBounds([restCoords, customerCoords]);
+    map.fitBounds(bounds, { padding: [50, 50] });
+
+    return () => {
+      map.remove();
+    };
+  }, [leafletLoaded, order, localStatus, restaurant, deliveryIcon]);
 
   // Simulate progress manually or via timer
   const handleSimulateStep = () => {
     if (!order) return;
-    const currentIndex = statusSteps.indexOf(order.status);
+    const currentIndex = statusSteps.indexOf(localStatus);
     
     if (currentIndex < statusSteps.length - 1) {
       const nextStatus = statusSteps[currentIndex + 1];
@@ -86,14 +186,7 @@ export default function OrderTracking() {
     );
   }
 
-  const currentStepIndex = statusSteps.indexOf(order.status);
-
-  // Determine delivery icon
-  const deliveryIcon = {
-    Bicycle: '🚲',
-    'Electric Vehicle': '⚡',
-    'Solar Drone': '🛸'
-  }[order.deliveryMethod] || '🚚';
+  const currentStepIndex = statusSteps.indexOf(localStatus);
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 pb-16 font-sans">
@@ -114,14 +207,14 @@ export default function OrderTracking() {
               Order ID: <span className="font-bold text-slate-700 dark:text-slate-350">{order.id}</span> | Sourced from {order.restaurantName}
             </p>
           </div>
-
+ 
           {/* Simulator controls */}
           <div className="flex space-x-2 shrink-0">
             <button
               onClick={handleSimulateStep}
-              disabled={order.status === 'Delivered'}
+              disabled={localStatus === 'Delivered'}
               className={`px-4.5 py-2 rounded-xl text-xs font-bold transition-all border flex items-center cursor-pointer ${
-                order.status === 'Delivered'
+                localStatus === 'Delivered'
                   ? 'bg-slate-100 text-slate-400 border-slate-200 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-500 cursor-not-allowed'
                   : 'bg-emerald-50 text-emerald-600 border-emerald-200 hover:bg-emerald-100 dark:bg-emerald-950/20 dark:border-emerald-800 dark:text-emerald-400 dark:hover:bg-emerald-950/50'
               }`}
@@ -137,7 +230,7 @@ export default function OrderTracking() {
             </button>
           </div>
         </div>
-
+ 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           
           {/* Left Column: Timeline & Map */}
@@ -149,7 +242,7 @@ export default function OrderTracking() {
                 <Clock className="w-4 h-4 mr-1.5 text-emerald-500" />
                 Live Status Timeline
               </h3>
-
+ 
               {/* Graphical timeline */}
               <div className="grid grid-cols-4 gap-2 relative mb-8">
                 {/* Horizontal progress bar */}
@@ -166,7 +259,7 @@ export default function OrderTracking() {
                     </div>
                   </div>
                 </div>
-
+ 
                 {statusSteps.map((step, index) => {
                   const isCompleted = index <= currentStepIndex;
                   const isCurrent = index === currentStepIndex;
@@ -191,95 +284,33 @@ export default function OrderTracking() {
                   );
                 })}
               </div>
-
+ 
               {/* Status descriptive summary */}
               <div className="p-4 bg-slate-50 dark:bg-slate-850 rounded-2xl border border-slate-100 dark:border-slate-800 flex items-start">
                 <span className="text-xl mr-2.5">🌿</span>
                 <div className="text-xs text-slate-550 dark:text-slate-400">
-                  {order.status === 'Order Received' && 'We have dispatched your checkout data to the eco-kitchen. Preparing to select biodegradable packaging materials.'}
-                  {order.status === 'Preparing' && 'The kitchen is sorting organic locally sourced ingredients. Preparing items to pack in returnable Bento boxes/Compostable containers.'}
-                  {order.status === 'Out for Delivery' && `Your ${order.deliveryMethod} delivery courier is en route. Emitting zero emissions along the path.`}
-                  {order.status === 'Delivered' && 'The order has been handed over! Reusable Bento containers can be returned on your next dining order. Thank you for eating green!'}
+                  {localStatus === 'Order Received' && 'We have dispatched your checkout data to the eco-kitchen. Preparing to select biodegradable packaging materials.'}
+                  {localStatus === 'Preparing' && 'The kitchen is sorting organic locally sourced ingredients. Preparing items to pack in returnable Bento boxes/Compostable containers.'}
+                  {localStatus === 'Out for Delivery' && `Your ${order.deliveryMethod} delivery courier is en route. Emitting zero emissions along the path.`}
+                  {localStatus === 'Delivered' && 'The order has been handed over! Reusable Bento containers can be returned on your next dining order. Thank you for eating green!'}
                 </div>
               </div>
             </div>
-
-            {/* Google Maps Simulation Visual Board */}
-            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl overflow-hidden">
+ 
+            {/* OpenStreetMap Logistics Board */}
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl overflow-hidden relative z-10">
               <div className="p-4 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-slate-50/50 dark:bg-slate-900/50">
                 <h3 className="text-xs font-black text-slate-800 dark:text-white uppercase tracking-wider flex items-center">
                   <Map className="w-4 h-4 mr-1.5 text-emerald-500" />
-                  Google Maps Logistics Tracker
+                  OpenStreetMap Zero-Carbon Logistics
                 </h3>
                 <span className="text-[10px] font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 rounded">
-                  Live coordinates
+                  Live Route Map
                 </span>
               </div>
 
-              {/* Simulated Map Canvas */}
-              <div className="relative h-64 bg-slate-100 dark:bg-slate-950 overflow-hidden flex items-center justify-center p-4">
-                
-                {/* Mock Grid Lines */}
-                <div className="absolute inset-0 grid grid-cols-12 grid-rows-6 opacity-30 select-none pointer-events-none">
-                  {Array.from({ length: 72 }).map((_, i) => (
-                    <div key={i} className="border-r border-b border-slate-300 dark:border-slate-800/80" />
-                  ))}
-                </div>
-
-                {/* Simulated Green Park / Forest Graphic */}
-                <div className="absolute w-24 h-16 bg-emerald-500/10 dark:bg-emerald-500/5 rounded-full filter blur-md left-[10%] top-[30%]" />
-                <div className="absolute w-32 h-20 bg-teal-500/10 dark:bg-teal-500/5 rounded-full filter blur-lg right-[20%] bottom-[15%]" />
-
-                {/* Dotted Delivery Route Path */}
-                <svg className="absolute inset-0 w-full h-full pointer-events-none" xmlns="http://www.w3.org/2000/svg">
-                  <path
-                    d="M 120, 80 Q 250, 160 380, 70 T 640, 180" 
-                    fill="none" 
-                    stroke="#10b981" 
-                    strokeWidth="3.5" 
-                    strokeDasharray="6, 6" 
-                    className="opacity-70"
-                    id="route-path"
-                  />
-                </svg>
-
-                {/* Restaurant Marker */}
-                <div className="absolute left-[120px] top-[80px] -translate-x-1/2 -translate-y-1/2 flex flex-col items-center z-10">
-                  <div className="bg-emerald-500 text-white p-2 rounded-full shadow-lg shadow-emerald-500/25 border-2 border-white dark:border-slate-900">
-                    🏪
-                  </div>
-                  <span className="text-[9px] font-bold text-slate-700 bg-white/90 dark:bg-slate-900/90 dark:text-slate-300 px-1.5 py-0.5 rounded shadow mt-1 whitespace-nowrap">
-                    {order.restaurantName.split(' ')[0]}
-                  </span>
-                </div>
-
-                {/* User Address Destination Marker */}
-                <div className="absolute left-[640px] top-[180px] -translate-x-1/2 -translate-y-1/2 flex flex-col items-center z-10">
-                  <div className="bg-red-500 text-white p-2 rounded-full shadow-lg shadow-red-500/25 border-2 border-white dark:border-slate-900">
-                    🏡
-                  </div>
-                  <span className="text-[9px] font-bold text-slate-700 bg-white/90 dark:bg-slate-900/90 dark:text-slate-300 px-1.5 py-0.5 rounded shadow mt-1 whitespace-nowrap">
-                    Destination
-                  </span>
-                </div>
-
-                {/* Animated Courier Courier Moving marker */}
-                <div
-                  className="absolute z-20 -translate-x-1/2 -translate-y-1/2 transition-all duration-300 ease-out"
-                  style={{
-                    left: `${coords.x}px`,
-                    top: `${coords.y}px`
-                  }}
-                >
-                  <div className="h-10 w-10 bg-slate-900 dark:bg-slate-800 text-xl border-2 border-emerald-400 rounded-full flex items-center justify-center shadow-2xl animate-bounce-slow">
-                    {deliveryIcon}
-                  </div>
-                </div>
-
-                <div className="absolute bottom-3 left-4 text-[10px] text-slate-400 dark:text-slate-500 font-bold bg-white/80 dark:bg-slate-900/80 px-2 py-0.5 rounded">
-                  Eco-Friendly Logistics Route
-                </div>
-              </div>
+              {/* OSM Map Div container */}
+              <div id="osm-map" className="h-72 w-full bg-slate-100 dark:bg-slate-950 relative z-10" style={{ minHeight: '300px' }} />
             </div>
 
           </div>

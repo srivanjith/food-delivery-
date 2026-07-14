@@ -27,9 +27,11 @@ const OrderSchema = new mongoose.Schema({
   address: { type: String },
   status: { 
     type: String, 
-    enum: ['Order Received', 'Preparing', 'Out for Delivery', 'Delivered', 'Cancelled'],
+    enum: ['Order Received', 'Preparing', 'Ready for Pickup', 'Out for Delivery', 'Delivered', 'Cancelled'],
     default: 'Order Received' 
   },
+  deliveryBoyId: { type: String, index: true },
+  deliveryBoyName: { type: String },
   paymentId: { type: String },
   rewardCoinsEarned: { type: Number, default: 0 },
   rewardCoinsRedeemed: { type: Number, default: 0 },

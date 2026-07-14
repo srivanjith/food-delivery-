@@ -46,7 +46,7 @@ export const getSettlements = async (req, res, next) => {
     if (role === 'restaurant') {
       const rest = await Restaurant.findOne({ ownerId: userId });
       if (rest) {
-        query = { restaurantId: rest.id };
+        query = { restaurantId: rest.get('id') };
       } else {
         query = { restaurantId: 'none' };
       }

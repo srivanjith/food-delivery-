@@ -3,7 +3,7 @@ import Wallet from '../models/Wallet.js';
 import CoinHistory from '../models/CoinHistory.js';
 import AdminSettings from '../models/AdminSettings.js';
 import { processOrderDelivery } from '../services/orderFlowService.js';
-import { processUPIPayment } from '../services/paymentService.js';
+import { processUPIPayment, verifyRazorpayPayment } from '../services/paymentService.js';
 
 export const createOrder = async (req, res, next) => {
   try {
@@ -122,15 +122,23 @@ export const createOrder = async (req, res, next) => {
     const order = new Order(finalOrderData);
     await order.save();
 
+    let paymentDetails = null;
     // Simulate Payment flow via UPI immediately if amount > 0
     if (order.total > 0) {
-      await processUPIPayment(orderId, customerId, order.total, orderData.upiId || 'eco@payupi');
+      paymentDetails = await processUPIPayment(orderId, customerId, order.total, orderData.upiId || 'eco@payupi');
     } else {
       order.status = 'Preparing';
       await order.save();
     }
 
-    res.status(201).json({ success: true, order });
+    // Broadcast new order to WebSocket pool
+    const io = req.app.get('io');
+    if (io) {
+      console.log(`🔌 [WEBSOCKET] Broadcasting new order placed: ${orderId}`);
+      io.emit('orderStatusUpdated', { orderId, status: order.status, order });
+    }
+
+    res.status(201).json({ success: true, order, paymentDetails });
   } catch (error) {
     next(error);
   }
@@ -149,11 +157,13 @@ export const getOrders = async (req, res, next) => {
       const Restaurant = (await import('../models/Restaurant.js')).default;
       const rest = await Restaurant.findOne({ ownerId: userId });
       if (rest) {
-        query = { restaurantId: rest.id };
+        query = { restaurantId: rest.get('id') };
       } else {
         // Fallback or empty list
         query = { restaurantId: 'none' };
       }
+    } else if (role === 'delivery') {
+      query = { deliveryBoyId: userId };
     }
 
     const orders = await Order.find(query).sort({ createdAt: -1 });
@@ -175,6 +185,18 @@ export const updateOrderStatus = async (req, res, next) => {
     order.status = status;
     await order.save();
 
+    // Broadcast live update to connected clients via WebSockets
+    const io = req.app.get('io');
+    if (io) {
+      console.log(`🔌 [WEBSOCKET] Broadcasting status update for order ${id} -> ${status}`);
+      io.to(`order:${id}`).emit('orderStatusUpdated', { orderId: id, status, order });
+      
+      if (status === 'Ready for Pickup') {
+        console.log(`🔌 [WEBSOCKET] Alerting delivery pool: Order ${id} is ready for pickup.`);
+        io.to('delivery-pool').emit('newOrderReady', { orderId: id, restaurantName: order.restaurantName, order });
+      }
+    }
+
     let emailSent = false;
     let recipient = order.customerEmail || 'user@ecoeats.com';
 
@@ -190,6 +212,58 @@ export const updateOrderStatus = async (req, res, next) => {
       emailSent,
       recipient
     });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const verifyOrderPayment = async (req, res, next) => {
+  const { id } = req.params;
+  const { razorpayPaymentId, razorpayOrderId, razorpaySignature } = req.body;
+  try {
+    const result = await verifyRazorpayPayment(id, razorpayPaymentId, razorpayOrderId, razorpaySignature);
+    res.json(result);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getPendingDeliveryOrders = async (req, res, next) => {
+  try {
+    // Delivery couriers can fetch all orders waiting to be claimed (Ready for Pickup)
+    const orders = await Order.find({ status: 'Ready for Pickup' }).sort({ createdAt: -1 });
+    res.json(orders);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const assignCourierToOrder = async (req, res, next) => {
+  const { id } = req.params;
+  const deliveryBoyId = req.user.id;
+  const deliveryBoyName = req.user.name;
+  try {
+    const order = await Order.findOne({ id });
+    if (!order) {
+      return res.status(404).json({ success: false, message: 'Order not found' });
+    }
+
+    order.status = 'Out for Delivery';
+    order.deliveryBoyId = deliveryBoyId;
+    order.deliveryBoyName = deliveryBoyName;
+    await order.save();
+
+    // Broadcast update via WebSockets so customer page updates immediately
+    const io = req.app.get('io');
+    if (io) {
+      console.log(`🔌 [WEBSOCKET] Courier claimed order ${id}. Status -> Out for Delivery`);
+      io.to(`order:${id}`).emit('orderStatusUpdated', { orderId: id, status: 'Out for Delivery', order });
+      
+      // Notify delivery-pool that this order is claimed so others close/remove it
+      io.to('delivery-pool').emit('orderClaimed', { orderId: id });
+    }
+
+    res.json({ success: true, order });
   } catch (error) {
     next(error);
   }

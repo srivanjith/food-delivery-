@@ -127,6 +127,35 @@ export default function Checkout() {
     }, 100);
   };
 
+  const loadRazorpayScript = () => {
+    return new Promise((resolve) => {
+      const script = document.createElement('script');
+      script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+      script.onload = () => resolve(true);
+      script.onerror = () => resolve(false);
+      document.body.appendChild(script);
+    });
+  };
+
+  const finalizeCheckout = (actualOrderId) => {
+    setIsProcessing(false);
+    setIsGatewayOpen(false);
+
+    // Update User Eco-Points (Add earned points)
+    addEcoPoints(ecoPointsEarned);
+    
+    // Deduct redeemed points
+    if (pointsToRedeem > 0) {
+      deductEcoPoints(pointsToRedeem);
+    }
+    
+    // Clear Cart
+    clearCart();
+
+    // Navigate to tracking screen
+    navigate(`/order-tracking/${actualOrderId}`);
+  };
+
   const handlePlaceOrder = async () => {
     let addressText = '';
     
@@ -169,68 +198,130 @@ export default function Checkout() {
       }
     }
 
-    // Trigger Razorpay Simulated Gateway
+    // Construct Order Object
+    const orderId = `order-${Math.floor(1000 + Math.random() * 9000)}`;
+    const newOrder = {
+      id: orderId,
+      date: new Date().toISOString(),
+      restaurantName: cartItems[0].restaurantId === 'rest-4' ? 'Re-Bake Artisan Bakery' : (cartItems[0].restaurantId === 'rest-1' ? 'The Green Beanery' : 'Sustainable Bistro'),
+      restaurantId: cartItems[0].restaurantId,
+      customerName: user.name,
+      customerEmail: user.email,
+      items: cartItems.map(item => ({ id: item.id, name: item.name, price: item.price, quantity: item.quantity })),
+      subtotal,
+      packagingCharge,
+      deliveryCharge,
+      gst,
+      total: finalPaidTotal,
+      packagingChoice: packagingChoice === 'reusable' ? 'Reusable Bento Box' : (packagingChoice === 'seaweed' ? 'Seaweed biodegradable' : 'Compostable Paper'),
+      deliveryMethod: deliveryMethod === 'bicycle' ? 'Bicycle' : (deliveryMethod === 'ev' ? 'Electric Vehicle' : (deliveryMethod === 'pickup' ? 'Self-Pickup' : 'Solar Drone')),
+      status: 'Order Received',
+      address: addressText
+    };
+
+    // Trigger Checkout Gateway Modal
     setIsGatewayOpen(true);
     setIsProcessing(true);
-    setGatewayMessage('Initiating secure transaction via Razorpay...');
+    setGatewayMessage('Initiating checkout and registering order...');
 
-    setTimeout(() => {
-      setGatewayMessage('Verifying credentials and card limits...');
-    }, 1200);
-
-    setTimeout(() => {
-      setGatewayMessage('Authorizing Carbon-Neutral offset donation...');
-    }, 2400);
-
-    setTimeout(() => {
-      setGatewayMessage('Payment Approved! Scaffolding order confirmation...');
-    }, 3600);
-
-    setTimeout(() => {
-      setIsProcessing(false);
+    const responseData = await addOrder(newOrder);
+    if (!responseData) {
       setIsGatewayOpen(false);
+      setIsProcessing(false);
+      alert('Order placement failed.');
+      return;
+    }
+
+    const { order: savedOrder, paymentDetails } = responseData;
+    const actualOrderId = savedOrder ? savedOrder.id : orderId;
+
+    if (paymentDetails && !paymentDetails.isSimulated && paymentDetails.razorpayOrderId) {
+      setGatewayMessage('Opening Razorpay Payment portal...');
       
-      // Construct Order Object
-      const orderId = `order-${Math.floor(1000 + Math.random() * 9000)}`;
-      const newOrder = {
-        id: orderId,
-        date: new Date().toISOString(),
-        restaurantName: cartItems[0].restaurantId === 'rest-4' ? 'Re-Bake Artisan Bakery' : (cartItems[0].restaurantId === 'rest-1' ? 'The Green Beanery' : 'Sustainable Bistro'),
-        restaurantId: cartItems[0].restaurantId,
-        customerName: user.name,
-        customerEmail: user.email,
-        items: cartItems.map(item => ({ id: item.id, name: item.name, price: item.price, quantity: item.quantity })),
-        subtotal,
-        packagingCharge,
-        deliveryCharge,
-        gst,
-        total: finalPaidTotal,
-        packagingChoice: packagingChoice === 'reusable' ? 'Reusable Bento Box' : (packagingChoice === 'seaweed' ? 'Seaweed biodegradable' : 'Compostable Paper'),
-        deliveryMethod: deliveryMethod === 'bicycle' ? 'Bicycle' : (deliveryMethod === 'ev' ? 'Electric Vehicle' : (deliveryMethod === 'pickup' ? 'Self-Pickup' : 'Solar Drone')),
-        status: 'Order Received',
-        address: addressText
+      const scriptLoaded = await loadRazorpayScript();
+      if (!scriptLoaded) {
+        setIsGatewayOpen(false);
+        setIsProcessing(false);
+        alert('Failed to load Razorpay payment client script.');
+        return;
+      }
+
+      const options = {
+        key: 'rzp_test_placeholder', // Will fail back to simulated if key secret is missing on server verification
+        amount: paymentDetails.amount,
+        currency: paymentDetails.currency,
+        name: 'EcoEats',
+        description: 'Sustainable dining delivery payment',
+        order_id: paymentDetails.razorpayOrderId,
+        handler: async function (response) {
+          setGatewayMessage('Verifying payment signature with security gateway...');
+          try {
+            const token = localStorage.getItem('token');
+            const verifyHeaders = { 'Content-Type': 'application/json' };
+            if (token) {
+              verifyHeaders['Authorization'] = `Bearer ${token}`;
+            }
+
+            const verifyRes = await fetch(`http://localhost:5000/api/orders/${actualOrderId}/verify-payment`, {
+              method: 'POST',
+              headers: verifyHeaders,
+              body: JSON.stringify({
+                razorpayPaymentId: response.razorpay_payment_id,
+                razorpayOrderId: response.razorpay_order_id,
+                razorpaySignature: response.razorpay_signature
+              })
+            });
+
+            const verifyJson = await verifyRes.json();
+            if (verifyJson.success) {
+              setGatewayMessage('Payment Approved! Transitioning to tracking screen...');
+              setTimeout(() => {
+                finalizeCheckout(actualOrderId);
+              }, 1200);
+            } else {
+              setIsGatewayOpen(false);
+              setIsProcessing(false);
+              alert(`Payment verification failed: ${verifyJson.message}`);
+            }
+          } catch (err) {
+            setIsGatewayOpen(false);
+            setIsProcessing(false);
+            alert('Security validation gateway returned an error.');
+          }
+        },
+        prefill: {
+          name: user.name,
+          email: user.email
+        },
+        theme: {
+          color: '#10B981'
+        },
+        modal: {
+          ondismiss: function () {
+            setIsGatewayOpen(false);
+            setIsProcessing(false);
+          }
+        }
       };
 
-      // Add to Global Context
-      addOrder(newOrder).then((savedOrder) => {
-        const actualOrderId = savedOrder ? savedOrder.id : orderId;
-        
-        // Update User Eco-Points (Add earned points)
-        addEcoPoints(ecoPointsEarned);
-        
-        // Deduct redeemed points
-        if (pointsToRedeem > 0) {
-          deductEcoPoints(pointsToRedeem);
-        }
-        
-        // Clear Cart
-        clearCart();
+      const rzp = new window.Razorpay(options);
+      rzp.open();
+    } else {
+      // Simulated gateway fallback
+      setGatewayMessage('Verifying simulated credentials and wallet balances...');
 
-        // Navigate to tracking screen
-        navigate(`/order-tracking/${actualOrderId}`);
-      });
+      setTimeout(() => {
+        setGatewayMessage('Authorizing Carbon-Neutral offset donation...');
+      }, 1200);
 
-    }, 4500);
+      setTimeout(() => {
+        setGatewayMessage('Payment Approved! Scaffolding order confirmation...');
+      }, 2400);
+
+      setTimeout(() => {
+        finalizeCheckout(actualOrderId);
+      }, 3600);
+    }
   };
 
   return (

@@ -12,7 +12,7 @@ const UserSchema = new mongoose.Schema({
   name: { type: String, required: true },
   email: { type: String, required: true, unique: true, index: true },
   password: { type: String, required: true },
-  role: { type: String, enum: ['customer', 'restaurant', 'admin'], default: 'customer' },
+  role: { type: String, enum: ['customer', 'restaurant', 'admin', 'delivery'], default: 'customer' },
   avatar: { type: String },
   savedAddresses: [AddressSchema],
   ecoPoints: { type: Number, default: 0 } // Reused for reward coins

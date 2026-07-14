@@ -50,6 +50,7 @@ export default function Auth() {
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [role, setRole] = useState('customer'); // 'customer' | 'restaurant' | 'delivery'
   
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
@@ -57,14 +58,25 @@ export default function Auth() {
   const [showGlitch, setShowGlitch] = useState(false);
   const [isFadingOut, setIsFadingOut] = useState(false);
 
+  const redirectUserByRole = (userRole) => {
+    if (userRole === 'admin') {
+      navigate('/admin');
+    } else if (userRole === 'restaurant') {
+      navigate('/restaurant-dashboard');
+    } else if (userRole === 'delivery') {
+      navigate('/delivery-dashboard');
+    } else {
+      navigate('/', { state: { showLoginTransition: true } });
+    }
+  };
+
   const handleLogin = async (e) => {
     e.preventDefault();
     setErrorMsg('');
     setLoading(true);
     try {
-      await login(email, password);
-      // Directly navigate to Home with transition state parameter
-      navigate('/', { state: { showLoginTransition: true } });
+      const loggedInUser = await login(email, password);
+      redirectUserByRole(loggedInUser.role);
     } catch (err) {
       setErrorMsg(err.message || 'Login failed. Please verify credentials.');
       setLoading(false);
@@ -80,9 +92,8 @@ export default function Auth() {
     }
     setLoading(true);
     try {
-      await signup(name, email, password);
-      // Directly navigate to Home with transition state parameter
-      navigate('/', { state: { showLoginTransition: true } });
+      const registeredUser = await signup(name, email, password, role);
+      redirectUserByRole(registeredUser.role);
     } catch (err) {
       setErrorMsg(err.message || 'Signup failed.');
       setLoading(false);
@@ -286,6 +297,21 @@ export default function Auth() {
                     placeholder="Re-enter password"
                   />
                 </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
+                  Register as
+                </label>
+                <select
+                  value={role}
+                  onChange={(e) => setRole(e.target.value)}
+                  className="block w-full px-3.5 py-3.5 border border-slate-855 bg-slate-950 text-slate-300 rounded-xl focus:ring-1.5 focus:ring-emerald-500 focus:outline-none focus:border-emerald-500 text-sm font-semibold font-sans cursor-pointer"
+                >
+                  <option value="customer">Customer (Eco-Citizen)</option>
+                  <option value="restaurant">Restaurant Owner (Hotel Partner)</option>
+                  <option value="delivery">Delivery Partner (Eco Courier)</option>
+                </select>
               </div>
 
               <button

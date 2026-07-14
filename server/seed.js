@@ -94,6 +94,20 @@ async function seed() {
       });
     }
 
+    // Add delivery courier profile dynamically
+    if (!data.users.find(u => u.email === 'delivery@ecoeats.com')) {
+      data.users.push({
+        id: "courier-888",
+        name: "John Eco-Courier",
+        email: "delivery@ecoeats.com",
+        password: "password",
+        role: "delivery",
+        avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80",
+        savedAddresses: [],
+        ecoPoints: 150
+      });
+    }
+
     for (const u of data.users) {
       // Use save() to trigger bcrypt pre-save password hashing
       const user = new User({
@@ -112,7 +126,7 @@ async function seed() {
       await Wallet.create({
         holderId: u.id,
         holderEmail: u.email,
-        holderType: u.role === 'admin' ? 'platform' : u.role === 'restaurant' ? 'restaurant' : 'customer',
+        holderType: u.role === 'admin' ? 'platform' : u.role === 'restaurant' ? 'restaurant' : u.role === 'delivery' ? 'delivery' : 'customer',
         coinBalance: u.ecoPoints || 0,
         fiatBalance: 0
       });

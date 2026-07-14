@@ -70,3 +70,36 @@ export const deleteRestaurant = async (req, res, next) => {
     next(error);
   }
 };
+
+export const registerOwnerRestaurant = async (req, res, next) => {
+  try {
+    const ownerId = req.user.id;
+    const existing = await Restaurant.findOne({ ownerId });
+    if (existing) {
+      return res.status(400).json({ success: false, message: 'You have already registered a restaurant' });
+    }
+
+    const restId = `rest-${Date.now()}`;
+    const newRest = new Restaurant({
+      ...req.body,
+      id: restId,
+      ownerId,
+      rating: 5.0,
+      distance: parseFloat((Math.random() * 4 + 0.5).toFixed(1))
+    });
+
+    await newRest.save();
+
+    // Initialize restaurant wallet
+    await Wallet.create({
+      holderId: restId,
+      holderType: 'restaurant',
+      coinBalance: 0,
+      fiatBalance: 0
+    });
+
+    res.status(201).json({ success: true, restaurant: newRest });
+  } catch (error) {
+    next(error);
+  }
+};

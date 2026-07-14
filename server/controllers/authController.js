@@ -36,7 +36,7 @@ export const signup = async (req, res, next) => {
     await Wallet.create({
       holderId: userId,
       holderEmail: user.email,
-      holderType: user.role === 'restaurant' ? 'restaurant' : user.role === 'admin' ? 'platform' : 'customer',
+      holderType: user.role === 'restaurant' ? 'restaurant' : user.role === 'admin' ? 'platform' : user.role === 'delivery' ? 'delivery' : 'customer',
       coinBalance: 0,
       fiatBalance: 0
     });

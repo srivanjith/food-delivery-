@@ -413,6 +413,46 @@ export default function AdminDashboard() {
     setIsRestModalOpen(true);
   };
 
+  const [uploadingImage, setUploadingImage] = useState(false);
+
+  const handleImageUpload = async (e, setImageVal) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploadingImage(true);
+    const formData = new FormData();
+    formData.append('image', file);
+
+    try {
+      const token = localStorage.getItem('token');
+      const headers = {};
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+
+      const res = await fetch('http://localhost:5000/api/upload', {
+        method: 'POST',
+        headers,
+        body: formData
+      });
+      const data = await res.json();
+      if (data.success) {
+        setImageVal(data.url);
+        setSuccessMsg('Image uploaded successfully!');
+        setTimeout(() => setSuccessMsg(''), 2000);
+      } else {
+        setErrorMsg(data.message || 'Image upload failed.');
+        setTimeout(() => setErrorMsg(''), 2000);
+      }
+    } catch (err) {
+      console.error(err);
+      setErrorMsg('Error connecting to image upload service.');
+      setTimeout(() => setErrorMsg(''), 2000);
+    } finally {
+      setUploadingImage(false);
+    }
+  };
+
   const handleRestSubmit = (e) => {
     e.preventDefault();
     const certsArray = restFormCerts.split(',').map(c => c.trim()).filter(Boolean);
@@ -664,10 +704,13 @@ export default function AdminDashboard() {
         <div className="flex border-b border-slate-205 dark:border-slate-800 overflow-x-auto scrollbar-none gap-1">
           {[
             { id: 'dashboard', label: 'Dashboard', icon: <LayoutDashboard className="w-4 h-4 mr-1.5" /> },
-            { id: 'hotels', label: 'Hotel Details', icon: <Store className="w-4 h-4 mr-1.5" /> },
-            { id: 'orders', label: 'Orders Pipeline', icon: <ClipboardList className="w-4 h-4 mr-1.5" /> },
+            { id: 'hotels', label: 'Hotels', icon: <Store className="w-4 h-4 mr-1.5" /> },
+            { id: 'menu', label: 'Menu & Categories', icon: <Utensils className="w-4 h-4 mr-1.5" /> },
+            { id: 'orders', label: 'Orders', icon: <ClipboardList className="w-4 h-4 mr-1.5" /> },
+            { id: 'rewards', label: 'Eco-Coins Program', icon: <Coins className="w-4 h-4 mr-1.5" /> },
             { id: 'offers', label: 'Offers', icon: <Gift className="w-4 h-4 mr-1.5" /> },
             { id: 'reviews', label: 'Reviews', icon: <Star className="w-4 h-4 mr-1.5" /> },
+            { id: 'reports', label: 'Analytics Reports', icon: <BarChart3 className="w-4 h-4 mr-1.5" /> },
           ].map((tab) => (
             <button
               key={tab.id}
@@ -986,7 +1029,127 @@ export default function AdminDashboard() {
                 </tbody>
               </table>
             </div>
-          </div>        )}
+          </div>
+        )}
+
+        {/* SECTION 3: MENU & CATEGORIES */}
+        {activeTab === 'menu' && (
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+            {/* Left Column: Menu Items list */}
+            <div className="lg:col-span-8 bg-white dark:bg-slate-900 border border-slate-202 dark:border-slate-800 rounded-3xl p-6 space-y-6">
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <h3 className="text-base font-bold text-slate-850 dark:text-white">Menu Catalog ({filteredFoodItems.length})</h3>
+                <div className="flex items-center gap-3 w-full sm:w-auto">
+                  <div className="relative w-full sm:w-48">
+                    <Search className="absolute left-3 top-2.5 h-3.5 w-3.5 text-slate-400" />
+                    <input
+                      type="text"
+                      placeholder="Search menu..."
+                      value={foodSearchQuery}
+                      onChange={e => setFoodSearchQuery(e.target.value)}
+                      className="pl-8 pr-3 py-1.5 text-xs neumo-input rounded-xl w-full"
+                    />
+                  </div>
+                  <button
+                    onClick={openFoodAddModal}
+                    className="inline-flex items-center space-x-1.5 px-3.5 py-2 skeuo-button-primary text-xs font-bold rounded-xl whitespace-nowrap"
+                  >
+                    <Plus className="w-3.5 h-3.5" />
+                    <span>Add Item</span>
+                  </button>
+                </div>
+              </div>
+
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-xs">
+                  <thead>
+                    <tr className="border-b border-slate-205 dark:border-slate-800 text-slate-400 font-bold uppercase tracking-wider">
+                      <th className="pb-3">Item Details</th>
+                      <th className="pb-3">Restaurant</th>
+                      <th className="pb-3">Price</th>
+                      <th className="pb-3">Attributes</th>
+                      <th className="pb-3 text-right">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60 font-semibold text-slate-700 dark:text-slate-300">
+                    {filteredFoodItems.map(item => {
+                      const rest = restaurants.find(r => r.id === item.restaurantId);
+                      return (
+                        <tr key={item.id}>
+                          <td className="py-4 flex items-center space-x-3 pr-2">
+                            <img src={item.image} alt={item.name} className="w-12 h-12 object-cover rounded-xl shrink-0" />
+                            <div>
+                              <span className="block text-slate-800 dark:text-white font-bold">{item.name}</span>
+                              <span className="block text-[10px] text-slate-405 font-normal mt-0.5 truncate max-w-[150px]">{item.description}</span>
+                            </div>
+                          </td>
+                          <td className="py-4 pr-2 text-slate-850 dark:text-white font-semibold">
+                            {rest ? rest.name : 'Unknown Restaurant'}
+                          </td>
+                          <td className="py-4 pr-2 font-bold text-slate-800 dark:text-white">₹{item.price}</td>
+                          <td className="py-4 pr-2 space-y-1">
+                            {item.organic && <span className="inline-block bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 text-[9px] px-1.5 py-0.5 rounded mr-1 font-bold font-sans">Organic</span>}
+                            {item.vegan && <span className="inline-block bg-teal-50 dark:bg-teal-950/40 text-teal-705 dark:text-teal-400 text-[9px] px-1.5 py-0.5 rounded font-bold font-sans font-sans">Vegan</span>}
+                          </td>
+                          <td className="py-4 text-right space-x-2">
+                            <button
+                              onClick={() => openFoodEditModal(item)}
+                              className="p-1.5 bg-slate-100 dark:bg-slate-800 rounded-lg text-slate-550 hover:text-slate-800 dark:hover:text-white transition-colors cursor-pointer"
+                            >
+                              <Edit className="w-3.5 h-3.5" />
+                            </button>
+                            <button
+                              onClick={() => { if(confirm('Delete food item?')) deleteFoodItem(item.id); }}
+                              className="p-1.5 bg-red-50 dark:bg-red-950/20 rounded-lg text-red-500 hover:text-red-750 transition-colors cursor-pointer"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            {/* Right Column: Categories Management */}
+            <div className="lg:col-span-4 bg-white dark:bg-slate-900 border border-slate-202 dark:border-slate-800 rounded-3xl p-6 space-y-6">
+              <div className="flex justify-between items-center">
+                <h3 className="text-sm font-black text-slate-800 dark:text-white uppercase tracking-wider">Categories</h3>
+                <button
+                  onClick={openCategoryAddModal}
+                  className="inline-flex items-center space-x-1 px-2.5 py-1.5 bg-emerald-50 text-emerald-600 border border-emerald-200 rounded-xl text-xs font-bold cursor-pointer"
+                >
+                  <Plus className="w-3 h-3 mr-0.5" />
+                  Add
+                </button>
+              </div>
+
+              <div className="divide-y divide-slate-100 dark:divide-slate-800 text-xs">
+                {categories.map((cat, index) => (
+                  <div key={index} className="py-3 flex justify-between items-center font-bold">
+                    <span className="text-slate-805 dark:text-white">{cat}</span>
+                    <div className="flex space-x-1">
+                      <button
+                        onClick={() => openCategoryEditModal(index)}
+                        className="p-1 bg-slate-100 dark:bg-slate-800 rounded text-slate-550 hover:text-slate-800 dark:hover:text-white cursor-pointer"
+                      >
+                        <Edit className="w-3.5 h-3.5" />
+                      </button>
+                      <button
+                        onClick={() => deleteCategory(index)}
+                        className="p-1 bg-red-50 dark:bg-red-950/20 rounded text-red-500 hover:text-red-750 cursor-pointer"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* SECTION 5: ORDERS */}
         {activeTab === 'orders' && (
@@ -1488,9 +1651,26 @@ export default function AdminDashboard() {
             <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Hotel Name</label>
             <input required type="text" value={restFormName} onChange={e => setRestFormName(e.target.value)} className="w-full px-3 py-2 border border-slate-205 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-800 dark:text-white rounded-xl text-sm" />
           </div>
-          <div>
-            <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Unsplash Logo/Image URL</label>
-            <input required type="text" value={restFormImage} onChange={e => setRestFormImage(e.target.value)} className="w-full px-3 py-2 border border-slate-205 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-800 dark:text-white rounded-xl text-sm" />
+          <div className="flex gap-2 items-end">
+            <div className="flex-1">
+              <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Unsplash Logo/Image URL</label>
+              <input required type="text" value={restFormImage} onChange={e => setRestFormImage(e.target.value)} className="w-full px-3 py-2 border border-slate-205 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-800 dark:text-white rounded-xl text-sm" />
+            </div>
+            <div className="relative shrink-0">
+              <input 
+                type="file" 
+                accept="image/*" 
+                id="rest-upload" 
+                className="hidden" 
+                onChange={(e) => handleImageUpload(e, setRestFormImage)} 
+              />
+              <label 
+                htmlFor="rest-upload" 
+                className="px-4 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl text-xs font-bold cursor-pointer inline-block whitespace-nowrap"
+              >
+                {uploadingImage ? 'Uploading...' : 'Upload File'}
+              </label>
+            </div>
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
@@ -1522,6 +1702,101 @@ export default function AdminDashboard() {
           </div>
           <button type="submit" className="w-full py-3 skeuo-button-primary text-xs uppercase tracking-widest rounded-xl font-bold">
             Save Hotel Details
+          </button>
+        </form>
+      </Modal>
+
+      {/* MODAL 2: FOOD ITEM CREATION / EDIT */}
+      <Modal
+        isOpen={isFoodModalOpen}
+        onClose={() => setIsFoodModalOpen(false)}
+        title={foodFormId ? 'Modify Menu Item' : 'Add New Food Item'}
+      >
+        <form onSubmit={handleFoodSubmit} className="space-y-4 font-sans max-h-[80vh] overflow-y-auto pr-1">
+          {successMsg && <Alert type="success" message={successMsg} />}
+          <div>
+            <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Item Name</label>
+            <input required type="text" value={foodFormName} onChange={e => setFoodFormName(e.target.value)} placeholder="Organic Beetroot Salad" className="w-full px-3 py-2 border border-slate-205 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-800 dark:text-white rounded-xl text-sm" />
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Price (₹)</label>
+              <input required type="number" value={foodFormPrice} onChange={e => setFoodFormPrice(e.target.value)} placeholder="249" className="w-full px-3 py-2 border border-slate-205 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-800 dark:text-white rounded-xl text-sm" />
+            </div>
+            <div>
+              <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Restaurant Sourced</label>
+              <select value={foodFormRestId} onChange={e => setFoodFormRestId(e.target.value)} className="w-full px-3 py-2 border border-slate-205 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-850 dark:text-white rounded-xl text-sm">
+                {restaurants.map(r => (
+                  <option key={r.id} value={r.id}>{r.name}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+          <div className="flex gap-2 items-end">
+            <div className="flex-1">
+              <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Menu Image URL</label>
+              <input required type="text" value={foodFormImage} onChange={e => setFoodFormImage(e.target.value)} className="w-full px-3 py-2 border border-slate-205 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-800 dark:text-white rounded-xl text-sm" />
+            </div>
+            <div className="relative shrink-0">
+              <input 
+                type="file" 
+                accept="image/*" 
+                id="food-upload" 
+                className="hidden" 
+                onChange={(e) => handleImageUpload(e, setFoodFormImage)} 
+              />
+              <label 
+                htmlFor="food-upload" 
+                className="px-4 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl text-xs font-bold cursor-pointer inline-block whitespace-nowrap"
+              >
+                {uploadingImage ? 'Uploading...' : 'Upload File'}
+              </label>
+            </div>
+          </div>
+          <div>
+            <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Description / Ingredients</label>
+            <textarea required rows="3" value={foodFormDesc} onChange={e => setFoodFormDesc(e.target.value)} placeholder="Made with 100% organic farm fresh beetroot, walnuts, and vegan cheese." className="w-full p-3 border border-slate-205 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-800 dark:text-white rounded-xl text-sm" />
+          </div>
+          <div className="grid grid-cols-2 gap-4 pt-2">
+            <label className="flex items-center space-x-2 text-xs font-bold text-slate-700 dark:text-slate-300 cursor-pointer">
+              <input type="checkbox" checked={foodFormOrganic} onChange={e => setFoodFormOrganic(e.target.checked)} className="rounded border-slate-300 text-emerald-500 focus:ring-emerald-500" />
+              <span>Organic Sourced</span>
+            </label>
+            <label className="flex items-center space-x-2 text-xs font-bold text-slate-700 dark:text-slate-300 cursor-pointer">
+              <input type="checkbox" checked={foodFormVegan} onChange={e => setFoodFormVegan(e.target.checked)} className="rounded border-slate-300 text-emerald-500 focus:ring-emerald-500" />
+              <span>Vegan Recipe</span>
+            </label>
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <label className="flex items-center space-x-2 text-xs font-bold text-slate-700 dark:text-slate-300 cursor-pointer">
+              <input type="checkbox" checked={foodFormLocal} onChange={e => setFoodFormLocal(e.target.checked)} className="rounded border-slate-300 text-emerald-500 focus:ring-emerald-500" />
+              <span>Locally Sourced</span>
+            </label>
+            <label className="flex items-center space-x-2 text-xs font-bold text-slate-700 dark:text-slate-300 cursor-pointer">
+              <input type="checkbox" checked={foodFormPopular} onChange={e => setFoodFormPopular(e.target.checked)} className="rounded border-slate-300 text-emerald-500 focus:ring-emerald-500" />
+              <span>Popular Item</span>
+            </label>
+          </div>
+          <button type="submit" className="w-full py-3 skeuo-button-primary text-xs uppercase tracking-widest rounded-xl font-bold">
+            Save Food Item Details
+          </button>
+        </form>
+      </Modal>
+
+      {/* MODAL 3: CATEGORY CREATION / EDIT */}
+      <Modal
+        isOpen={isCategoryModalOpen}
+        onClose={() => setIsCategoryModalOpen(false)}
+        title={editCategoryIndex !== null ? 'Modify Food Category' : 'Create New Category'}
+      >
+        <form onSubmit={handleCategorySubmit} className="space-y-4 font-sans">
+          {successMsg && <Alert type="success" message={successMsg} />}
+          <div>
+            <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Category Name</label>
+            <input required type="text" value={categoryFormName} onChange={e => setCategoryFormName(e.target.value)} placeholder="Vegan Tacos" className="w-full px-3 py-2 border border-slate-205 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-800 dark:text-white rounded-xl text-sm" />
+          </div>
+          <button type="submit" className="w-full py-3 skeuo-button-primary text-xs uppercase tracking-widest rounded-xl font-bold">
+            Save Category
           </button>
         </form>
       </Modal>

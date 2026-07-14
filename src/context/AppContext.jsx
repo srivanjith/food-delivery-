@@ -48,7 +48,6 @@ export const AppProvider = ({ children }) => {
   useEffect(() => {
     const loadInitialData = async () => {
       try {
-        const headers = getAuthHeaders();
         const [restRes, foodRes, reviewsRes] = await Promise.all([
           fetch('/api/restaurants'),
           fetch('/api/food-items'),
@@ -69,9 +68,24 @@ export const AppProvider = ({ children }) => {
     loadInitialData();
     loadOrders();
 
+    // Setup real-time Socket.io listener for order synchronization
+    let socket;
+    import('socket.io-client').then(({ io }) => {
+      socket = io('http://localhost:5000');
+      socket.on('orderStatusUpdated', () => {
+        console.log('🔌 [WEBSOCKET CONTEXT] Order update detected. Syncing orders...');
+        loadOrders();
+      });
+    });
+
     // Re-fetch orders whenever login/logout happens
     window.addEventListener('auth-changed', loadOrders);
-    return () => window.removeEventListener('auth-changed', loadOrders);
+    return () => {
+      window.removeEventListener('auth-changed', loadOrders);
+      if (socket) {
+        socket.disconnect();
+      }
+    };
   }, []);
 
   const addOrder = async (order) => {
@@ -84,7 +98,7 @@ export const AppProvider = ({ children }) => {
       const data = await response.json();
       if (data.success) {
         setOrders(prev => [data.order, ...prev]);
-        return data.order;
+        return { order: data.order, paymentDetails: data.paymentDetails };
       }
       return null;
     } catch (err) {
@@ -237,6 +251,7 @@ export const AppProvider = ({ children }) => {
         foodItems,
         orders,
         reviews,
+        loadOrders,
         addOrder,
         updateOrderStatus,
         addReview,
