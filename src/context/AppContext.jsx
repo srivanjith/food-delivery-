@@ -14,7 +14,7 @@ export const AppProvider = ({ children }) => {
     if (token) {
       headers['Authorization'] = `Bearer ${token}`;
     }
-    const userStr = localStorage.getItem('user');
+    const userStr = localStorage.getItem('ecoeats_user');
     if (userStr) {
       try {
         const u = JSON.parse(userStr);
@@ -260,7 +260,8 @@ export const AppProvider = ({ children }) => {
         deleteRestaurant,
         addFoodItem,
         updateFoodItem,
-        deleteFoodItem
+        deleteFoodItem,
+        getAuthHeaders
       }}
     >
       {children}

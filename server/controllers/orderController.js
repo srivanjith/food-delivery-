@@ -4,6 +4,7 @@ import CoinHistory from '../models/CoinHistory.js';
 import AdminSettings from '../models/AdminSettings.js';
 import { processOrderDelivery } from '../services/orderFlowService.js';
 import { processUPIPayment, verifyRazorpayPayment } from '../services/paymentService.js';
+import { sendSMSNotification } from '../services/smsService.js';
 
 export const createOrder = async (req, res, next) => {
   try {
@@ -14,6 +15,7 @@ export const createOrder = async (req, res, next) => {
     const coinsRedeemed = Number(orderData.rewardCoinsRedeemed) || 0;
     const customerId = req.user?.id || orderData.customerId || 'user-888';
     const customerEmail = req.user?.email || orderData.customerEmail || 'user@ecoeats.com';
+    const customerPhone = req.user?.phone || orderData.customerPhone || '';
     
     let settings = await AdminSettings.findOne();
     if (!settings) {
@@ -70,6 +72,7 @@ export const createOrder = async (req, res, next) => {
       customerId,
       customerName: req.user?.name || orderData.customerName || 'Eco-Citizen',
       customerEmail,
+      customerPhone,
       date: new Date().toISOString()
     };
 
@@ -116,11 +119,16 @@ export const createOrder = async (req, res, next) => {
       });
       
       finalOrderData.rewardCoinsEarned = coinsEarned;
-      finalOrderData.coinsProcessed = true;
+      finalOrderData.coinsProcessed = false;
     }
 
     const order = new Order(finalOrderData);
     await order.save();
+
+    // Trigger Twilio SMS notification
+    sendSMSNotification(order, customerPhone).catch(err => {
+      console.error(`🚨 [ORDER CONTROLLER] SMS send failed:`, err.message);
+    });
 
     let paymentDetails = null;
     // Simulate Payment flow via UPI immediately if amount > 0
@@ -136,6 +144,7 @@ export const createOrder = async (req, res, next) => {
     if (io) {
       console.log(`🔌 [WEBSOCKET] Broadcasting new order placed: ${orderId}`);
       io.emit('orderStatusUpdated', { orderId, status: order.status, order });
+      io.to(`order:restaurant:${order.restaurantId}`).emit('orderStatusUpdated', { orderId, status: order.status, order });
     }
 
     res.status(201).json({ success: true, order, paymentDetails });
@@ -189,11 +198,14 @@ export const updateOrderStatus = async (req, res, next) => {
     const io = req.app.get('io');
     if (io) {
       console.log(`🔌 [WEBSOCKET] Broadcasting status update for order ${id} -> ${status}`);
+      // Notify customer tracking page
       io.to(`order:${id}`).emit('orderStatusUpdated', { orderId: id, status, order });
+      // Notify restaurant dashboard room
+      io.to(`order:restaurant:${order.restaurantId}`).emit('orderStatusUpdated', { orderId: id, status, order });
       
       if (status === 'Ready for Pickup') {
         console.log(`🔌 [WEBSOCKET] Alerting delivery pool: Order ${id} is ready for pickup.`);
-        io.to('delivery-pool').emit('newOrderReady', { orderId: id, restaurantName: order.restaurantName, order });
+        io.to('order:delivery-pool').emit('newOrderReady', { orderId: id, restaurantName: order.restaurantName, order });
       }
     }
 
@@ -258,9 +270,11 @@ export const assignCourierToOrder = async (req, res, next) => {
     if (io) {
       console.log(`🔌 [WEBSOCKET] Courier claimed order ${id}. Status -> Out for Delivery`);
       io.to(`order:${id}`).emit('orderStatusUpdated', { orderId: id, status: 'Out for Delivery', order });
+      // Notify restaurant dashboard room
+      io.to(`order:restaurant:${order.restaurantId}`).emit('orderStatusUpdated', { orderId: id, status: 'Out for Delivery', order });
       
       // Notify delivery-pool that this order is claimed so others close/remove it
-      io.to('delivery-pool').emit('orderClaimed', { orderId: id });
+      io.to('order:delivery-pool').emit('orderClaimed', { orderId: id });
     }
 
     res.json({ success: true, order });

@@ -6,7 +6,7 @@ import LoginLog from '../models/LoginLog.js';
 const JWT_SECRET = process.env.JWT_SECRET || 'ecoeats_jwt_secret_key_2026';
 
 export const signup = async (req, res, next) => {
-  const { name, email, password, role } = req.body;
+  const { name, email, password, phone, role } = req.body;
   try {
     const existing = await User.findOne({ email });
     if (existing) {
@@ -26,6 +26,7 @@ export const signup = async (req, res, next) => {
       name,
       email,
       password,
+      phone,
       role: role || 'customer',
       avatar: `https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80`
     });

@@ -35,37 +35,7 @@ export const sendFeedbackEmail = async (order) => {
     </div>
   `;
 
-  // 1. If SMTP is configured, send using Nodemailer
-  if (smtpHost && smtpUser && smtpPass) {
-    try {
-      console.log(`📧 [EMAIL SERVICE] Sending real email to ${recipient} via Nodemailer SMTP...`);
-      const transporter = nodemailer.createTransport({
-        host: smtpHost,
-        port: smtpPort,
-        secure: smtpPort === 465, // true for 465, false for other ports
-        auth: {
-          user: smtpUser,
-          pass: smtpPass
-        }
-      });
-
-      const info = await transporter.sendMail({
-        from: smtpFrom,
-        to: recipient,
-        subject: `How was your sustainable dining experience from ${order.restaurantName}?`,
-        html: emailHtml,
-        text: `Hello ${order.customerName || 'Eco-Citizen'},\n\nThank you for choosing EcoEats! How was your meal from ${order.restaurantName}? Leave a review here: ${feedbackLink}`
-      });
-
-      console.log(`📧 [EMAIL SERVICE] Email successfully sent! Message ID: ${info.messageId}`);
-      return { success: true, recipient, messageId: info.messageId };
-    } catch (error) {
-      console.error(`🚨 [EMAIL SERVICE] Nodemailer SMTP failed:`, error.message);
-      // Fallback to other methods
-    }
-  }
-
-  // 2. EmailJS API integration (if configured)
+  // 1. EmailJS API integration (if configured)
   const serviceId = process.env.EMAILJS_SERVICE_ID;
   const templateId = process.env.EMAILJS_TEMPLATE_ID;
   const publicKey = process.env.EMAILJS_PUBLIC_KEY;
@@ -77,7 +47,7 @@ export const sendFeedbackEmail = async (order) => {
     publicKey && publicKey !== 'your_public_key'
   ) {
     try {
-      console.log(`📧 [EMAIL SERVICE] SMTP not available. Sending via EmailJS API...`);
+      console.log(`📧 [EMAIL SERVICE] Sending email to ${recipient} via EmailJS API...`);
       const payload = {
         service_id: serviceId,
         template_id: templateId,
@@ -102,13 +72,43 @@ export const sendFeedbackEmail = async (order) => {
       
       if (response.ok) {
         console.log(`📧 [EMAIL SERVICE] Email successfully sent to ${recipient} via EmailJS.`);
-        return { success: true, recipient };
+        return { success: true, recipient, method: 'emailjs' };
       } else {
         const errorText = await response.text();
         console.error(`📧 [EMAIL SERVICE] EmailJS API failure:`, errorText);
       }
     } catch (err) {
       console.error(`🚨 [EMAIL SERVICE] EmailJS API error:`, err.message);
+    }
+  }
+
+  // 2. If SMTP is configured, send using Nodemailer
+  if (smtpHost && smtpUser && smtpPass) {
+    try {
+      console.log(`📧 [EMAIL SERVICE] Sending email to ${recipient} via Nodemailer SMTP...`);
+      const transporter = nodemailer.createTransport({
+        host: smtpHost,
+        port: smtpPort,
+        secure: smtpPort === 465, // true for 465, false for other ports
+        auth: {
+          user: smtpUser,
+          pass: smtpPass
+        }
+      });
+
+      const info = await transporter.sendMail({
+        from: smtpFrom,
+        to: recipient,
+        subject: `How was your sustainable dining experience from ${order.restaurantName}?`,
+        html: emailHtml,
+        text: `Hello ${order.customerName || 'Eco-Citizen'},\n\nThank you for choosing EcoEats! How was your meal from ${order.restaurantName}? Leave a review here: ${feedbackLink}`
+      });
+
+      console.log(`📧 [EMAIL SERVICE] Email successfully sent! Message ID: ${info.messageId}`);
+      return { success: true, recipient, method: 'smtp', messageId: info.messageId };
+    } catch (error) {
+      console.error(`🚨 [EMAIL SERVICE] Nodemailer SMTP failed:`, error.message);
+      // Fallback to other methods
     }
   }
 

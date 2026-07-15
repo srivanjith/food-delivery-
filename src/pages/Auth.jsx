@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import Alert from '../components/Common/Alert';
-import { Leaf, Mail, Lock, User, KeyRound, ArrowLeft } from 'lucide-react';
+import { Leaf, Mail, Lock, User, KeyRound, ArrowLeft, Phone } from 'lucide-react';
 import Hyperspeed from '../components/Home/Hyperspeed';
 
 const HYPERSPEED_OPTIONS = {
@@ -49,6 +49,7 @@ export default function Auth() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
+  const [phone, setPhone] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [role, setRole] = useState('customer'); // 'customer' | 'restaurant' | 'delivery'
   
@@ -92,7 +93,7 @@ export default function Auth() {
     }
     setLoading(true);
     try {
-      const registeredUser = await signup(name, email, password, role);
+      const registeredUser = await signup(name, email, password, phone, role);
       redirectUserByRole(registeredUser.role);
     } catch (err) {
       setErrorMsg(err.message || 'Signup failed.');
@@ -255,6 +256,26 @@ export default function Auth() {
                     id="signup-email-input"
                     className="block w-full pl-10 pr-3 py-3 border border-slate-855 bg-slate-950 text-slate-200 rounded-xl focus:ring-1.5 focus:ring-emerald-500 focus:outline-none focus:border-emerald-500 text-sm font-sans"
                     placeholder="name@domain.com"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
+                  Phone Number
+                </label>
+                <div className="relative rounded-xl shadow-sm">
+                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                    <Phone className="h-4.5 w-4.5 text-slate-500" />
+                  </div>
+                  <input
+                    type="tel"
+                    required
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    id="signup-phone-input"
+                    className="block w-full pl-10 pr-3 py-3 border border-slate-855 bg-slate-950 text-slate-200 rounded-xl focus:ring-1.5 focus:ring-emerald-500 focus:outline-none focus:border-emerald-500 text-sm font-sans"
+                    placeholder="+91 98765 43210"
                   />
                 </div>
               </div>

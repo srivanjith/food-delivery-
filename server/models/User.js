@@ -12,6 +12,7 @@ const UserSchema = new mongoose.Schema({
   name: { type: String, required: true },
   email: { type: String, required: true, unique: true, index: true },
   password: { type: String, required: true },
+  phone: { type: String },
   role: { type: String, enum: ['customer', 'restaurant', 'admin', 'delivery'], default: 'customer' },
   avatar: { type: String },
   savedAddresses: [AddressSchema],

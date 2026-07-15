@@ -15,6 +15,7 @@ const OrderSchema = new mongoose.Schema({
   customerId: { type: String, index: true },
   customerName: { type: String },
   customerEmail: { type: String },
+  customerPhone: { type: String },
   items: [OrderItemSchema],
   subtotal: { type: Number, required: true },
   packagingCharge: { type: Number, default: 0 },

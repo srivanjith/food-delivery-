@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useApp } from '../context/AppContext';
 import { Store, ClipboardList, TrendingUp, AlertCircle, Sparkles, CheckCircle2, Clock, Check, Plus, Edit, Trash2 } from 'lucide-react';
@@ -8,7 +9,7 @@ import { io } from 'socket.io-client';
 
 export default function RestaurantDashboard() {
   const { user } = useAuth();
-  const { getAuthHeaders, loadOrders } = useApp();
+  const { getAuthHeaders, loadOrders, foodItems } = useApp();
 
   const [restaurant, setRestaurant] = useState(null);
   const [loadingRest, setLoadingRest] = useState(true);
@@ -286,8 +287,11 @@ export default function RestaurantDashboard() {
             <img src={restaurant.image} alt={restaurant.name} className="w-16 h-16 object-cover rounded-2xl shadow-md border-2 border-emerald-500/20" />
             <div>
               <h1 className="text-xl font-black text-slate-850 dark:text-white flex items-center">
-                {restaurant.name}
-                <span className="ml-2 text-[10px] bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-450 px-2 py-0.5 rounded font-black font-sans">Hotel Owner Partner</span>
+                <Link to={`/restaurant/${restaurant.id}`} className="hover:text-emerald-500 hover:underline flex items-center gap-1.5" title="Click to view/manage menu">
+                  {restaurant.name}
+                  <span className="text-[10px] text-slate-400 font-normal italic font-sans hover:text-emerald-500">(Manage Menu)</span>
+                </Link>
+                <span className="ml-2 text-[10px] bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-450 px-2 py-0.5 rounded font-black font-sans font-sans">Hotel Owner Partner</span>
               </h1>
               <p className="text-xs text-slate-500 mt-1">{restaurant.location} • {restaurant.timings}</p>
             </div>
@@ -300,6 +304,22 @@ export default function RestaurantDashboard() {
             ))}
           </div>
         </div>
+
+        {/* Empty Menu Tip Alert */}
+        {(() => {
+          const myDishes = foodItems ? foodItems.filter(item => item.restaurantId === restaurant.id) : [];
+          if (myDishes.length === 0) {
+            return (
+              <div className="mb-8 p-4 bg-amber-500/10 border border-amber-500/20 text-amber-800 dark:text-amber-300 rounded-3xl text-xs flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <span>💡 <strong>Tip: Your restaurant menu is currently empty!</strong> Customers will not see any dishes under your kitchen on the home page.</span>
+                <Link to={`/restaurant/${restaurant.id}`} className="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-xl whitespace-nowrap cursor-pointer transition-all">
+                  Manage Menu & Add Dishes
+                </Link>
+              </div>
+            );
+          }
+          return null;
+        })()}
 
         {/* Analytics metrics grids */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
