@@ -105,3 +105,5 @@ server.listen(PORT, () => {
   console.log(`EcoEats backend server is running on http://localhost:${PORT}`);
 });
 
+// Trigger reload
+

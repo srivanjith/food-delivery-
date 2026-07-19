@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken';
-import User from '../models/User.js';
-import Wallet from '../models/Wallet.js';
-import LoginLog from '../models/LoginLog.js';
+import User from '../../db/models/User.js';
+import Wallet from '../../db/models/Wallet.js';
+import LoginLog from '../../db/models/LoginLog.js';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'ecoeats_jwt_secret_key_2026';
 

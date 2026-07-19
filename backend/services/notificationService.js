@@ -1,4 +1,4 @@
-import Notification from '../models/Notification.js';
+import Notification from '../../db/models/Notification.js';
 
 export const sendPushNotification = async (userId, title, message, type = 'system') => {
   try {

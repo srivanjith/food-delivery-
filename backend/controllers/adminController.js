@@ -1,8 +1,8 @@
-import AdminSettings from '../models/AdminSettings.js';
-import Coupon from '../models/Coupon.js';
-import User from '../models/User.js';
-import Restaurant from '../models/Restaurant.js';
-import Order from '../models/Order.js';
+import AdminSettings from '../../db/models/AdminSettings.js';
+import Coupon from '../../db/models/Coupon.js';
+import User from '../../db/models/User.js';
+import Restaurant from '../../db/models/Restaurant.js';
+import Order from '../../db/models/Order.js';
 import { getAdminMetrics } from '../services/analyticsService.js';
 
 export const getSystemSettings = async (req, res, next) => {

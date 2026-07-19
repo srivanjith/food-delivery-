@@ -1,7 +1,7 @@
 import Razorpay from 'razorpay';
 import crypto from 'crypto';
-import Payment from '../models/Payment.js';
-import Order from '../models/Order.js';
+import Payment from '../../db/models/Payment.js';
+import Order from '../../db/models/Order.js';
 
 let razorpayInstance = null;
 

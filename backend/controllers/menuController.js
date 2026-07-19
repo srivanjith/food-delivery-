@@ -1,5 +1,5 @@
-import FoodItem from '../models/FoodItem.js';
-import Category from '../models/Category.js';
+import FoodItem from '../../db/models/FoodItem.js';
+import Category from '../../db/models/Category.js';
 
 export const getFoodItems = async (req, res, next) => {
   const { restaurantId, search, organic, vegan } = req.query;

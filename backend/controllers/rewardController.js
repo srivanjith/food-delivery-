@@ -1,7 +1,7 @@
-import Wallet from '../models/Wallet.js';
-import CoinHistory from '../models/CoinHistory.js';
-import AdminSettings from '../models/AdminSettings.js';
-import Notification from '../models/Notification.js';
+import Wallet from '../../db/models/Wallet.js';
+import CoinHistory from '../../db/models/CoinHistory.js';
+import AdminSettings from '../../db/models/AdminSettings.js';
+import Notification from '../../db/models/Notification.js';
 
 // GET /wallet
 export const getWalletData = async (req, res, next) => {
@@ -171,7 +171,7 @@ export const earnCoins = async (req, res, next) => {
     const coinsToEarn = Math.floor(foodAmount / 100) * settings.coinsPer100;
 
     // Get target user's registered email
-    const User = (await import('../models/User.js')).default;
+    const User = (await import('../../db/models/User.js')).default;
     const targetUserDoc = await User.findOne({ id: targetUser });
     const userEmail = targetUserDoc?.email || req.user?.email || 'user@ecoeats.com';
 
@@ -357,7 +357,7 @@ export const convertCoinsToMoney = async (req, res, next) => {
     await wallet.save();
 
     // Deduct User ecoPoints for compatibility
-    await import('../models/User.js').then(async (m) => {
+    await import('../../db/models/User.js').then(async (m) => {
       const User = m.default;
       await User.findOneAndUpdate(
         { id: userId },

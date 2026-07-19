@@ -1,4 +1,4 @@
-import Review from '../models/Review.js';
+import Review from '../../db/models/Review.js';
 
 export const getReviews = async (req, res, next) => {
   const { restaurantId } = req.query;

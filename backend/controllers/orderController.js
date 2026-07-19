@@ -1,7 +1,7 @@
-import Order from '../models/Order.js';
-import Wallet from '../models/Wallet.js';
-import CoinHistory from '../models/CoinHistory.js';
-import AdminSettings from '../models/AdminSettings.js';
+import Order from '../../db/models/Order.js';
+import Wallet from '../../db/models/Wallet.js';
+import CoinHistory from '../../db/models/CoinHistory.js';
+import AdminSettings from '../../db/models/AdminSettings.js';
 import { processOrderDelivery } from '../services/orderFlowService.js';
 import { processUPIPayment, verifyRazorpayPayment } from '../services/paymentService.js';
 import { sendSMSNotification } from '../services/smsService.js';
@@ -42,7 +42,7 @@ export const createOrder = async (req, res, next) => {
       await wallet.save();
 
       // Update User ecoPoints for frontend compatibility
-      await import('../models/User.js').then(async (m) => {
+      await import('../../db/models/User.js').then(async (m) => {
         const User = m.default;
         await User.findOneAndUpdate(
           { id: customerId },
@@ -110,7 +110,7 @@ export const createOrder = async (req, res, next) => {
       });
 
       // Update User ecoPoints for frontend compatibility
-      await import('../models/User.js').then(async (m) => {
+      await import('../../db/models/User.js').then(async (m) => {
         const User = m.default;
         await User.findOneAndUpdate(
           { id: customerId },
@@ -163,7 +163,7 @@ export const getOrders = async (req, res, next) => {
       query = { customerId: userId };
     } else if (role === 'restaurant') {
       // Find restaurant owned by this user
-      const Restaurant = (await import('../models/Restaurant.js')).default;
+      const Restaurant = (await import('../../db/models/Restaurant.js')).default;
       const rest = await Restaurant.findOne({ ownerId: userId });
       if (rest) {
         query = { restaurantId: rest.get('id') };
@@ -202,6 +202,8 @@ export const updateOrderStatus = async (req, res, next) => {
       io.to(`order:${id}`).emit('orderStatusUpdated', { orderId: id, status, order });
       // Notify restaurant dashboard room
       io.to(`order:restaurant:${order.restaurantId}`).emit('orderStatusUpdated', { orderId: id, status, order });
+      // Notify delivery dashboard room
+      io.to('order:delivery-pool').emit('orderStatusUpdated', { orderId: id, status, order });
       
       if (status === 'Ready for Pickup') {
         console.log(`🔌 [WEBSOCKET] Alerting delivery pool: Order ${id} is ready for pickup.`);
@@ -272,6 +274,8 @@ export const assignCourierToOrder = async (req, res, next) => {
       io.to(`order:${id}`).emit('orderStatusUpdated', { orderId: id, status: 'Out for Delivery', order });
       // Notify restaurant dashboard room
       io.to(`order:restaurant:${order.restaurantId}`).emit('orderStatusUpdated', { orderId: id, status: 'Out for Delivery', order });
+      // Notify delivery dashboard room
+      io.to('order:delivery-pool').emit('orderStatusUpdated', { orderId: id, status: 'Out for Delivery', order });
       
       // Notify delivery-pool that this order is claimed so others close/remove it
       io.to('order:delivery-pool').emit('orderClaimed', { orderId: id });

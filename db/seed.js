@@ -17,11 +17,11 @@ import AdminSettings from './models/AdminSettings.js';
 import Category from './models/Category.js';
 import Coupon from './models/Coupon.js';
 
-dotenv.config();
-
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const dbJsonPath = path.join(__dirname, 'db.json');
+
+dotenv.config({ path: path.join(__dirname, '../backend/.env') });
 
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/ecoeats';
 

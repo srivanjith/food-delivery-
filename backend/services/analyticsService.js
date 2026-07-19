@@ -1,10 +1,10 @@
-import Order from '../models/Order.js';
-import PlatformRevenue from '../models/PlatformRevenue.js';
-import CoinHistory from '../models/CoinHistory.js';
-import Wallet from '../models/Wallet.js';
-import User from '../models/User.js';
-import Restaurant from '../models/Restaurant.js';
-import RestaurantSettlement from '../models/RestaurantSettlement.js';
+import Order from '../../db/models/Order.js';
+import PlatformRevenue from '../../db/models/PlatformRevenue.js';
+import CoinHistory from '../../db/models/CoinHistory.js';
+import Wallet from '../../db/models/Wallet.js';
+import User from '../../db/models/User.js';
+import Restaurant from '../../db/models/Restaurant.js';
+import RestaurantSettlement from '../../db/models/RestaurantSettlement.js';
 
 export const getAdminMetrics = async () => {
   try {

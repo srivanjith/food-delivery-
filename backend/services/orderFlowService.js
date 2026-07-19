@@ -1,9 +1,9 @@
-import Order from '../models/Order.js';
-import Restaurant from '../models/Restaurant.js';
-import Wallet from '../models/Wallet.js';
-import CoinHistory from '../models/CoinHistory.js';
-import PlatformRevenue from '../models/PlatformRevenue.js';
-import AdminSettings from '../models/AdminSettings.js';
+import Order from '../../db/models/Order.js';
+import Restaurant from '../../db/models/Restaurant.js';
+import Wallet from '../../db/models/Wallet.js';
+import CoinHistory from '../../db/models/CoinHistory.js';
+import PlatformRevenue from '../../db/models/PlatformRevenue.js';
+import AdminSettings from '../../db/models/AdminSettings.js';
 import { sendPushNotification } from './notificationService.js';
 import { sendFeedbackEmail } from './emailService.js';
 

@@ -3,7 +3,10 @@ import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
-dotenv.config();
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+dotenv.config({ path: path.join(__dirname, '../backend/.env') });
 
 console.log("Debug - process.env.MONGODB_URI:", process.env.MONGODB_URI ? "Found" : "Not Found");
 if (process.env.MONGODB_URI) {
@@ -64,7 +67,6 @@ export async function disconnectFromMongoDB() {
 }
 
 // If run directly: e.g., "node dbClient.js"
-const __filename = fileURLToPath(import.meta.url);
 const isDirectRun = process.argv[1] && path.resolve(process.argv[1]) === path.resolve(__filename);
 
 if (isDirectRun) {

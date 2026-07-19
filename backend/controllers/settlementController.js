@@ -1,6 +1,6 @@
-import RestaurantSettlement from '../models/RestaurantSettlement.js';
-import Wallet from '../models/Wallet.js';
-import Restaurant from '../models/Restaurant.js';
+import RestaurantSettlement from '../../db/models/RestaurantSettlement.js';
+import Wallet from '../../db/models/Wallet.js';
+import Restaurant from '../../db/models/Restaurant.js';
 
 export const requestSettlement = async (req, res, next) => {
   const { restaurantId, amount } = req.body;

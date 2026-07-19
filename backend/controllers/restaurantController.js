@@ -1,5 +1,5 @@
-import Restaurant from '../models/Restaurant.js';
-import Wallet from '../models/Wallet.js';
+import Restaurant from '../../db/models/Restaurant.js';
+import Wallet from '../../db/models/Wallet.js';
 
 export const getAllRestaurants = async (req, res, next) => {
   try {
@@ -61,7 +61,7 @@ export const deleteRestaurant = async (req, res, next) => {
       return res.status(404).json({ success: false, message: 'Restaurant not found' });
     }
     // Delete associated food items
-    await import('../models/FoodItem.js').then(async (m) => {
+    await import('../../db/models/FoodItem.js').then(async (m) => {
       const FoodItem = m.default;
       await FoodItem.deleteMany({ restaurantId: id });
     });
