@@ -29,12 +29,10 @@ export default function RestaurantMenu() {
   const [activeFilter, setActiveFilter] = useState('all');
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
   
-  // Review form states
   const [reviewRating, setReviewRating] = useState(5);
   const [reviewComment, setReviewComment] = useState('');
   const [reviewSuccess, setReviewSuccess] = useState('');
 
-  // Food Item modal states
   const [isFoodModalOpen, setIsFoodModalOpen] = useState(false);
   const [foodFormId, setFoodFormId] = useState(null);
   const [foodFormName, setFoodFormName] = useState('');

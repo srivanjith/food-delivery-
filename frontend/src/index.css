@@ -2,14 +2,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Great+Vibes&display=swap');
 
 
-/* ============================================================
-   MIDNIGHT PURPLE THEME — CSS CUSTOM PROPERTIES
-   Background : #0F172A  |  Cards    : #1E293B
-   Sidebar    : #111827  |  Primary  : #8B5CF6
-   Hover      : #7C3AED  |  Text     : #FFFFFF
-   Success    : #22C55E  |  Warning  : #F59E0B
-   ============================================================ */
-
 :root {
   --mp-bg:       #0F172A;
   --mp-sidebar:  #111827;
