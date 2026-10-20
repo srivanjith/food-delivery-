@@ -8,7 +8,10 @@ export default function OrderTracking() {
   const { id } = useParams();
   const { orders, updateOrderStatus, loadOrders, restaurants } = useApp();
   
-  const order = orders.find(o => o.id === id);
+  const [fetchedOrder, setFetchedOrder] = useState(null);
+  const [loadingOrder, setLoadingOrder] = useState(true);
+
+  const order = orders.find(o => o.id === id) || fetchedOrder;
   const restaurant = restaurants?.find(r => r.id === order?.restaurantId);
   const deliveryIcon = order ? ({
     Bicycle: '🚲',
@@ -21,6 +24,27 @@ export default function OrderTracking() {
   
   const [localStatus, setLocalStatus] = useState(order?.status || 'Order Received');
   const [leafletLoaded, setLeafletLoaded] = useState(false);
+
+  // Fetch order directly from API if not yet in orders context
+  useEffect(() => {
+    const existing = orders.find(o => o.id === id);
+    if (existing) {
+      setLoadingOrder(false);
+      return;
+    }
+    if (id) {
+      setLoadingOrder(true);
+      fetch(`/api/orders/${id}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.success && data.order) {
+            setFetchedOrder(data.order);
+          }
+        })
+        .catch(err => console.error('Failed fetching order details:', err))
+        .finally(() => setLoadingOrder(false));
+    }
+  }, [id, orders]);
 
   // Keep localStatus in sync with context order.status when it loads or changes
   useEffect(() => {
@@ -173,6 +197,14 @@ export default function OrderTracking() {
     if (!order) return;
     updateOrderStatus(order.id, 'Order Received');
   };
+
+  if (loadingOrder && !order) {
+    return (
+      <div className="min-h-[80vh] flex items-center justify-center font-sans">
+        <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-emerald-500" />
+      </div>
+    );
+  }
 
   if (!order) {
     return (

@@ -23,7 +23,7 @@ export default function UserDashboard() {
           } else if (user?.id) {
             headers['x-user-id'] = user.id;
           }
-          const res = await fetch('http://localhost:5000/api/rewards/wallet', { headers });
+          const res = await fetch('/api/rewards/wallet', { headers });
           const data = await res.json();
           if (data.success) {
             setWallet(data.wallet);

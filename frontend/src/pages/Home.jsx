@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
 import Hero from '../components/Home/Hero';
 import Categories from '../components/Home/Categories';
@@ -49,6 +49,7 @@ const HYPERSPEED_OPTIONS = {
 export default function Home() {
   const { restaurants } = useApp();
   const location = useLocation();
+  const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
   
@@ -65,8 +66,8 @@ export default function Home() {
 
       const unmountTimer = setTimeout(() => {
         setShowTransition(false);
-        // Clear route state so it doesn't trigger on fresh reloads
-        window.history.replaceState({}, document.title);
+        // Clear route state cleanly through router
+        navigate(location.pathname, { replace: true, state: {} });
       }, 2500);
 
       return () => {
@@ -74,20 +75,21 @@ export default function Home() {
         clearTimeout(unmountTimer);
       };
     }
-  }, [location.state]);
+  }, [location.state, location.pathname, navigate]);
 
   // Filter restaurants based on category and search query
-  const filteredRestaurants = restaurants.filter((restaurant) => {
-    const matchesSearch = restaurant.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                          restaurant.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase())) ||
-                          restaurant.location.toLowerCase().includes(searchQuery.toLowerCase());
+  const filteredRestaurants = (restaurants || []).filter((restaurant) => {
+    const nameMatch = (restaurant.name || '').toLowerCase().includes(searchQuery.toLowerCase());
+    const tagsMatch = Array.isArray(restaurant.tags) && restaurant.tags.some(tag => (tag || '').toLowerCase().includes(searchQuery.toLowerCase()));
+    const locMatch = (restaurant.location || '').toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesSearch = nameMatch || tagsMatch || locMatch;
     
     if (selectedCategory === 'All') {
       return matchesSearch;
     }
     
     // Category checks
-    const matchesCategory = restaurant.categories.includes(selectedCategory);
+    const matchesCategory = Array.isArray(restaurant.categories) && restaurant.categories.includes(selectedCategory);
     return matchesSearch && matchesCategory;
   });
 

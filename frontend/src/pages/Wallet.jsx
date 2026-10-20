@@ -30,10 +30,10 @@ export default function Wallet() {
         headers['x-user-id'] = user.id;
       }
 
-      const walletRes = await fetch('http://localhost:5000/api/rewards/wallet', { headers });
+      const walletRes = await fetch('/api/rewards/wallet', { headers });
       const walletJson = await walletRes.json();
       
-      const historyRes = await fetch('http://localhost:5000/api/rewards/wallet/history', { headers });
+      const historyRes = await fetch('/api/rewards/wallet/history', { headers });
       const historyJson = await historyRes.json();
 
       if (walletJson.success) {
@@ -78,7 +78,7 @@ export default function Wallet() {
         headers['x-user-id'] = user.id;
       }
 
-      const res = await fetch('http://localhost:5000/api/rewards/wallet/convert', {
+      const res = await fetch('/api/rewards/wallet/convert', {
         method: 'POST',
         headers,
         body: JSON.stringify({ coinsToConvert: amt })

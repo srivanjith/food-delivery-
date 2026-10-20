@@ -57,9 +57,9 @@ export const AppProvider = ({ children }) => {
         const foods = await foodRes.json();
         const revs = await reviewsRes.json();
 
-        setRestaurants(rests);
-        setFoodItems(foods);
-        setReviews(revs);
+        setRestaurants(Array.isArray(rests) ? rests : (rests?.restaurants || []));
+        setFoodItems(Array.isArray(foods) ? foods : (foods?.foodItems || []));
+        setReviews(Array.isArray(revs) ? revs : (revs?.reviews || []));
       } catch (e) {
         console.error('Error fetching backend data:', e);
       }

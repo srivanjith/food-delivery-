@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useApp } from '../context/AppContext';
 import { Navigation, ClipboardList, Map, ShieldAlert, Sparkles, CheckCircle2, Clock, Check, Coins, ArrowRight, Phone } from 'lucide-react';
@@ -154,6 +155,10 @@ export default function DeliveryDashboard() {
   };
 
   const fetchDeliveryData = async () => {
+    if (!user) {
+      setLoading(false);
+      return;
+    }
     setLoading(true);
     try {
       // 1. Fetch available unclaimed orders (Ready for Pickup)
@@ -161,21 +166,25 @@ export default function DeliveryDashboard() {
         headers: getAuthHeaders()
       });
       const dataPending = await resPending.json();
-      setPendingJobs(dataPending || []);
+      setPendingJobs(Array.isArray(dataPending) ? dataPending : []);
 
       // 2. Fetch all orders (we will filter those assigned to this courier)
       const resAll = await fetch('/api/orders', {
         headers: getAuthHeaders()
       });
       const dataAll = await resAll.json();
+      const allOrders = Array.isArray(dataAll) ? dataAll : [];
       
-      const active = dataAll.filter(o => o.deliveryBoyId === user.id && o.status === 'Out for Delivery');
-      const completed = dataAll.filter(o => o.deliveryBoyId === user.id && o.status === 'Delivered');
+      const active = allOrders.filter(o => o.deliveryBoyId === user.id && o.status === 'Out for Delivery');
+      const completed = allOrders.filter(o => o.deliveryBoyId === user.id && o.status === 'Delivered');
 
       setActiveJobs(active);
       setCompletedJobs(completed);
     } catch (err) {
       console.error('Error fetching delivery jobs:', err);
+      setPendingJobs([]);
+      setActiveJobs([]);
+      setCompletedJobs([]);
     } finally {
       setLoading(false);
     }
@@ -205,7 +214,7 @@ export default function DeliveryDashboard() {
 
   const handleDeliverJob = async (orderId) => {
     try {
-      const res = await fetch(`http://localhost:5000/api/orders/${orderId}/status`, {
+      const res = await fetch(`/api/orders/${orderId}/status`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -230,6 +239,24 @@ export default function DeliveryDashboard() {
     return (
       <div className="min-h-[80vh] flex items-center justify-center font-sans">
         <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-emerald-500" />
+      </div>
+    );
+  }
+
+  if (!user) {
+    return (
+      <div className="min-h-[80vh] flex flex-col items-center justify-center font-sans text-center px-4">
+        <span className="text-5xl">🔐</span>
+        <h2 className="text-2xl font-black text-slate-800 dark:text-white mt-4">Access Denied</h2>
+        <p className="text-sm text-slate-500 mt-2 max-w-sm">
+          Please login with a Delivery Partner account to access the courier dispatch portal.
+        </p>
+        <Link
+          to="/auth"
+          className="mt-6 px-6 py-3 bg-emerald-500 text-white font-bold rounded-2xl shadow transition-all cursor-pointer"
+        >
+          Sign In Now
+        </Link>
       </div>
     );
   }

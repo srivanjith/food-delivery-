@@ -9,7 +9,7 @@ import { MapPin, CreditCard, ShieldCheck, ArrowLeft, Plus, Check } from 'lucide-
 export default function Checkout() {
   const { user, addAddress, addEcoPoints, deductEcoPoints } = useAuth();
   const { cartItems, grandTotal, clearCart, ecoPointsEarned, packagingChoice, deliveryMethod, subtotal, packagingCharge, deliveryCharge, gst, offsetFee, offsetCarbon } = useCart();
-  const { addOrder } = useApp();
+  const { addOrder, restaurants } = useApp();
   const navigate = useNavigate();
 
   // Address states
@@ -47,7 +47,7 @@ export default function Checkout() {
           headers['x-user-id'] = user.id;
         }
 
-        const res = await fetch('http://localhost:5000/api/rewards/wallet', { headers });
+        const res = await fetch('/api/rewards/wallet', { headers });
         const json = await res.json();
         if (json.success) {
           setWallet(json.wallet);
@@ -161,7 +161,7 @@ export default function Checkout() {
     
     // Address validation (skip if self-pickup)
     if (deliveryMethod !== 'pickup') {
-      const addressObj = user.savedAddresses.find(addr => addr.id === selectedAddressId);
+      const addressObj = (user.savedAddresses || []).find(addr => addr.id === selectedAddressId);
       if (!addressObj) {
         alert('Please select or add a delivery address!');
         return;
@@ -182,7 +182,7 @@ export default function Checkout() {
           headers['x-user-id'] = user.id;
         }
 
-        const res = await fetch('http://localhost:5000/api/rewards/wallet/redeem', {
+        const res = await fetch('/api/rewards/wallet/redeem', {
           method: 'POST',
           headers,
           body: JSON.stringify({ coinsToRedeem: pointsToRedeem, orderSubtotal: subtotal })
@@ -198,13 +198,17 @@ export default function Checkout() {
       }
     }
 
+    // Dynamic restaurant name resolution
+    const matchedRest = restaurants?.find(r => r.id === cartItems[0]?.restaurantId);
+    const resolvedRestName = matchedRest?.name || cartItems[0]?.restaurantName || 'Eco Restaurant';
+
     // Construct Order Object
     const orderId = `order-${Math.floor(1000 + Math.random() * 9000)}`;
     const newOrder = {
       id: orderId,
       date: new Date().toISOString(),
-      restaurantName: cartItems[0].restaurantId === 'rest-4' ? 'Re-Bake Artisan Bakery' : (cartItems[0].restaurantId === 'rest-1' ? 'The Green Beanery' : 'Sustainable Bistro'),
-      restaurantId: cartItems[0].restaurantId,
+      restaurantName: resolvedRestName,
+      restaurantId: cartItems[0]?.restaurantId || 'rest-1',
       customerName: user.name,
       customerEmail: user.email,
       items: cartItems.map(item => ({ id: item.id, name: item.name, price: item.price, quantity: item.quantity })),
@@ -262,7 +266,7 @@ export default function Checkout() {
               verifyHeaders['Authorization'] = `Bearer ${token}`;
             }
 
-            const verifyRes = await fetch(`http://localhost:5000/api/orders/${actualOrderId}/verify-payment`, {
+            const verifyRes = await fetch(`/api/orders/${actualOrderId}/verify-payment`, {
               method: 'POST',
               headers: verifyHeaders,
               body: JSON.stringify({

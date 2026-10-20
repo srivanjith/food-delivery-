@@ -88,9 +88,16 @@ export const AuthProvider = ({ children }) => {
   const updateProfile = async (updatedData) => {
     if (!user) return false;
     try {
+      const token = localStorage.getItem('token');
+      const headers = { 'Content-Type': 'application/json' };
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      } else {
+        headers['x-user-id'] = user.id;
+      }
       const response = await fetch('/api/auth/profile', {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers,
         body: JSON.stringify({ userId: user.id, ...updatedData })
       });
       const data = await response.json();
@@ -103,7 +110,6 @@ export const AuthProvider = ({ children }) => {
       }
     } catch (err) {
       console.error('Update profile error:', err);
-      alert(`Profile update failed: ${err.message}`);
       return false;
     }
   };

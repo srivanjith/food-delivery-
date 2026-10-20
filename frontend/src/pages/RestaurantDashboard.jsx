@@ -35,12 +35,16 @@ export default function RestaurantDashboard() {
   }, [user]);
 
   const fetchRestaurantProfile = async () => {
-    if (!user) return;
+    if (!user) {
+      setLoadingRest(false);
+      return;
+    }
     setLoadingRest(true);
     try {
       const response = await fetch('/api/restaurants');
       const data = await response.json();
-      const matched = data.find(r => r.ownerId === user.id);
+      const restList = Array.isArray(data) ? data : (data.restaurants || []);
+      const matched = restList.find(r => r.ownerId === user.id);
       if (matched) {
         setRestaurant(matched);
         fetchRestaurantOrders(matched.id);
@@ -59,11 +63,13 @@ export default function RestaurantDashboard() {
         headers: getAuthHeaders()
       });
       const data = await response.json();
+      const orderList = Array.isArray(data) ? data : [];
       // Filter orders by restaurant ID
-      const filtered = data.filter(o => o.restaurantId === restaurantId);
+      const filtered = orderList.filter(o => o.restaurantId === restaurantId);
       setRestOrders(filtered);
     } catch (err) {
       console.error('Error fetching restaurant orders:', err);
+      setRestOrders([]);
     } finally {
       setLoadingOrders(false);
     }
@@ -101,7 +107,7 @@ export default function RestaurantDashboard() {
       const headers = {};
       if (token) headers['Authorization'] = `Bearer ${token}`;
 
-      const res = await fetch('http://localhost:5000/api/upload', {
+      const res = await fetch('/api/upload', {
         method: 'POST',
         headers,
         body: formData
@@ -140,7 +146,7 @@ export default function RestaurantDashboard() {
     };
 
     try {
-      const res = await fetch('http://localhost:5000/api/restaurants/register-owner', {
+      const res = await fetch('/api/restaurants/register-owner', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -163,7 +169,7 @@ export default function RestaurantDashboard() {
 
   const handleStatusTransition = async (orderId, nextStatus) => {
     try {
-      const res = await fetch(`http://localhost:5000/api/orders/${orderId}/status`, {
+      const res = await fetch(`/api/orders/${orderId}/status`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -188,6 +194,22 @@ export default function RestaurantDashboard() {
     return (
       <div className="min-h-[80vh] flex items-center justify-center font-sans">
         <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-emerald-500" />
+      </div>
+    );
+  if (!user) {
+    return (
+      <div className="min-h-[80vh] flex flex-col items-center justify-center font-sans text-center px-4">
+        <span className="text-5xl">🔐</span>
+        <h2 className="text-2xl font-black text-slate-800 dark:text-white mt-4">Access Denied</h2>
+        <p className="text-sm text-slate-500 mt-2 max-w-sm">
+          Please login to manage your restaurant kitchen, incoming orders, and menu items.
+        </p>
+        <Link
+          to="/auth"
+          className="mt-6 px-6 py-3 bg-emerald-500 text-white font-bold rounded-2xl shadow transition-all cursor-pointer"
+        >
+          Sign In Now
+        </Link>
       </div>
     );
   }
@@ -472,4 +494,5 @@ export default function RestaurantDashboard() {
       </div>
     </div>
   );
+}
 }

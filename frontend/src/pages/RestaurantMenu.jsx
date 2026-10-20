@@ -50,9 +50,16 @@ export default function RestaurantMenu() {
   const [certSuccessMsg, setCertSuccessMsg] = useState('');
 
   // Find the current restaurant
-  const restaurant = restaurants.find((r) => r.id === id);
+  const restaurant = (restaurants || []).find((r) => r.id === id);
 
   if (!restaurant) {
+    if (!restaurants || restaurants.length === 0) {
+      return (
+        <div className="min-h-screen flex items-center justify-center font-sans">
+          <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-emerald-500" />
+        </div>
+      );
+    }
     return (
       <div className="min-h-screen flex flex-col items-center justify-center font-sans text-center px-4">
         <h2 className="text-2xl font-black text-slate-800 dark:text-white">Restaurant Not Found</h2>
@@ -65,16 +72,17 @@ export default function RestaurantMenu() {
   }
 
   // Filter restaurant items
-  const menuItems = foodItems.filter((item) => item.restaurantId === restaurant.id);
-  const bounceImages = menuItems.map(item => item.image);
+  const menuItems = (foodItems || []).filter((item) => item.restaurantId === restaurant.id);
+  const bounceImages = menuItems.map(item => item.image).filter(Boolean);
   while (bounceImages.length < 5) {
-    bounceImages.push(restaurant.image);
+    bounceImages.push(restaurant.image || 'https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb');
   }
   const displayBounceImages = bounceImages.slice(0, 5);
 
   const filteredMenuItems = menuItems.filter((item) => {
-    const matchesSearch = item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                          item.description.toLowerCase().includes(searchQuery.toLowerCase());
+    const nameMatch = (item.name || '').toLowerCase().includes(searchQuery.toLowerCase());
+    const descMatch = (item.description || '').toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesSearch = nameMatch || descMatch;
     
     if (activeFilter === 'all') return matchesSearch;
     if (activeFilter === 'vegan') return matchesSearch && item.vegan;
@@ -85,7 +93,7 @@ export default function RestaurantMenu() {
   });
 
   // Get reviews for this specific restaurant
-  const restaurantReviews = reviews.filter(rev => rev.restaurantId === restaurant.id);
+  const restaurantReviews = (reviews || []).filter(rev => rev.restaurantId === restaurant.id);
 
   // Handle Review submission
   const handleReviewSubmit = (e) => {

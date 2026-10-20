@@ -286,3 +286,16 @@ export const assignCourierToOrder = async (req, res, next) => {
     next(error);
   }
 };
+
+export const getOrderById = async (req, res, next) => {
+  const { id } = req.params;
+  try {
+    const order = await Order.findOne({ id });
+    if (!order) {
+      return res.status(404).json({ success: false, message: 'Order not found' });
+    }
+    res.json({ success: true, order });
+  } catch (error) {
+    next(error);
+  }
+};

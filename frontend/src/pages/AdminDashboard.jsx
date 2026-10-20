@@ -114,13 +114,13 @@ export default function AdminDashboard() {
         headers['x-user-id'] = user.id;
       }
 
-      const settingsRes = await fetch('http://localhost:5000/api/rewards/reward/settings', { headers });
+      const settingsRes = await fetch('/api/rewards/reward/settings', { headers });
       const settingsJson = await settingsRes.json();
       if (settingsJson.success) {
         setRewardsSettings(settingsJson.settings);
       }
 
-      const statsRes = await fetch('http://localhost:5000/api/rewards/admin/stats', { headers });
+      const statsRes = await fetch('/api/rewards/admin/stats', { headers });
       const statsJson = await statsRes.json();
       if (statsJson.success) {
         setRewardsStats(statsJson.stats);
@@ -145,7 +145,7 @@ export default function AdminDashboard() {
         headers['x-user-id'] = user.id;
       }
 
-      const res = await fetch('http://localhost:5000/api/rewards/reward/settings', {
+      const res = await fetch('/api/rewards/reward/settings', {
         method: 'PUT',
         headers,
         body: JSON.stringify(rewardsSettings)
@@ -221,6 +221,7 @@ export default function AdminDashboard() {
   // Search queries
   const [orderSearchQuery, setOrderSearchQuery] = useState('');
   const [foodSearchQuery, setFoodSearchQuery] = useState('');
+  const [uploadingImage, setUploadingImage] = useState(false);
 
   if (!user || (user.role !== 'admin' && user.role !== 'restaurant')) {
     return (
@@ -413,8 +414,6 @@ export default function AdminDashboard() {
     setIsRestModalOpen(true);
   };
 
-  const [uploadingImage, setUploadingImage] = useState(false);
-
   const handleImageUpload = async (e, setImageVal) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -430,7 +429,7 @@ export default function AdminDashboard() {
         headers['Authorization'] = `Bearer ${token}`;
       }
 
-      const res = await fetch('http://localhost:5000/api/upload', {
+      const res = await fetch('/api/upload', {
         method: 'POST',
         headers,
         body: formData

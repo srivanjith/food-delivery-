@@ -15,10 +15,17 @@ export const CartProvider = ({ children }) => {
     const storedDelivery = localStorage.getItem('ecoeats_delivery');
     const storedOffset = localStorage.getItem('ecoeats_offset');
 
-    if (storedCart) setCartItems(JSON.parse(storedCart));
-    if (storedPackaging) setPackagingChoice(storedPackaging);
-    if (storedDelivery) setDeliveryMethod(storedDelivery);
-    if (storedOffset) setOffsetCarbon(JSON.parse(storedOffset));
+    try {
+      if (storedCart) {
+        const parsed = JSON.parse(storedCart);
+        if (Array.isArray(parsed)) setCartItems(parsed);
+      }
+      if (storedPackaging) setPackagingChoice(storedPackaging);
+      if (storedDelivery) setDeliveryMethod(storedDelivery);
+      if (storedOffset) setOffsetCarbon(JSON.parse(storedOffset));
+    } catch (e) {
+      console.warn('Failed parsing cart storage:', e);
+    }
   }, []);
 
   // Save cart to local storage when changed
